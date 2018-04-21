@@ -1,0 +1,168 @@
+body {
+    font-family: sans-serif;
+    overflow: scroll;
+}
+
+.milestoneMapContainer {
+    overflow: scroll;
+}
+
+.menubar {
+    height: 1cm;
+}
+
+.milestoneMap {
+    width: 2475px;
+    height: 1755px;
+}
+
+/* general */
+.transparent {
+    stroke: none;
+    fill: rgba(0, 0, 0, 1);
+}
+
+.even {
+    fill: none;
+}
+.odd {
+    fill: #f4f4f4;
+}
+
+.projectLine {
+    stroke: #b0b0b0;
+    stroke-dasharray: 3,8;
+    stroke-width: 1;
+}
+
+.milestone {
+    stroke-width: 1;
+    stroke: #505050;
+}
+
+.milestone .complete {
+    fill: #b0b0b0;
+}
+.milestone .on-track {
+    fill: #33cc33;
+}
+.milestone .at-risk {
+    fill: yellow;
+}
+.milestone .late {
+    fill: red;
+}
+.milestone .previous {
+    fill: white;
+    stroke: gray;
+    /* stroke-dasharray: 2,2; */
+}
+
+
+.milestone .compareLine {
+    stroke: rgba(255, 102, 255, 0.5);
+    stroke-width: 3;
+    stroke-dasharray: 5, 5;
+}
+.milestone .compareArrow {
+    fill: rgba(255, 102, 255, 0.5);
+    stroke: none;
+}
+.msAtReport div {
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    font-size: small;
+}
+.msAtReport .wide, .project .wide {
+    min-width: 100%;
+    max-width: 100%;
+}
+.msAtReport input, .project input, .programmeHeader input{
+    border: none;
+    display: inline;
+    font-family: inherit;
+    font-size: inherit;
+    background-color: transparent;
+    text-overflow: ellipsis;
+}
+.msAtReport input {
+    text-align: center;
+}
+
+.programmeHeader input {
+    font-weight: bold;
+}
+
+/* dependencies */
+.dependencyLine {
+    fill: none;
+    stroke: hsl(240, 50%, 80%);
+    stroke-width: 2;
+}
+
+.dependencyArrow {
+    fill: hsl(240, 50%, 80%);
+    stroke: none;
+}
+
+
+/* Menus */
+.menuEntry circle{
+    fill: hsl(180, 30%, 90%);
+    stroke: none;
+}
+
+
+
+/* priority level pallette */
+/* default */
+.priorityLine{
+    stroke: #4D4D4D;
+    fill: #4D4D4D;
+    stroke-width: 2;
+}
+
+.priorityLine.priority-0 {
+    stroke: #F15854;
+    fill: #F15854;
+}
+.priorityLine.priority-1 {
+    stroke: #5DA5DA;
+    fill: #5DA5DA;
+}
+.priorityLine.priority-2 {
+    stroke: #FAA43A;
+    fill: #FAA43A;
+}
+.priorityLine.priority-3 {
+    stroke: #60BD68;
+    fill: #60BD68;
+}
+.priorityLine.priority-4 {
+    stroke: #F17CB0;
+    fill: #F17CB0;
+}
+.priorityLine.priority-5 {
+    stroke: #B2912F;
+    fill: #B2912F;
+}
+.priorityLine.priority-6 {
+    stroke: #B276B2;
+    fill: #B276B2;
+}
+.priorityLine.priority-7 {
+    stroke: #DECF3F;
+    fill: #DECF3F;
+}
+.priorityLine.slack {
+    stroke: #b0b0b0;
+    stroke-dasharray: 5,5;
+    stroke-width: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+
