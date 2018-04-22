@@ -37,20 +37,15 @@ Project.prototype.save = function () {
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
 
-    var g = Draw.svgElem ("g", {} , this.elem);
-    var foreign = Draw.svgElem("foreignObject", {
-        "width": "150",
-        "height": "30",
-        "x": "20",
-        "y": "0"
-    }, g);
-
-    var name = Draw.htmlElem ("input", {
-        "class": "wide",
-        "value": this.name,
-        "type": "text"
-    }, foreign);
-    name.addEventListener("change", this.modifyName.bind(this, name));
+    // this group stops multiple click events on the parent elem occuring
+    var g = Draw.svgElem ("g", {
+        "transform": "translate(0, 10)",
+        "class": "projectHeader"
+    } , this.elem);
+    var name = new Draw.svgTextInput (
+        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.modifyName.bind(this), {
+        }, g);    
 
     Draw.svgElem("line", {
         "x1": 0,
@@ -62,24 +57,25 @@ Project.prototype.draw = function () {
 
     var milestones = Draw.svgElem("g", {
         "transform": "translate(0 20)"
-    }, this.elem)
+    }, this.elem);
 
     this.milestones.forEach(milestone => milestones.appendChild(milestone.elem));
 
-    var menu = Draw.menu (Draw.ALIGNLEFT, [{
+    var menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
-        "action": this.moveDown.bind (this)
+        "action": this.moveDown.bind(this)
     },{
         "icon": "icons/move-up.svg",
-        "action":  this.moveUp.bind (this)
+        "action": this.moveUp.bind(this)
     },{
         "icon": "icons/delete.svg",
-        "action": this.deleteDraw.bind (this)
+        "action": this.deleteDraw.bind(this)
     },{
         "icon": "icons/plus.svg",
-        "action": this.newMilestone.bind (this)
-    }], g);
-    menu.setAttribute ("transform", "translate(12, 40)");
+        "action": this.newMilestone.bind(this)
+    }], {
+        "transform": "translate(0, 30)"              
+    }, g);
 };
 
 
@@ -96,8 +92,8 @@ Project.prototype.removeMilestone = function (milestone) {
 
 
 // modifications
-Project.prototype.modifyName = function (elem) {
-    this.name = elem.value;
+Project.prototype.modifyName = function (e, input) {
+    this.name = input.text;
 };
 Project.prototype.deleteThis = function () {
     this.programme.removeProject (this);

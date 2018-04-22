@@ -150,7 +150,7 @@ MsAtReport.prototype.drawCurrent = function () {
     }, body);
     date.addEventListener ("change", this.modifyDate.bind(this, date));
     
-    var menu = Draw.menu (Draw.ALIGNCENTER, [{
+   Draw.menu (Draw.ALIGNCENTER, this.mMap.unclicker, [{
         "icon": "icons/health.svg",
         "action": this.cycleStatus.bind(this)
     },{
@@ -159,8 +159,9 @@ MsAtReport.prototype.drawCurrent = function () {
     },{
         "icon": "icons/arrow-right.svg",
         "action": this.createDependency.bind(this)
-    }], this.g);
-    menu.setAttribute ("transform", "translate(0, -50)");
+    }], {
+        "transform": "translate(0, -50)"
+    }, this.g);
 
     // TODO put other text here
 };

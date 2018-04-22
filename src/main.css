@@ -3,6 +3,12 @@ body {
     overflow: scroll;
 }
 
+/* menu bar */
+.menubar svg {
+    height: 90%;
+    width: 300;
+}
+
 .milestoneMapContainer {
     overflow: scroll;
 }
@@ -35,6 +41,7 @@ body {
     stroke-width: 1;
 }
 
+/* milestones */
 .milestone {
     stroke-width: 1;
     stroke: #505050;
@@ -79,18 +86,16 @@ body {
     max-width: 100%;
 }
 .msAtReport input, .project input, .programmeHeader input{
-    border: none;
-    display: inline;
     font-family: inherit;
     font-size: inherit;
-    background-color: transparent;
     text-overflow: ellipsis;
 }
 .msAtReport input {
     text-align: center;
 }
 
-.programmeHeader input {
+
+.programmeHeader {
     font-weight: bold;
 }
 

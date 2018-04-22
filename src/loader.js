@@ -28,7 +28,9 @@ Loader.prototype.draw = function () {
         "class": "menubar"
     }, this.elem);
 
-    var svg = Draw.svgElem ("svg", {}, menubar);
+    var svg = Draw.svgElem ("svg", {
+        "style": "display:inline;"
+    }, menubar);
 
     var menu = Draw.visibleMenu (Draw.ALIGNLEFT, [{
         "icon": "icons/new.svg",
@@ -47,6 +49,17 @@ Loader.prototype.draw = function () {
         "action": this.map.newProgramme.bind(this.map)
     }], svg);
     menu.setAttribute ("transform", "translate (0, 15)")
+
+    Draw.htmlElem ("span", {}, menubar).textContent = "Current Report:";
+    Draw.htmlElem ("span", {}, menubar).textContent = "Comparison Report:";
+    Draw.htmlElem ("span", {}, menubar).textContent = "Start Date:";
+    Draw.htmlElem ("input", {
+        "type": "date"
+    }, menubar);
+    Draw.htmlElem ("span", {}, menubar).textContent = "End Date:";
+    Draw.htmlElem ("input", {
+        "type": "date"
+    }, menubar);
 
     this.elem.appendChild(this.map.elem);
     this.map.draw();

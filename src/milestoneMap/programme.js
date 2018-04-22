@@ -31,23 +31,16 @@ Programme.prototype.draw = function () {
     this.elem.innerHTML = "";
 
     // this group stops multiple click events on the parent elem occuring
-    var g = Draw.svgElem ("g", {} , this.elem);
-    var foreign = Draw.svgElem("foreignObject", {
-        "class": "programmeHeader",
-        "width": "200",
-        "height": "30",
-        "x": "5",
-        "y": "15"
-    }, g);
+    var g = Draw.svgElem ("g", {
+        "class": "programmeHeader"
+    } , this.elem);
+    new Draw.svgTextInput (
+        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.modifyName.bind(this), {
+            "transform": "translate(0, 25)"
+        }, g);
 
-    var name = Draw.htmlElem ("input", {
-        "class": "wide",
-        "value": this.name,
-        "type": "text"
-    }, foreign);
-    name.addEventListener("change", this.modifyName.bind(this, name));
-
-    var menu = Draw.menu (Draw.ALIGNLEFT, [{
+    Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
         "action": this.moveDown.bind(this)
     },{
@@ -59,8 +52,9 @@ Programme.prototype.draw = function () {
     },{
         "icon": "icons/plus.svg",
         "action": this.newProject.bind(this)
-    }], g);
-    menu.setAttribute ("transform", "translate(0, -5)");
+    }], {
+        "transform": "translate(0, -15)"
+    }, g);
 
     this.projects.forEach(project => this.elem.appendChild (project.elem));
     this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
@@ -75,8 +69,8 @@ Programme.prototype.removeProject = function (project) {
 };
 
 // modifications
-Programme.prototype.modifyName = function (elem) {
-    this.name = elem.value;
+Programme.prototype.modifyName = function (e, input) {
+    this.name = input.text;
 };
 Programme.prototype.deleteThis = function () {
     this.projects.forEach(project => project.deleteThis());

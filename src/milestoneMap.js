@@ -36,6 +36,7 @@ var MilestoneMap = function (obj) {
     //view model
     this.parent = parent;
     this.width;
+    this.unclicker = new Unclicker (this.elem);
 
     // events
     this.globalMode = MilestoneMap.SELECT;
