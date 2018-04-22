@@ -39,7 +39,7 @@ Project.prototype.draw = function () {
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
-        "transform": "translate(0, 10)",
+        "transform": "translate(20, 10)",
         "class": "projectHeader"
     } , this.elem);
     var name = new Draw.svgTextInput (
@@ -56,7 +56,7 @@ Project.prototype.draw = function () {
     }, this.elem);
 
     var milestones = Draw.svgElem("g", {
-        "transform": "translate(0 20)"
+        "transform": "translate(0, 20)"
     }, this.elem);
 
     this.milestones.forEach(milestone => milestones.appendChild(milestone.elem));

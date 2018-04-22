@@ -50,8 +50,11 @@ Loader.prototype.draw = function () {
     }], svg);
     menu.setAttribute ("transform", "translate (0, 15)")
 
-    Draw.htmlElem ("span", {}, menubar).textContent = "Current Report:";
-    Draw.htmlElem ("span", {}, menubar).textContent = "Comparison Report:";
+    this.reportSelector (
+        "Current:", this.modifyCurrReport.bind(this), menubar);
+    this.reportSelector (
+        "Comparison:", this.modifyCmpReport.bind(this), menubar);
+
     Draw.htmlElem ("span", {}, menubar).textContent = "Start Date:";
     Draw.htmlElem ("input", {
         "type": "date"
@@ -64,7 +67,30 @@ Loader.prototype.draw = function () {
     this.elem.appendChild(this.map.elem);
     this.map.draw();
 };
+Loader.prototype.reportSelector = function (text, onchange, parent) {
+    var current = Draw.elem ("span", {}, parent);
+    
+    Draw.elem ("span", {}, current).textContent = text;
+    var select = Draw.elem ("select", {}, current);
+    select.addEventListener ("change", onchange);
+    
+    this.map.reports.forEach (report => report.draw(select));
 
+    return current;
+};
+
+// modifications
+
+
+// user events
+Loader.prototype.modifyCurrReport = function (evt) {
+    this.map.modifyCurrReport (evt.currentTarget.value);
+    this.map.draw ();
+};
+Loader.prototype.modifyCmpReport = function (evt) {
+    this.map.modifyCmpReport (evt.currentTarget.value);
+    this.map.draw ();
+};
 
 
 Loader.prototype.newFile = function () {
@@ -93,8 +119,8 @@ Loader.prototype.newFile = function () {
         milestones: [],
         msAtReports: [ ],
         reports: [
-            {date: 1543788263794},
-            {date: 1533788263794}
+            {name: "Report 1", date: 1543788263794},
+            {name: "Report 2", date: 1533788263794}
         ],
         dependencies: [],
         currReport: 0,

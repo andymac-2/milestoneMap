@@ -147,6 +147,14 @@ MilestoneMap.prototype.clampDate = function (date) {
     return Util.clamp (this.start, this.end, date);
 };
 
+// Modifications
+MilestoneMap.prototype.modifyCurrReport = function (index) {
+     return this.currReport = this.reports[index];
+};
+MilestoneMap.prototype.modifyCmpReport = function (index) {
+     return this.currReport = this.reports[index];
+};
+
 // add and removal methods
 MilestoneMap.prototype.addMsAtReport = function (obj) {
     var msAtReport = new MsAtReport (obj, this.msAtReports.length, this);

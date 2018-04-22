@@ -3,6 +3,7 @@
 var Report = function (obj, index, mMap) {
     // state
     this.date;
+    this.name;
 
     //model
     this.index = index;
@@ -12,9 +13,18 @@ var Report = function (obj, index, mMap) {
 };
 
 Report.prototype.restore = function (obj) {
-    this.date = obj.date;
+    this.date = obj["date"];
+    this.name = obj["name"];
 };
 
 Report.prototype.save = function () {
-    return {date: this.date};
+    return {"date": this.date, "name": this.name};
+};
+
+Report.prototype.draw = function (parent) {
+    var elem = Draw.elem ("option", {
+        "value": this.index,
+    }, parent);
+    elem.textContent = this.name + ": "  + new Date(this.date).toUTCString();
+    return elem;
 };
