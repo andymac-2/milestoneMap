@@ -183,3 +183,22 @@ MilestoneMap.prototype.addProject = function (obj) {
 MilestoneMap.prototype.removeProject = function (project) {
     Util.removeFromIndexedArray (this.projects, project);
 };
+
+MilestoneMap.prototype.addProgramme = function (obj) {
+    var programme = new Programme (obj, this.programmes.length, this);
+    this.programmes.push (programme);
+    return programme;
+};
+MilestoneMap.prototype.removeProgramme = function (programme) {
+    Util.removeFromIndexedArray (this.programmes, programme);
+};
+
+
+// user events
+MilestoneMap.prototype.newProgramme = function () {
+    this.addProgramme({
+        "name": "New Programme"
+    });
+
+    this.draw();
+};
