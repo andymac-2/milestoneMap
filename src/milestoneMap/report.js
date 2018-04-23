@@ -21,7 +21,7 @@ Report.prototype.save = function () {
     return {"date": this.date, "name": this.name};
 };
 
-Report.prototype.draw = function (parent) {
+Report.prototype.drawMenu = function (parent) {
     var elem = Draw.elem ("option", {
         "value": this.index,
     }, parent);

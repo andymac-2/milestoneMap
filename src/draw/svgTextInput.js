@@ -57,6 +57,8 @@ Draw.svgTextInput.prototype.onclick = function (parent) {
         "value": this.text,
         "type": "text"
     }, foreign);
+    textBox.focus();
+    textBox.select();
     textBox.addEventListener("change", this.modifyText.bind(this, textBox));
     textBox.addEventListener("change", e => this.onchange(e, this));
 };

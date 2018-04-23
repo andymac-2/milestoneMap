@@ -47,6 +47,9 @@ Loader.prototype.draw = function () {
     }, {
         "icon": "icons/plus.svg",
         "action": this.map.newProgramme.bind(this.map)
+    }, {
+        "icon": "icons/plus.svg",
+        "action": this.newReport.bind(this)
     }], svg);
     menu.setAttribute ("transform", "translate (0, 15)")
 
@@ -74,7 +77,7 @@ Loader.prototype.reportSelector = function (text, onchange, parent) {
     var select = Draw.elem ("select", {}, current);
     select.addEventListener ("change", onchange);
     
-    this.map.reports.forEach (report => report.draw(select));
+    this.map.reports.forEach (report => report.drawMenu(select));
 
     return current;
 };
@@ -90,6 +93,10 @@ Loader.prototype.modifyCurrReport = function (evt) {
 Loader.prototype.modifyCmpReport = function (evt) {
     this.map.modifyCmpReport (evt.currentTarget.value);
     this.map.draw ();
+};
+Loader.prototype.newReport = function () {
+    this.map.addReport ({"name": "New Report", "date": Date.now()});
+    this.draw();
 };
 
 

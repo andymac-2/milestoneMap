@@ -152,7 +152,7 @@ MilestoneMap.prototype.modifyCurrReport = function (index) {
      return this.currReport = this.reports[index];
 };
 MilestoneMap.prototype.modifyCmpReport = function (index) {
-     return this.currReport = this.reports[index];
+     return this.cmpReport = this.reports[index];
 };
 
 // add and removal methods
@@ -200,6 +200,24 @@ MilestoneMap.prototype.addProgramme = function (obj) {
 };
 MilestoneMap.prototype.removeProgramme = function (programme) {
     Util.removeFromIndexedArray (this.programmes, programme);
+};
+
+MilestoneMap.prototype.addReport = function (obj) {
+    var report = new Report (obj, this.reports.length, this);
+    this.reports.push (report);
+
+    var msAtReports = this.msAtReports.filter(ms => {
+        return ms.report === this.currReport;
+    });
+
+    msAtReports.forEach (ms => {
+        var obj = ms.save();
+        obj.report = report.index;
+        this.addMsAtReport (obj);
+    });
+
+    this.cmpReport = this.currReport;
+    this.currReport = report;
 };
 
 
