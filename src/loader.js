@@ -28,11 +28,7 @@ Loader.prototype.draw = function () {
         "class": "menubar"
     }, this.elem);
 
-    var svg = Draw.svgElem ("svg", {
-        "style": "display:inline;"
-    }, menubar);
-
-    var menu = Draw.visibleMenu (Draw.ALIGNLEFT, [{
+    var fileMenu = Draw.menuBarSegment("File", [{
         "icon": "icons/new.svg",
         "action": () => {}
     }, {
@@ -44,19 +40,32 @@ Loader.prototype.draw = function () {
     }, {
         "icon": "icons/print.svg",
         "action": () => {}
-    }, {
+    }], menubar);
+
+    var programmeMenu = Draw.menuBarSegment("Programme", [{
         "icon": "icons/plus.svg",
         "action": this.map.newProgramme.bind(this.map)
-    }, {
+    }], menubar)
+    programmeMenu.setAttribute("width", "90");
+
+    var reportMenu = Draw.menuBarSegment("Report", [{
         "icon": "icons/plus.svg",
         "action": this.newReport.bind(this)
-    }], svg);
-    menu.setAttribute ("transform", "translate (0, 15)")
-
+    }, {
+        "icon": "icons/delete.svg",
+        "action": () => {}
+    }], menubar);
+    reportMenu.setAttribute("width", "350");
+    
+    
     this.reportSelector (
-        "Current:", this.modifyCurrReport.bind(this), menubar);
+        "Current:", this.modifyCurrReport.bind(this), {
+            "transform": "translate(90, 35)"
+        }, reportMenu);
     this.reportSelector (
-        "Comparison:", this.modifyCmpReport.bind(this), menubar);
+        "Comparison:", this.modifyCmpReport.bind(this), {
+            "transform": "translate(90, 55)"
+        }, reportMenu);
 
     Draw.htmlElem ("span", {}, menubar).textContent = "Start Date:";
     Draw.htmlElem ("input", {
@@ -70,16 +79,28 @@ Loader.prototype.draw = function () {
     this.elem.appendChild(this.map.elem);
     this.map.draw();
 };
-Loader.prototype.reportSelector = function (text, onchange, parent) {
-    var current = Draw.elem ("span", {}, parent);
+Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
+    var g = Draw.svgElem("g", attrs, parent);
+
+    var foreign = Draw.svgElem("foreignObject", {
+        "width": "240",
+        "height": "20",
+        "x": "0",
+        "y": "-20",
+        "class": "reportSelector"
+    }, g);
     
-    Draw.elem ("span", {}, current).textContent = text;
-    var select = Draw.elem ("select", {}, current);
+    Draw.elem ("span", {
+        "class": "reportSelectorHeader"
+    }, foreign).textContent = text;
+    var select = Draw.elem ("select", {
+        "class": "reportSelectorDropdown"
+    }, foreign);
     select.addEventListener ("change", onchange);
     
     this.map.reports.forEach (report => report.drawMenu(select));
 
-    return current;
+    return g;
 };
 
 // modifications

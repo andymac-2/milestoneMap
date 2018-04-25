@@ -4,17 +4,27 @@ body {
 }
 
 /* menu bar */
-.menubar svg {
-    height: 90%;
-    width: 350;
+.menuBarHeader {
+    fill: #444;
+    font-size: small;    
+}
+.reportSelector {
+    color: #444;
+    font-size: small;
+}
+.reportSelectorDropdown {
+    float: right;
+}
+
+.menuBarSegment {
+    border: 1px solid #888;
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    margin: 4px
 }
 
 .milestoneMapContainer {
     overflow: scroll;
-}
-
-.menubar {
-    height: 1cm;
 }
 
 .milestoneMap {

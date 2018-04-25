@@ -46,13 +46,23 @@ Milestone.prototype.draw = function () {
             "x1": this.cmpX, "y1": "0",
             "x2": this.currX, "y2": "0"
         }, this.elem);
-
-        Draw.svgElem ("path", {
-            "class": "compareArrow",
-            "d": "M -6 -6 L -6 6 L 0 0 Z",
-            "transform": "translate("+
-                (this.currX - MsAtReport.DIAMONDSIZE) + ", 0)"
-        }, this.elem);
+        
+        if (this.cmpX < this.currX) {
+            Draw.svgElem ("path", {
+                "class": "compareArrow",
+                "d": "M -6 -6 L -6 6 L 0 0 Z",
+                "transform": "translate("+
+                    (this.currX - MsAtReport.DIAMONDSIZE) + ", 0)"
+            }, this.elem);
+        }
+        else if (this.cmpX > this.currX) {
+            Draw.svgElem ("path", {
+                "class": "compareArrow",
+                "d": "M 6 -6 L 6 6 L 0 0 Z",
+                "transform": "translate("+
+                    (this.currX + MsAtReport.DIAMONDSIZE) + ", 0)"
+            }, this.elem);
+        }
     };
 
     this.atReports.forEach(atReport => this.elem.appendChild (atReport.elem));

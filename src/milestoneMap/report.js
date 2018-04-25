@@ -25,6 +25,6 @@ Report.prototype.drawMenu = function (parent) {
     var elem = Draw.elem ("option", {
         "value": this.index,
     }, parent);
-    elem.textContent = this.name + ": "  + new Date(this.date).toUTCString();
+    elem.textContent = this.name + ": "  + Util.getISODateOnly(this.date);
     return elem;
 };

@@ -14,6 +14,7 @@ var MsAtReport = function (obj, index, mMap) {
     });
     // used to prevent click event accumulation
     this.g;
+    this.diamond;
 
     // view model
     this.dependencies = [];
@@ -31,22 +32,6 @@ MsAtReport.LATE = 3;
 MsAtReport.PREVIOUS = 4;
 
 MsAtReport.DIAMONDSIZE = 7;
-
-Milestone.resolveStatusClass = function (status) {
-    switch (status) {
-    case MsAtReport.COMPLETE:
-        return "complete";
-    case MsAtReport.ONTRACK:
-        return "on-track";
-    case MsAtReport.ATRISK:
-        return "at-risk";
-    case MsAtReport.LATE:
-        return "late";
-    case MsAtReport.PREVIOUS:
-        return "previous";
-    }
-};
-
 
 MsAtReport.prototype.restore = function (obj) {
     if (this.milestone) {
@@ -86,29 +71,48 @@ MsAtReport.prototype.draw = function () {
     var x = this.mMap.getXCoord (this.date);
     this.elem.setAttribute("transform", "translate(" + x + " 0)");
 
-    var cls = MsAtReport.PREVIOUS;
-
     this.g = Draw.svgElem("g", {}, this.elem);
 
     if (this.report === this.mMap.currReport) {
         this.milestone.currX = x;
-        cls = this.status;
-        
         this.drawCurrent();
     }   
     else if (this.report === this.mMap.cmpReport){
         this.milestone.cmpX = x;
     }
 
-    var diamond = Draw.svgElem("path", {
-        "class": Milestone.resolveStatusClass (cls),
+    this.diamond = Draw.svgElem("path", {
+        "class": this.resolveStatusClass (),
         "d" : "M -" +  MsAtReport.DIAMONDSIZE + " 0" +
             "L 0 " +  MsAtReport.DIAMONDSIZE +
             "L " + MsAtReport.DIAMONDSIZE + " 0" +
             "L 0 -" + MsAtReport.DIAMONDSIZE + " Z"
     }, this.g);
-    diamond.addEventListener ("click", this.diamondOnClick.bind(this));
+    this.diamond.addEventListener ("click", this.diamondOnClick.bind(this));
 
+};
+
+MsAtReport.prototype.resolveStatusClass = function () {
+    if (this.mMap.currReport === this.report) {
+        switch (this.status) {
+        case MsAtReport.COMPLETE:
+            return "complete";
+        case MsAtReport.ONTRACK:
+            return "on-track";
+        case MsAtReport.ATRISK:
+            return "at-risk";
+        case MsAtReport.LATE:
+            return "late";
+        }
+    }
+    else if (this.mMap.cmpReport === this.report){
+        return "previous";
+    }
+    assert (() => false);
+};
+
+MsAtReport.prototype.updateDiamond = function (cls) {
+    this.diamond.setAttribute("class", this.resolveStatusClass());
 };
 
 MsAtReport.prototype.drawCurrent = function () {   
@@ -140,7 +144,7 @@ MsAtReport.prototype.drawCurrent = function () {
 
     body = Draw.htmlElem("div", {
     }, foreign);
-
+    
     var date = Draw.htmlElem ("input", {
         "type": "date",
         "required": "",
@@ -150,7 +154,7 @@ MsAtReport.prototype.drawCurrent = function () {
     }, body);
     date.addEventListener ("change", this.modifyDate.bind(this, date));
     
-   Draw.menu (Draw.ALIGNCENTER, this.mMap.unclicker, [{
+    Draw.menu (Draw.ALIGNCENTER, this.mMap.unclicker, [{
         "icon": "icons/health.svg",
         "action": this.cycleStatus.bind(this)
     },{
@@ -216,7 +220,7 @@ MsAtReport.prototype.modifyDate = function (elem) {
 };
 MsAtReport.prototype.cycleStatus = function () {
     this.status = this.status >= MsAtReport.LATE ? 0 : this.status + 1;
-    this.draw ();
+    this.updateDiamond();
 };
 MsAtReport.prototype.deleteDraw = function () {
     this.deleteThis ();
