@@ -69,3 +69,6 @@ Util.swapIndexedElements = function (array, index1, index2) {
 Util.getISODateOnly = function (date) {
     return new Date(date).toISOString().slice(0, 10);
 };
+Util.getDateValueFromInputElem = function (elem) {
+    return new Date(elem.value + "T01:00:00.000Z").valueOf();
+};

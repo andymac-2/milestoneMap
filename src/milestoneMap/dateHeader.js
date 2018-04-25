@@ -50,9 +50,44 @@ DateHeader.prototype.restore = function () {
     this.draw();
 };
 
+DateHeader.TITLEY = 30;
+DateHeader.ROW1Y = 40;
+DateHeader.ROW2Y = 65;
+DateHeader.TEXTOFFSET = 18;
 DateHeader.prototype.draw = function () {
     this.bgElem.innerHTML = "";
+    
+    // drawing the header
+    var g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgTextInput (
+        this.mMap.name, Draw.ALIGNCENTER, this.mMap.unclicker,
+        this.mMap.modifyName.bind(this.mMap), {
+            "transform": "translate(" +
+                (this.mMap.width / 2) + " " +
+                DateHeader.TITLEY + ")",
+            "class": "mMapTitle"
+        }, g);
 
+    g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgDateInput (
+        this.mMap.start, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.mMap.modifyStartDate.bind(this.mMap), {
+            "transform": "translate(10 " + DateHeader.TITLEY + ")",
+            "class":  "mMapEdgeDate"
+        }, g);
+
+    g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgDateInput (
+        this.mMap.end, Draw.ALIGNRIGHT, this.mMap.unclicker,
+        this.mMap.modifyEndDate.bind(this.mMap), {
+            "transform": "translate(" + 
+                (this.mMap.width - 10) + " " +
+                DateHeader.TITLEY + ")",
+            "class": "mMapEdgeDate"
+        }, g);
+
+    
+    // drawing the months
     var cursor = DateHeader.zeroDayOfMonth(new Date (this.mMap.start));
     var num = 0;
     
@@ -63,14 +98,14 @@ DateHeader.prototype.draw = function () {
         
         Draw.svgElem ("rect", {
             "class": num % 2 === 0 ? "even": "odd",
-            "height": "25",
-            "y": "0",
+            "height": DateHeader.ROW2Y - DateHeader.ROW1Y,
+            "y": DateHeader.ROW1Y,
             "x": x,
             "width": width
         }, this.bgElem);
 
         Draw.svgElem ("text", {
-            "y": "18",
+            "y": DateHeader.ROW1Y + DateHeader.TEXTOFFSET,
             "x": x + width / 2,
             "text-anchor": "middle"
         }, this.fgElem).textContent = text;
@@ -89,19 +124,21 @@ DateHeader.prototype.draw = function () {
         Draw.svgElem ("rect", {
             "class": num % 2 === 0 ? "even": "odd",
             "height": "100%",
-            "y": "25",
+            "y": DateHeader.ROW2Y,
             "x": x,
             "width": width
         }, this.bgElem);
 
         Draw.svgElem ("text", {
-            "y": "43",
+            "y": DateHeader.ROW2Y + DateHeader.TEXTOFFSET,
             "x": x + width / 2,
             "text-anchor": "middle"
         }, this.fgElem).textContent = text;
 
         num ++;
     };
+
+    this.endy = DateHeader.ROW2Y * 2 - DateHeader.ROW1Y;
 };
 
 

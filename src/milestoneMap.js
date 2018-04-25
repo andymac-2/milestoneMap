@@ -37,6 +37,7 @@ var MilestoneMap = function (obj) {
     this.parent = parent;
     this.width;
     this.unclicker = new Unclicker (this.elem);
+    this.dateHeader;
 
     // events
     this.globalMode = MilestoneMap.SELECT;
@@ -48,11 +49,11 @@ var MilestoneMap = function (obj) {
 MilestoneMap.SELECT = 0;
 MilestoneMap.CREATEDEPENDENCY = 1;
 
-MilestoneMap.STARTY = 40;
 // restore here will also draw as well
 MilestoneMap.prototype.restore = function (obj) {
     this.start = obj.start;
     this.end = obj.end;
+    this.name = obj.name;
 
     this.programmes = obj.programmes.map((programme, i) => {
         return new Programme (programme, i, this);
@@ -89,7 +90,7 @@ MilestoneMap.prototype.draw = function (obj) {
     this.width = this.elem.getBoundingClientRect().width
 
     // maybe this would be better as a series of functions rather than a class.
-    new DateHeader (this);
+    this.dateHeader = new DateHeader (this);
     
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
@@ -109,7 +110,7 @@ MilestoneMap.prototype.drawDependencies = function () {
 };
 
 MilestoneMap.prototype.reflow = function () {
-    Draw.verticalReflow (MilestoneMap.STARTY, this.programmes);
+    Draw.verticalReflow (this.dateHeader.endy, this.programmes);
     this.drawDependencies();
 };
 MilestoneMap.prototype.deactivateOnUnclick = function (event) {
@@ -227,5 +228,22 @@ MilestoneMap.prototype.newProgramme = function () {
         "name": "New Programme"
     });
 
+    this.draw();
+};
+
+// called by svgTextInput
+MilestoneMap.prototype.modifyName = function (e, input) {
+    this.name = input.text;
+};
+
+// called by svgDateInput change of date will require complete redraw.
+MilestoneMap.prototype.modifyStartDate = function (e, input) {
+    this.start = input.date;
+    this.draw();
+};
+
+// called by svgDateInput change of date will require complete redraw.
+MilestoneMap.prototype.modifyEndDate = function (e, input) {
+    this.end = input.date;
     this.draw();
 };

@@ -67,15 +67,6 @@ Loader.prototype.draw = function () {
             "transform": "translate(90, 55)"
         }, reportMenu);
 
-    Draw.htmlElem ("span", {}, menubar).textContent = "Start Date:";
-    Draw.htmlElem ("input", {
-        "type": "date"
-    }, menubar);
-    Draw.htmlElem ("span", {}, menubar).textContent = "End Date:";
-    Draw.htmlElem ("input", {
-        "type": "date"
-    }, menubar);
-
     this.elem.appendChild(this.map.elem);
     this.map.draw();
 };
@@ -140,6 +131,7 @@ Loader.prototype.newFile = function () {
 
 
     this.map = new MilestoneMap ({
+        name: "New Map",
         start: 1523788263794,
         end: 1550226663794,
         programmes: [],
