@@ -58,33 +58,10 @@ DateHeader.prototype.draw = function () {
     this.bgElem.innerHTML = "";
     
     // drawing the header
-    var g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgTextInput (
-        this.mMap.name, Draw.ALIGNCENTER, this.mMap.unclicker,
-        this.mMap.modifyName.bind(this.mMap), {
-            "transform": "translate(" +
-                (this.mMap.width / 2) + " " +
-                DateHeader.TITLEY + ")",
-            "class": "mMapTitle"
-        }, g);
+    this.drawTitle();
+    this.drawEndDates();
+    this.drawReports();
 
-    g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.start, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.mMap.modifyStartDate.bind(this.mMap), {
-            "transform": "translate(10 " + DateHeader.TITLEY + ")",
-            "class":  "mMapEdgeDate"
-        }, g);
-
-    g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.end, Draw.ALIGNRIGHT, this.mMap.unclicker,
-        this.mMap.modifyEndDate.bind(this.mMap), {
-            "transform": "translate(" + 
-                (this.mMap.width - 10) + " " +
-                DateHeader.TITLEY + ")",
-            "class": "mMapEdgeDate"
-        }, g);
 
     
     // drawing the months
@@ -141,4 +118,45 @@ DateHeader.prototype.draw = function () {
     this.endy = DateHeader.ROW2Y * 2 - DateHeader.ROW1Y;
 };
 
+DateHeader.prototype.drawTitle = function () {
+    var g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgTextInput (
+        this.mMap.name, Draw.ALIGNCENTER, this.mMap.unclicker,
+        this.mMap.modifyName.bind(this.mMap), {
+            "transform": "translate(" +
+                (this.mMap.width / 2) + " " +
+                DateHeader.TITLEY + ")",
+            "class": "mMapTitle"
+        }, g);
+};
 
+DateHeader.prototype.drawEndDates = function () {
+    var g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgDateInput (
+        this.mMap.start, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.mMap.modifyStartDate.bind(this.mMap), {
+            "transform": "translate(10 " + DateHeader.TITLEY + ")",
+            "class":  "mMapEdgeDate"
+        }, g);
+
+    g = Draw.svgElem ("g", {}, this.fgElem);
+    new Draw.svgDateInput (
+        this.mMap.end, Draw.ALIGNRIGHT, this.mMap.unclicker,
+        this.mMap.modifyEndDate.bind(this.mMap), {
+            "transform": "translate(" + 
+                (this.mMap.width - 10) + " " +
+                DateHeader.TITLEY + ")",
+            "class": "mMapEdgeDate"
+        }, g);
+};
+
+DateHeader.prototype.drawReports = function () {
+    this.mMap.currReport.drawHeader ("Current", {
+        "transform": "translate(250, 15)"
+    }, this.fgElem);
+
+    this.mMap.cmpReport.drawHeader ("Baseline", {
+        "transform": "translate(500, 15)"
+    }, this.fgElem);
+    
+};

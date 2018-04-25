@@ -66,7 +66,7 @@ Loader.prototype.draw = function () {
             "transform": "translate(90, 35)"
         }, reportMenu);
     this.reportSelector (
-        "Comparison:", this.modifyCmpReport.bind(this), {
+        "Baseline:", this.modifyCmpReport.bind(this), {
             "transform": "translate(90, 55)"
         }, reportMenu);
 

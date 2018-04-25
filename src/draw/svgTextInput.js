@@ -32,6 +32,7 @@ Draw.svgTextInput.HEIGHTWIDTHRATIO = 10;
 Draw.svgTextInput.TEXTTOTEXTBOXRATIO = 1.4;
 Draw.svgTextInput.prototype.restore = function (text) {
     this.text = text;
+    this.text = this.text === "" ? "Untitled": this.text;
 };
 
 Draw.svgTextInput.prototype.draw = function () {
@@ -42,14 +43,13 @@ Draw.svgTextInput.prototype.draw = function () {
 
 Draw.svgTextInput.prototype.onclick = function (parent) {
     var height = Draw.getElemHeight(parent);
-    
     parent.innerHTML = "";
     
     var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO;
     var x = this.anchor === "middle" ? width / -2 : 0;
     
     var foreign = Draw.svgElem("foreignObject", {
-        "width": (height * Draw.svgTextInput.HEIGHTWIDTHRATIO),
+        "width": width,
         "height": (height * Draw.svgTextInput.TEXTTOTEXTBOXRATIO),
         "x": x,
         "y": (0 - height)
@@ -77,6 +77,5 @@ Draw.svgTextInput.prototype.onunclick = function (parent) {
 
 // user events
 Draw.svgTextInput.prototype.modifyText = function (elem) {
-    this.text = elem.value;
-    this.text = this.text === "" ? "Untitled": this.text;
+    this.restore(elem.value);
 };

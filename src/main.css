@@ -20,7 +20,7 @@ body {
 }
 .reportSelectorDropdown {
     float: right;
-    width: 150px;
+    width: 170px;
 }
 .menuBarSegment {
     border: 1px solid #888;
@@ -48,6 +48,11 @@ body {
 }
 .mMapEdgeDate {
     font-weight: bold;
+}
+/* reports */
+.reportHeader {
+    font-size: small;
+    fill: #444;
 }
 
 
