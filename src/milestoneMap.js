@@ -78,7 +78,19 @@ MilestoneMap.prototype.restore = function (obj) {
     });
 };
 MilestoneMap.prototype.save = function () {
-    //TODO
+    return {
+        "name": this.name,
+        "end": this.end,
+        "start": this.start,
+        "currReport": this.currReport.index,
+        "cmpReport": this.cmpReport.index,
+        "reports": this.reports.map(o => o.save()),
+        "programmes": this.programmes.map(o => o.save()),
+        "projects": this.projects.map(o => o.save()),
+        "milestones": this.milestones.map(o => o.save()),
+        "msAtReports": this.msAtReports.map(o => o.save()),
+        "dependencies": this.dependencies.map(o => o.save())
+    }
 };
 
 // drawing methods
@@ -150,10 +162,14 @@ MilestoneMap.prototype.clampDate = function (date) {
 
 // Modifications
 MilestoneMap.prototype.modifyCurrReport = function (index) {
-     return this.currReport = this.reports[index];
+    if (index >= 0 && index < this.reports.length) {
+        return this.currReport = this.reports[index];
+    }
 };
 MilestoneMap.prototype.modifyCmpReport = function (index) {
-     return this.cmpReport = this.reports[index];
+    if (index >= 0 && index < this.reports.length) {
+        return this.cmpReport = this.reports[index];
+    }
 };
 
 // add and removal methods

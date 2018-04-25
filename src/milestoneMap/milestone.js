@@ -40,7 +40,8 @@ Milestone.prototype.save = function () {
 Milestone.prototype.draw = function () {
     this.elem.innerHTML = "";
 
-    if (this.currentReport() && this.cmpReport()) {
+    if (this.currentReport() && this.cmpReport() &&
+        (this.mMap.currReport !== this.mMap.cmpReport)) {
         Draw.svgElem ("line", {
             "class": "compareLine",
             "x1": this.cmpX, "y1": "0",

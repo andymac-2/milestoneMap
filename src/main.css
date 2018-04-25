@@ -20,6 +20,7 @@ body {
 }
 .reportSelectorDropdown {
     float: right;
+    width: 150px;
 }
 .menuBarSegment {
     border: 1px solid #888;

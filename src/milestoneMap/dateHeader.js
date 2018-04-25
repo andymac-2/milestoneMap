@@ -36,7 +36,7 @@ DateHeader.incrementMonth = function (date) {
     return date;
 };
 DateHeader.getWeekOfYear = function (date) {
-    var onejan = new Date(date.getFullYear(),0,1);
+    var onejan = new Date(date.getUTCFullYear(),0,1);
     var millisecsInDay = 86400000;
     return Math.ceil((((date - onejan) /millisecsInDay) + onejan.getDay()+1)/7);
 };

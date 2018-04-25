@@ -11,16 +11,19 @@ var Loader = function (parent) {
     this.file;
 
     this.newFile();
-    this.draw();
 };
 
 Loader.prototype.save = function () {
-    
+    var string = JSON.stringify(this.map.save());
+    Util.download (this.map.name + ".json", string, "application/json",
+                   this.elem);
 };
 
-Loader.prototype.restore = function () {
-    
+Loader.prototype.restore = function (string) {
+    var obj = JSON.parse(string);
+    this.map = new MilestoneMap(obj);
 };
+
 Loader.prototype.draw = function () {
     this.elem.innerHTML = "";
     
@@ -33,10 +36,10 @@ Loader.prototype.draw = function () {
         "action": () => {}
     }, {
         "icon": "icons/open.svg",
-        "action": () => {}
+        "action": this.loadFile.bind(this)
     }, {
         "icon": "icons/save.svg",
-        "action": () => {}
+        "action": this.save.bind(this)
     }, {
         "icon": "icons/print.svg",
         "action": () => {}
@@ -88,6 +91,12 @@ Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
         "class": "reportSelectorDropdown"
     }, foreign);
     select.addEventListener ("change", onchange);
+
+    Draw.elem ("option", {
+        "selected": "",
+        "disabled": "",
+        "hidden": ""
+    }, select).textContent = "Select a report";
     
     this.map.reports.forEach (report => report.drawMenu(select));
 
@@ -113,37 +122,33 @@ Loader.prototype.newReport = function () {
 
 
 Loader.prototype.newFile = function () {
-    // TODO: make the start date and end date correct.
-    // this.map = new MilestoneMap ({
-    //     start: 1523788263794,
-    //     end: 1550226663794,
-    //     programmes: [],
-    //     projects: [],
-    //     milestones: [],
-    //     msAtReports: [],
-    //     reports: [
-    //         {date: 1543788263794},
-    //     ],
-    //     dependencies: [],
-    //     currReport: 0,
-    //     cmpreport: 0
-    // }, this.elem;);
-
+    var now = Date.now();
+    var date = new Date(Date.now());
+    var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf(); 
 
     this.map = new MilestoneMap ({
         name: "New Map",
-        start: 1523788263794,
-        end: 1550226663794,
+        start: now,
+        end: nextYear,
         programmes: [],
         projects: [],
         milestones: [],
-        msAtReports: [ ],
+        msAtReports: [],
         reports: [
-            {name: "Report 1", date: 1543788263794},
-            {name: "Report 2", date: 1533788263794}
+            {name: "Baseline", date: now},
         ],
         dependencies: [],
         currReport: 0,
-        cmpReport: 1
+        cmpReport: 0
     });
+    this.draw();
+};
+
+Loader.prototype.loadFile = function () {
+    var restoreDraw = (string) => {
+        this.restore(string);
+        this.draw();
+    }
+    
+    Util.upload (this.elem, restoreDraw);
 };
