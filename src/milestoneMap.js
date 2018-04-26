@@ -236,6 +236,9 @@ MilestoneMap.prototype.addReport = function (obj) {
     this.cmpReport = this.currReport;
     this.currReport = report;
 };
+MilestoneMap.prototype.removeReport = function (report) {
+    Util.removeFromIndexedArray (this.reports, report);
+};
 
 
 // user events

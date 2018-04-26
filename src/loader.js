@@ -56,7 +56,7 @@ Loader.prototype.draw = function () {
         "action": this.newReport.bind(this)
     }, {
         "icon": "icons/delete.svg",
-        "action": () => {}
+        "action": this.deleteCurrReport.bind(this)
     }], menubar);
     reportMenu.setAttribute("width", "350");
     
@@ -119,7 +119,10 @@ Loader.prototype.newReport = function () {
     this.map.addReport ({"name": "New Report", "date": Date.now()});
     this.draw();
 };
-
+Loader.prototype.deleteCurrReport = function () {
+    this.map.currReport.deleteThis();
+    this.draw();
+};
 
 Loader.prototype.newFile = function () {
     var now = Date.now();

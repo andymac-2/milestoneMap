@@ -54,6 +54,13 @@ Report.prototype.drawHeader = function (text, attrs, parent) {
 
     return g;
 };
+Report.prototype.deleteThis = function () {
+    var milestones = this.mMap.msAtReports.filter (ms => ms.report === this);
+    milestones.forEach(ms => ms.deleteThis());
+
+    this.mMap.removeReport (this);
+    this.mMap.currReport = this.mMap.cmpReport;
+};
 
 
 // user events
@@ -67,3 +74,4 @@ Report.prototype.modifyName = function (e, input) {
     // TODO: redraw dropdown lists
     // TODO: redraw other report display.
 };
+
