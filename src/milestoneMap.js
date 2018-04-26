@@ -149,7 +149,9 @@ MilestoneMap.prototype.getXCoord = function (date) {
     return z * this.width;
 };
 MilestoneMap.prototype.defaultDate = function () {
-    return (this.start + this.end) / 2
+    var now = new Date(Date.now());
+    var offset = now.getTimezoneOffset() * 60 * 1000;
+    return now.valueOf() + offset;
 };
 
 MilestoneMap.prototype.isInInterval = function (value) {
