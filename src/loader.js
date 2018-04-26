@@ -14,7 +14,7 @@ var Loader = function (parent) {
 };
 
 Loader.prototype.save = function () {
-    var string = JSON.stringify(this.map.save());
+    var string = JSON.stringify(this.map.save(), null, "\t");
     Util.download (this.map.name + ".json", string, "application/json",
                    this.elem);
 };
