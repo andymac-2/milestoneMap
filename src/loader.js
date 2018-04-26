@@ -126,19 +126,21 @@ Loader.prototype.deleteCurrReport = function () {
 
 Loader.prototype.newFile = function () {
     var now = Date.now();
-    var date = new Date(Date.now());
+    var twoMonths = 60 * 24 * 60 * 60 * 1000;
+    var twoMonthsAgo = now - twoMonths;
+    var date = new Date(twoMonthsAgo);
     var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf(); 
 
     this.map = new MilestoneMap ({
         name: "New Map",
-        start: now,
+        start: twoMonthsAgo,
         end: nextYear,
         programmes: [],
         projects: [],
         milestones: [],
         msAtReports: [],
         reports: [
-            {name: "Baseline", date: now},
+            {name: "Baseline", date:now},
         ],
         dependencies: [],
         currReport: 0,

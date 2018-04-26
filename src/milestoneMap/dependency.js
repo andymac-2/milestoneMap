@@ -47,7 +47,8 @@ Dependency.prototype.save = function () {
 
     return {
         dependent: this.dependent.milestone.index,
-        dependency: this.dependency.milestone.index
+        dependency: this.dependency.milestone.index,
+        report: this.report.index
     };
 };
 
@@ -86,5 +87,6 @@ Dependency.prototype.deleteThis = function () {
 // user events
 Dependency.prototype.deleteDraw = function () {
     this.deleteThis ();
+    
     this.elem.parentNode.removeChild(this.elem);
 };

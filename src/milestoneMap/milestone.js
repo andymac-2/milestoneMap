@@ -40,7 +40,10 @@ Milestone.prototype.save = function () {
 Milestone.prototype.draw = function () {
     this.elem.innerHTML = "";
 
-    if (this.currentReport() && this.cmpReport() &&
+    var current = this.currentReport();
+    var comparison = this.cmpReport();
+
+    if (current && comparison &&
         (this.mMap.currReport !== this.mMap.cmpReport)) {
         Draw.svgElem ("line", {
             "class": "compareLine",
@@ -66,7 +69,12 @@ Milestone.prototype.draw = function () {
         }
     };
 
-    this.atReports.forEach(atReport => this.elem.appendChild (atReport.elem));
+    if (comparison) {
+        this.elem.appendChild (comparison.elem)
+    }
+    if (current) {
+        this.elem.appendChild (current.elem)
+    }
 };
 
 
