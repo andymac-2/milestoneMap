@@ -46,7 +46,25 @@ Draw.menu = function (alignment, unclicker, entries, attrs, parent) {
             g.innerHTML = ""
             Draw.visibleMenu (alignment, entries, g);
         },
-        unclicker, attrs, parent
-    )
+        unclicker, attrs, parent);
     return menu;
+};
+
+Draw.menuBarSegment = function (name, entries, parent) {
+    var svg = Draw.svgElem ("svg", {
+        "class": "menuBarSegment",
+        "width": Draw.MENUSPACING * (entries.length),
+        "height": "55"
+    }, parent)
+
+    var menu = Draw.visibleMenu (Draw.ALIGNLEFT, entries, svg);
+    menu.setAttribute ("transform", "translate (0, 35)");
+
+    Draw.svgElem ("text", {
+        "class": "menuBarHeader",
+        "text-anchor": "start",
+        "transform": "translate(12 13)"
+    }, svg).textContent = name;
+
+    return svg
 };

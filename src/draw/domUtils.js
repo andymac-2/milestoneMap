@@ -22,6 +22,9 @@ Draw.getElemXY = function (elem) {
     var matrix = elem.getCTM();
     return {x: matrix.e, y: matrix.f};
 };
+Draw.getElemHeight = function (elem) {
+    return elem.getBoundingClientRect().height;
+};
 
 
 // an element drawn one way when clicked, and drawn another way when clicked elsewhere.

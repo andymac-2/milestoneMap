@@ -8,11 +8,9 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
     switch (alignment) {
     case Draw.ALIGNLEFT:
         this.anchor = "start";
-        this.x = 0;
         break;
     case Draw.ALIGNCENTER:
         this.anchor = "middle";
-        this.x = Draw.svgTextInput.TEXTBOXWIDTH / 2;
         break;
     default:
         assert (() => false);
@@ -30,9 +28,11 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
     this.draw();
 };
 
-Draw.svgTextInput.TEXTBOXWIDTH = 200;
+Draw.svgTextInput.HEIGHTWIDTHRATIO = 10;
+Draw.svgTextInput.TEXTTOTEXTBOXRATIO = 1.4;
 Draw.svgTextInput.prototype.restore = function (text) {
     this.text = text;
+    this.text = this.text === "" ? "Untitled": this.text;
 };
 
 Draw.svgTextInput.prototype.draw = function () {
@@ -42,21 +42,26 @@ Draw.svgTextInput.prototype.draw = function () {
 };
 
 Draw.svgTextInput.prototype.onclick = function (parent) {
+    var height = Draw.getElemHeight(parent);
     parent.innerHTML = "";
     
+    var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO;
+    var x = this.anchor === "middle" ? width / -2 : 0;
+    
     var foreign = Draw.svgElem("foreignObject", {
-        "width": "200",
-        "height": "30",
-        "x": this.x,
-        "y": "-20"
+        "width": width,
+        "height": (height * Draw.svgTextInput.TEXTTOTEXTBOXRATIO),
+        "x": x,
+        "y": (0 - height)
     }, parent);
     
     var textBox = Draw.htmlElem ("input", {
-        "name": "test",
-        "width": "90%",
+        "class": "svgTextBox",
         "value": this.text,
         "type": "text"
     }, foreign);
+    textBox.focus();
+    textBox.select();
     textBox.addEventListener("change", this.modifyText.bind(this, textBox));
     textBox.addEventListener("change", e => this.onchange(e, this));
 };
@@ -72,6 +77,5 @@ Draw.svgTextInput.prototype.onunclick = function (parent) {
 
 // user events
 Draw.svgTextInput.prototype.modifyText = function (elem) {
-    this.text = elem.value;
-    this.text = this.text === "" ? "Untitled": this.text;
+    this.restore(elem.value);
 };

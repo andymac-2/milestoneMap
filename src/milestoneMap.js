@@ -37,6 +37,7 @@ var MilestoneMap = function (obj) {
     this.parent = parent;
     this.width;
     this.unclicker = new Unclicker (this.elem);
+    this.dateHeader;
 
     // events
     this.globalMode = MilestoneMap.SELECT;
@@ -48,11 +49,11 @@ var MilestoneMap = function (obj) {
 MilestoneMap.SELECT = 0;
 MilestoneMap.CREATEDEPENDENCY = 1;
 
-MilestoneMap.STARTY = 40;
 // restore here will also draw as well
 MilestoneMap.prototype.restore = function (obj) {
     this.start = obj.start;
     this.end = obj.end;
+    this.name = obj.name;
 
     this.programmes = obj.programmes.map((programme, i) => {
         return new Programme (programme, i, this);
@@ -77,7 +78,19 @@ MilestoneMap.prototype.restore = function (obj) {
     });
 };
 MilestoneMap.prototype.save = function () {
-    //TODO
+    return {
+        "name": this.name,
+        "end": this.end,
+        "start": this.start,
+        "currReport": this.currReport.index,
+        "cmpReport": this.cmpReport.index,
+        "reports": this.reports.map(o => o.save()),
+        "programmes": this.programmes.map(o => o.save()),
+        "projects": this.projects.map(o => o.save()),
+        "milestones": this.milestones.map(o => o.save()),
+        "msAtReports": this.msAtReports.map(o => o.save()),
+        "dependencies": this.dependencies.map(o => o.save())
+    }
 };
 
 // drawing methods
@@ -89,7 +102,7 @@ MilestoneMap.prototype.draw = function (obj) {
     this.width = this.elem.getBoundingClientRect().width
 
     // maybe this would be better as a series of functions rather than a class.
-    new DateHeader (this);
+    this.dateHeader = new DateHeader (this);
     
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
@@ -109,7 +122,7 @@ MilestoneMap.prototype.drawDependencies = function () {
 };
 
 MilestoneMap.prototype.reflow = function () {
-    Draw.verticalReflow (MilestoneMap.STARTY, this.programmes);
+    Draw.verticalReflow (this.dateHeader.endy, this.programmes);
     this.drawDependencies();
 };
 MilestoneMap.prototype.deactivateOnUnclick = function (event) {
@@ -145,6 +158,18 @@ MilestoneMap.prototype.isInInterval = function (value) {
 
 MilestoneMap.prototype.clampDate = function (date) {
     return Util.clamp (this.start, this.end, date);
+};
+
+// Modifications
+MilestoneMap.prototype.modifyCurrReport = function (index) {
+    if (index >= 0 && index < this.reports.length) {
+        return this.currReport = this.reports[index];
+    }
+};
+MilestoneMap.prototype.modifyCmpReport = function (index) {
+    if (index >= 0 && index < this.reports.length) {
+        return this.cmpReport = this.reports[index];
+    }
 };
 
 // add and removal methods
@@ -194,6 +219,27 @@ MilestoneMap.prototype.removeProgramme = function (programme) {
     Util.removeFromIndexedArray (this.programmes, programme);
 };
 
+MilestoneMap.prototype.addReport = function (obj) {
+    var report = new Report (obj, this.reports.length, this);
+    this.reports.push (report);
+
+    var msAtReports = this.msAtReports.filter(ms => {
+        return ms.report === this.currReport;
+    });
+
+    msAtReports.forEach (ms => {
+        var obj = ms.save();
+        obj.report = report.index;
+        this.addMsAtReport (obj);
+    });
+
+    this.cmpReport = this.currReport;
+    this.currReport = report;
+};
+MilestoneMap.prototype.removeReport = function (report) {
+    Util.removeFromIndexedArray (this.reports, report);
+};
+
 
 // user events
 MilestoneMap.prototype.newProgramme = function () {
@@ -201,5 +247,22 @@ MilestoneMap.prototype.newProgramme = function () {
         "name": "New Programme"
     });
 
+    this.draw();
+};
+
+// called by svgTextInput
+MilestoneMap.prototype.modifyName = function (e, input) {
+    this.name = input.text;
+};
+
+// called by svgDateInput change of date will require complete redraw.
+MilestoneMap.prototype.modifyStartDate = function (e, input) {
+    this.start = input.date;
+    this.draw();
+};
+
+// called by svgDateInput change of date will require complete redraw.
+MilestoneMap.prototype.modifyEndDate = function (e, input) {
+    this.end = input.date;
     this.draw();
 };

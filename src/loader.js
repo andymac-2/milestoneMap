@@ -11,16 +11,19 @@ var Loader = function (parent) {
     this.file;
 
     this.newFile();
-    this.draw();
 };
 
 Loader.prototype.save = function () {
-    
+    var string = JSON.stringify(this.map.save());
+    Util.download (this.map.name + ".json", string, "application/json",
+                   this.elem);
 };
 
-Loader.prototype.restore = function () {
-    
+Loader.prototype.restore = function (string) {
+    var obj = JSON.parse(string);
+    this.map = new MilestoneMap(obj);
 };
+
 Loader.prototype.draw = function () {
     this.elem.innerHTML = "";
     
@@ -28,76 +31,127 @@ Loader.prototype.draw = function () {
         "class": "menubar"
     }, this.elem);
 
-    var svg = Draw.svgElem ("svg", {
-        "style": "display:inline;"
-    }, menubar);
-
-    var menu = Draw.visibleMenu (Draw.ALIGNLEFT, [{
+    var fileMenu = Draw.menuBarSegment("File", [{
         "icon": "icons/new.svg",
         "action": () => {}
     }, {
         "icon": "icons/open.svg",
-        "action": () => {}
+        "action": this.loadFile.bind(this)
     }, {
         "icon": "icons/save.svg",
-        "action": () => {}
+        "action": this.save.bind(this)
     }, {
         "icon": "icons/print.svg",
         "action": () => {}
-    }, {
+    }], menubar);
+
+    var programmeMenu = Draw.menuBarSegment("Programme", [{
         "icon": "icons/plus.svg",
         "action": this.map.newProgramme.bind(this.map)
-    }], svg);
-    menu.setAttribute ("transform", "translate (0, 15)")
+    }], menubar)
+    programmeMenu.setAttribute("width", "90");
 
-    Draw.htmlElem ("span", {}, menubar).textContent = "Current Report:";
-    Draw.htmlElem ("span", {}, menubar).textContent = "Comparison Report:";
-    Draw.htmlElem ("span", {}, menubar).textContent = "Start Date:";
-    Draw.htmlElem ("input", {
-        "type": "date"
-    }, menubar);
-    Draw.htmlElem ("span", {}, menubar).textContent = "End Date:";
-    Draw.htmlElem ("input", {
-        "type": "date"
-    }, menubar);
+    var reportMenu = Draw.menuBarSegment("Report", [{
+        "icon": "icons/plus.svg",
+        "action": this.newReport.bind(this)
+    }, {
+        "icon": "icons/delete.svg",
+        "action": this.deleteCurrReport.bind(this)
+    }], menubar);
+    reportMenu.setAttribute("width", "350");
+    
+    
+    this.reportSelector (
+        "Current:", this.modifyCurrReport.bind(this), {
+            "transform": "translate(90, 35)"
+        }, reportMenu);
+    this.reportSelector (
+        "Baseline:", this.modifyCmpReport.bind(this), {
+            "transform": "translate(90, 55)"
+        }, reportMenu);
 
     this.elem.appendChild(this.map.elem);
     this.map.draw();
 };
+Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
+    var g = Draw.svgElem("g", attrs, parent);
+
+    var foreign = Draw.svgElem("foreignObject", {
+        "width": "240",
+        "height": "20",
+        "x": "0",
+        "y": "-20",
+        "class": "reportSelector"
+    }, g);
+    
+    Draw.elem ("span", {
+        "class": "reportSelectorHeader"
+    }, foreign).textContent = text;
+    var select = Draw.elem ("select", {
+        "class": "reportSelectorDropdown"
+    }, foreign);
+    select.addEventListener ("change", onchange);
+
+    Draw.elem ("option", {
+        "selected": "",
+        "disabled": "",
+        "hidden": ""
+    }, select).textContent = "Select a report";
+    
+    this.map.reports.forEach (report => report.drawMenu(select));
+
+    return g;
+};
+
+// modifications
 
 
+// user events
+Loader.prototype.modifyCurrReport = function (evt) {
+    this.map.modifyCurrReport (evt.currentTarget.value);
+    this.map.draw ();
+};
+Loader.prototype.modifyCmpReport = function (evt) {
+    this.map.modifyCmpReport (evt.currentTarget.value);
+    this.map.draw ();
+};
+Loader.prototype.newReport = function () {
+    this.map.addReport ({"name": "New Report", "date": Date.now()});
+    this.draw();
+};
+Loader.prototype.deleteCurrReport = function () {
+    this.map.currReport.deleteThis();
+    this.draw();
+};
 
 Loader.prototype.newFile = function () {
-    // TODO: make the start date and end date correct.
-    // this.map = new MilestoneMap ({
-    //     start: 1523788263794,
-    //     end: 1550226663794,
-    //     programmes: [],
-    //     projects: [],
-    //     milestones: [],
-    //     msAtReports: [],
-    //     reports: [
-    //         {date: 1543788263794},
-    //     ],
-    //     dependencies: [],
-    //     currReport: 0,
-    //     cmpreport: 0
-    // }, this.elem;);
-
+    var now = Date.now();
+    var date = new Date(Date.now());
+    var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf(); 
 
     this.map = new MilestoneMap ({
-        start: 1523788263794,
-        end: 1550226663794,
+        name: "New Map",
+        start: now,
+        end: nextYear,
         programmes: [],
         projects: [],
         milestones: [],
-        msAtReports: [ ],
+        msAtReports: [],
         reports: [
-            {date: 1543788263794},
-            {date: 1533788263794}
+            {name: "Baseline", date: now},
         ],
         dependencies: [],
         currReport: 0,
-        cmpReport: 1
+        cmpReport: 0
     });
+    this.draw();
+};
+
+Loader.prototype.loadFile = function () {
+    var restoreDraw = (string) => {
+        this.restore(string);
+        this.draw();
+    }
+    
+    Util.upload (this.elem, restoreDraw);
 };

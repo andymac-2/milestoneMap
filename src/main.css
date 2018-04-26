@@ -4,22 +4,67 @@ body {
 }
 
 /* menu bar */
-.menubar svg {
-    height: 90%;
-    width: 300;
+.menubar {
+    border: 1px solid #888;
+    border-radius: 3px;
+    padding: 0px;
+    width: 99%;
+}
+.menuBarHeader {
+    fill: #444;
+    font-size: small;    
+}
+.reportSelector {
+    color: #444;
+    font-size: small;
+}
+.reportSelectorDropdown {
+    float: right;
+    width: 170px;
+}
+.menuBarSegment {
+    border: 1px solid #888;
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    margin: 2px;
+    margin-bottom: 0px;
+    margin-top: 4px;
 }
 
+/* milestone map total */
 .milestoneMapContainer {
     overflow: scroll;
-}
-
-.menubar {
-    height: 1cm;
 }
 
 .milestoneMap {
     width: 2475px;
     height: 1755px;
+}
+
+/* title bar */
+.mMapTitle {
+    font-size: 2em;
+    font-weight: bold;
+}
+.mMapEdgeDate {
+    font-weight: bold;
+}
+/* reports */
+.reportHeader {
+    font-size: small;
+    fill: #444;
+}
+
+
+/* text input fields */
+.milestoneMap input {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    text-overflow: ellipsis;
+}
+.svgTextBox, .svgDateBox{
+    width: 90%;
 }
 
 /* general */
@@ -84,11 +129,6 @@ body {
 .msAtReport .wide, .project .wide {
     min-width: 100%;
     max-width: 100%;
-}
-.msAtReport input, .project input, .programmeHeader input{
-    font-family: inherit;
-    font-size: inherit;
-    text-overflow: ellipsis;
 }
 .msAtReport input {
     text-align: center;

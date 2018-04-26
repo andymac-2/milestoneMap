@@ -66,6 +66,45 @@ Util.swapIndexedElements = function (array, index1, index2) {
     array[index2].index = index2;
 };
 
+
+// date functions
 Util.getISODateOnly = function (date) {
     return new Date(date).toISOString().slice(0, 10);
+};
+Util.getDateValueFromInputElem = function (elem) {
+    return new Date(elem.value + "T01:00:00.000Z").valueOf();
+};
+
+
+//save and restore string
+Util.download = function (filename, string, type, parent) {
+    var a = Draw.elem("a", {"style": "display:none;"}, parent);
+    var file = new Blob([string], {type: type});
+    a.href = URL.createObjectURL(file);
+    a.download = filename;
+    a.click();
+    parent.removeChild(a);
+};
+
+Util.upload = function (parent, callback) {
+    var input = Draw.elem ("input", {
+        "type": "file",
+        "style": "display:none;"
+    }, parent);
+
+    var reader = new FileReader();
+    reader.onload = () => {
+        callback (reader.result);
+        if (parent.contains(input)){
+            parent.removeChild(input);
+        }
+    };
+
+    var handleFiles = () => {
+        var file = input.files[0];
+        reader.readAsText(file);
+    }
+    
+    input.addEventListener("change", handleFiles);
+    input.click();
 };
