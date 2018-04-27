@@ -16,6 +16,10 @@ DateHeader.zeroTimeOfDay = function (date) {
     date.setUTCHours(0, 0, 0, 0);
     return date;
 };
+DateHeader.zeroDateOfYear = function (date) {
+    date.setUTCMonth (0, 1);
+    return date;
+};
 DateHeader.zeroDayOfMonth = function (date) {
     date.setUTCDate(0);
     date.setUTCHours(0, 0, 0, 0);
@@ -36,9 +40,21 @@ DateHeader.incrementMonth = function (date) {
     return date;
 };
 DateHeader.getWeekOfYear = function (date) {
-    var onejan = new Date(date.getUTCFullYear(),0,1);
-    var millisecsInDay = 86400000;
-    return Math.ceil((((date - onejan) /millisecsInDay) + onejan.getDay()+1)/7);
+    // JS weeks start with Sun, ISO dates start with Mon, so we sub 1;
+    var dayOfWeek = (date.getUTCDay() - 1) % 7;
+    // if Mon = 0, then Thu = 3
+    var thursday = 3 - dayOfWeek;
+    
+    var closestThursday = new Date(date.valueOf());
+    DateHeader.zeroTimeOfDay(closestThursday);
+    closestThursday.setUTCDate(date.getUTCDate() + thursday);
+
+    var oneJan = new Date(closestThursday.getUTCFullYear(),0,1);
+    var millisecsInWeek = 604800000;
+    
+    return  Math.ceil(
+        (closestThursday.valueOf() - oneJan.valueOf()) /
+            millisecsInWeek);
 };
 DateHeader.getShortMonth = function (date) {
     var date2 = new Date (date);
@@ -116,6 +132,9 @@ DateHeader.prototype.draw = function () {
     };
 
     this.endy = DateHeader.ROW2Y * 2 - DateHeader.ROW1Y;
+};
+DateHeader.prototype.drawRow1 = function () {
+    
 };
 
 DateHeader.prototype.drawTitle = function () {
