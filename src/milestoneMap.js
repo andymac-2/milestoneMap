@@ -111,6 +111,8 @@ MilestoneMap.prototype.draw = function (obj) {
         elem.draw();
         this.fg.appendChild (elem.elem);
     });
+
+    this.fg.appendChild(this.currReport.drawLine());
     
     this.reflow ();
 };

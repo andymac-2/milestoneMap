@@ -18,17 +18,19 @@ DateHeader.zeroTimeOfDay = function (date) {
 };
 DateHeader.zeroDateOfYear = function (date) {
     date.setUTCMonth (0, 1);
+    date.setUTCHours(0, 0, 0, 0);
     return date;
 };
 DateHeader.zeroDayOfMonth = function (date) {
-    date.setUTCDate(0);
+    date.setUTCDate(1);
     date.setUTCHours(0, 0, 0, 0);
     return date;
 };
 DateHeader.zeroDayOfWeek = function (date) {
-    var dayOfWeek = date.getUTCDay();
+    // subtract 1 because Monday is the first day of an ISO week.
+    var dayOfWeek = (date.getUTCDay() - 1) % 7;
     var dayOfMonth = date.getUTCDate();
-    date.setUTCDate(dayOfMonth- dayOfWeek);
+    date.setUTCDate(dayOfMonth - dayOfWeek);
     return date;
 };
 DateHeader.incrementWeek = function (date) {
@@ -57,9 +59,9 @@ DateHeader.getWeekOfYear = function (date) {
             millisecsInWeek);
 };
 DateHeader.getShortMonth = function (date) {
-    var date2 = new Date (date);
-    date2.setUTCDate(date.getUTCDate() + 1);
-    return date2.toLocaleDateString("en-GB", {"month": "short"});
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    return months[date.getUTCMonth()];
 };
 
 DateHeader.prototype.restore = function () {

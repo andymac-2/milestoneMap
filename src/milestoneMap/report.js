@@ -5,6 +5,11 @@ var Report = function (obj, index, mMap) {
     this.date;
     this.name;
 
+    //view
+    this.lineElem = Draw.svgElem ("g", {
+        "class": "reportLine"
+    });
+
     //model
     this.index = index;
     this.mMap = mMap;
@@ -54,6 +59,20 @@ Report.prototype.drawHeader = function (text, attrs, parent) {
 
     return g;
 };
+
+Report.prototype.drawLine = function () {
+    this.lineElem.innerHTML = "";
+
+    var x = this.mMap.getXCoord(this.date);
+
+    Draw.svgElem("line", {
+        "x1": x, "y1": this.mMap.dateHeader.endy,
+        "x2": x, "y2": Draw.getElemHeight(this.mMap.elem)
+    }, this.lineElem);
+
+    return this.lineElem;
+};
+
 Report.prototype.deleteThis = function () {
     var milestones = this.mMap.msAtReports.filter (ms => ms.report === this);
     milestones.forEach(ms => ms.deleteThis());
@@ -66,7 +85,7 @@ Report.prototype.deleteThis = function () {
 // user events
 Report.prototype.modifyDate = function (e, input) {
     this.date = input.date;
-    // TODO: draw line
+    this.drawLine();
 };
 
 Report.prototype.modifyName = function (e, input) {

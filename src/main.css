@@ -54,6 +54,9 @@ body {
     font-size: small;
     fill: #444;
 }
+.reportLine {
+    stroke: rgba(255, 0, 0, 0.7);
+}
 
 
 /* text input fields */
