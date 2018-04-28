@@ -111,6 +111,8 @@ DateHeader.THIRTYWEEKS = 18144000000;
 DateHeader.FOURYEARS = 126144000000;
 DateHeader.SIXYEARS = 189216000000;
 
+// density calculated by <length of period in ms> / <min width of
+// interval in px>
 DateHeader.MAXDAYDENSITY = 4320000;
 DateHeader.MAXWEEKDENSITY = 30240000;
 DateHeader.MAXMONTHDENSITY = 89280000;

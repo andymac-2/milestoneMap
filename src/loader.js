@@ -70,7 +70,13 @@ Loader.prototype.draw = function () {
             "transform": "translate(90, 55)"
         }, reportMenu);
 
-    this.elem.appendChild(this.map.elem);
+    var version = Draw.elem ("span", {}, menubar)
+        .textContent = "Version: " + VERSION;
+  
+    this.elem.appendChild(this.map.scrollbox);
+    var height = window.innerHeight - Draw.getElemHeight(menubar) - 10;
+    this.map.scrollbox.setAttribute("style", "max-height:" + height + "px;");
+    
     this.map.draw();
 };
 Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {

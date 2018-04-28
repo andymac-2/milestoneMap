@@ -1,7 +1,8 @@
 body {
     font-family: sans-serif;
-    overflow: scroll;
+    overflow: hidden;
 }
+/* overall */
 
 /* menu bar */
 .menubar {
@@ -32,12 +33,13 @@ body {
 }
 
 /* milestone map total */
-.milestoneMapContainer {
+.mMapScrollBox {
     overflow: scroll;
+    max-height: 90vh;
 }
 
 .milestoneMap {
-    width: 2475px;
+    width: 100%;
     height: 1755px;
 }
 
@@ -55,7 +57,7 @@ body {
     fill: #444;
 }
 .reportLine {
-    stroke: rgba(255, 0, 0, 0.7);
+    stroke: rgba(255, 0, 0, 0.4);
 }
 
 

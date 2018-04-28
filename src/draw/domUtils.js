@@ -25,6 +25,9 @@ Draw.getElemXY = function (elem) {
 Draw.getElemHeight = function (elem) {
     return elem.getBoundingClientRect().height;
 };
+Draw.getElemWidth = function (elem) {
+    return elem.getBoundingClientRect().width;
+};
 
 
 // an element drawn one way when clicked, and drawn another way when clicked elsewhere.
@@ -45,4 +48,22 @@ Draw.activeOnClickElem = function (normal, active, unclicker, attrs, parent) {
 
     onUnclick ();
     return g;
+};
+
+// an element with a fixed x relative to the window
+Draw.fixedXElement = function (xoffset, y, elem, parentElem) {
+    var timer;
+    var moveNow = function () {
+        elem.setAttribute ("transform", "translate(" +
+                           (xoffset + parentElem.scrollLeft) + " " +
+                           y + ")");
+    };
+    var move = function () {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+        timer = setTimeout(moveNow, 100);
+    };
+    parentElem.addEventListener("scroll", move)
+    moveNow ();
 };

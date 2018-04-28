@@ -16,9 +16,13 @@ var MilestoneMap = function (obj) {
     this.cmpReport;
     
     //view
+    this.scrollbox = Draw.elem ("div", {
+        "class": "mMapScrollBox"
+    });
+    
     this.elem = Draw.svgElem("svg", {
         "class": "milestoneMap",
-    });
+    }, this.scrollbox);
     this.elem.addEventListener("click", this.deactivateOnUnclick.bind(this));
     
     this.bg = Draw.svgElem("g", {
@@ -34,7 +38,6 @@ var MilestoneMap = function (obj) {
     }, this.elem);
 
     //view model
-    this.parent = parent;
     this.width;
     this.unclicker = new Unclicker (this.elem);
     this.dateHeader;

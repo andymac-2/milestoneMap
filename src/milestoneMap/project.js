@@ -36,17 +36,7 @@ Project.prototype.save = function () {
 };
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
-
-    // this group stops multiple click events on the parent elem occuring
-    var g = Draw.svgElem ("g", {
-        "transform": "translate(20, 10)",
-        "class": "projectHeader"
-    } , this.elem);
-    var name = new Draw.svgTextInput (
-        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.modifyName.bind(this), {
-        }, g);    
-
+    
     Draw.svgElem("line", {
         "x1": 0,
         "y1": 20,
@@ -54,12 +44,22 @@ Project.prototype.draw = function () {
         "y2": 20,
         "class": "projectLine"
     }, this.elem);
-
+    
     var milestones = Draw.svgElem("g", {
         "transform": "translate(0, 20)"
     }, this.elem);
-
     this.milestones.forEach(milestone => milestones.appendChild(milestone.elem));
+
+    // this group stops multiple click events on the parent elem occuring
+    var g = Draw.svgElem ("g", {
+        "class": "projectHeader"
+    } , this.elem);
+    Draw.fixedXElement(20, 10, g, this.mMap.scrollbox);
+    
+    var name = new Draw.svgTextInput (
+        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.modifyName.bind(this), {
+        }, g);
 
     var menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
@@ -74,7 +74,7 @@ Project.prototype.draw = function () {
         "icon": "icons/plus.svg",
         "action": this.newMilestone.bind(this)
     }], {
-        "transform": "translate(0, 30)"              
+        "transform": "translate(180, -7)"              
     }, g);
 };
 

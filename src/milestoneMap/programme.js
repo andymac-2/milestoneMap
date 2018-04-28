@@ -34,7 +34,9 @@ Programme.prototype.draw = function () {
     var g = Draw.svgElem ("g", {
         "class": "programmeHeader"
     } , this.elem);
-    new Draw.svgTextInput (
+    Draw.fixedXElement(0, 0, g, this.mMap.scrollbox);
+    
+    var textBox = new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
             "transform": "translate(0, 25)"
@@ -53,7 +55,7 @@ Programme.prototype.draw = function () {
         "icon": "icons/plus.svg",
         "action": this.newProject.bind(this)
     }], {
-        "transform": "translate(0, -15)"
+        "transform": "translate(180, 20)"
     }, g);
 
     this.projects.forEach(project => this.elem.appendChild (project.elem));

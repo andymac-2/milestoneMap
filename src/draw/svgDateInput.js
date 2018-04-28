@@ -60,8 +60,8 @@ Draw.svgDateInput.prototype.onclick = function (parent) {
     }, foreign);
     dateBox.focus();
     dateBox.select();
-    dateBox.addEventListener("change", this.modifyDate.bind(this, dateBox));
-    dateBox.addEventListener("change", e => this.onchange(e, this));
+    dateBox.addEventListener("blur", this.modifyDate.bind(this, dateBox));
+    dateBox.addEventListener("blur", e => this.onchange(e, this));
 };
 
 Draw.svgDateInput.prototype.onunclick = function (parent) {
