@@ -43,6 +43,9 @@ Loader.prototype.draw = function () {
     }, {
         "icon": "icons/print.svg",
         "action": () => {} // TODO
+    }, {
+        "icon": "icons/exportCSV.svg",
+        "action": this.exportCSV.bind(this)
     }], menubar);
 
    Draw.menuBarSegment("Programme", [{
@@ -165,3 +168,9 @@ Loader.prototype.loadFile = function () {
     
     Util.upload (this.elem, restoreDraw);
 };
+
+Loader.prototype.exportCSV = function () {
+    var string = this.map.exportCSVMilestones();
+    Util.download (this.map.name + ".csv", string, "application/json",
+                   this.elem);
+}

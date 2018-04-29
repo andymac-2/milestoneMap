@@ -271,6 +271,23 @@ MilestoneMap.prototype.newProgramme = function () {
 
     this.draw();
 };
+MilestoneMap.CSVHEADING =
+    [
+        "Programme Name",
+        "Project Name",
+        "Milestone Name",
+        "Baseline Date",
+        "Comparison Date",
+        "Health",
+        "Comment"
+    ].map(JSON.stringify).join(",");
+MilestoneMap.prototype.exportCSVMilestones = function () {
+    var data = this.milestones
+        .filter(milestone => milestone.currentReport)
+        .map(milestone => milestone.exportCSVRow())
+        .join("\n");
+    return MilestoneMap.CSVHEADING + "\n" + data;
+};
 
 // called by svgTextInput
 MilestoneMap.prototype.modifyName = function (e, input) {

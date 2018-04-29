@@ -5,6 +5,7 @@ var BusinessMs = function (mMap) {
     this.milestones = [];
 
     this.index = -1;
+    this.name = "Business Milestones"
     
     // view
     this.elem = Draw.svgElem("g", {

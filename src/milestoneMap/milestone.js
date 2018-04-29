@@ -42,6 +42,26 @@ Milestone.prototype.save = function () {
         project: this.project.index
     };
 };
+Milestone.prototype.exportCSVRow = function () {
+    var msAtReport = this.cmpReport();
+    var cmpReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
+    
+    msAtReport = this.currentReport();
+    var currReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
+
+    var programmeName = this.project.index === -1 ?
+        this.project.name : this.project.programme.name;
+    return [
+        programmeName,
+        this.project.name,
+        this.name,
+        cmpReport,
+        currReport,
+        msAtReport.resolveStatusClass(),
+        msAtReport.comment
+    ].map(JSON.stringify).join(",");
+};
+
 Milestone.prototype.draw = function () {
     this.elem.innerHTML = "";
 
