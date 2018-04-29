@@ -139,44 +139,21 @@ MsAtReport.prototype.updateDiamond = function (cls) {
     this.diamond.setAttribute("class", this.resolveStatusClass());
 };
 
-MsAtReport.prototype.drawCurrent = function () {   
-    var foreign = Draw.svgElem("foreignObject", {
-        "width": "200",
-        "height": "18",
-        "x": "-100",
-        "y": "-25"
-    }, this.g);
+MsAtReport.prototype.drawCurrent = function () {
+    var comment = new Draw.svgTextInput (
+        this.comment, Draw.ALIGNCENTER, this.mMap.unclicker,
+        this.modifyComment.bind(this), {
+            "transform": "translate(0, 20)",
+            "class": "msComment"
+        }, this.g, "\xA0"); // nbsp allows comment field to actually appear
     
-    var body = Draw.htmlElem("div", {
-    }, foreign)
-    
-    var name = Draw.htmlElem ("input", {
-        "class": "wide",
-        "width": "100%",
-        "value": this.milestone.name,
-        "type": "text"
-    }, body);
-    name.addEventListener(
-        "change", this.milestone.modifyName.bind(this.milestone, name));
-
-    foreign = Draw.svgElem("foreignObject", {
-        "width": "200",
-        "height": "40",
-        "x": "-100",
-        "y": "10"
-    }, this.g);
-
-    body = Draw.htmlElem("div", {
-    }, foreign);
-    
-    var date = Draw.htmlElem ("input", {
-        "type": "date",
-        "required": "",
-        "max": Util.getISODateOnly (this.mMap.end),
-        "min": Util.getISODateOnly (this.mMap.start),
-        "value": Util.getISODateOnly (this.date)
-    }, body);
-    date.addEventListener ("change", this.modifyDate.bind(this, date));
+    var nameDate = new MilestoneTD (
+        this.milestone.name, this.date, this.mMap.unclicker,
+        this.milestone.modifyName.bind(this.milestone),
+        this.modifyDate.bind(this), {
+            "transform": "translate(0, -10)",
+            "class": "milestoneData"
+        }, this.g)
     
     Draw.menu (Draw.ALIGNCENTER, this.mMap.unclicker, [{
         "icon": "icons/health.svg",
@@ -232,8 +209,8 @@ MsAtReport.prototype.deleteThis = function () {
 
 
 // user modifications
-MsAtReport.prototype.modifyDate = function (elem) {
-    var date = new Date(elem.value + "T01:00:00.000Z").valueOf();
+MsAtReport.prototype.modifyDate = function (e, input) {
+    var date = input.date;
 
     this.date = this.mMap.clampDate (date);
 
@@ -242,6 +219,9 @@ MsAtReport.prototype.modifyDate = function (elem) {
     this.milestone.draw();
     this.dependencies.forEach(dep => dep.draw());
     this.dependents.forEach(dep => dep.draw());
+};
+MsAtReport.prototype.modifyComment = function (e, input) {
+    this.comment = input.text;
 };
 MsAtReport.prototype.cycleStatus = function () {
     this.status = this.status >= MsAtReport.LATE ? 0 : this.status + 1;

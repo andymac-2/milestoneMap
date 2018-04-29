@@ -26,7 +26,7 @@ Draw.svgDateInput = function (date, alignment, unclicker, onchange, attrs, paren
     this.draw();
 };
 Draw.svgDateInput.HEIGHTWIDTHRATIO = 10;
-Draw.svgDateInput.TEXTTOTEXTBOXRATIO = 1.4
+Draw.svgDateInput.TEXTTOTEXTBOXRATIO = 1.5;
 
 Draw.svgDateInput.prototype.restore = function (date) {
     this.date = date;

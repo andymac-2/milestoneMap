@@ -1,8 +1,9 @@
 'use strict'
 
-Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, parent) {
+Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, parent, defaultText) {
     // state
     this.text;
+    this.defaultText = defaultText === undefined ? "Untitled" : defaultText;
 
     // view model
     switch (alignment) {
@@ -33,7 +34,7 @@ Draw.svgTextInput.TEXTTOTEXTBOXRATIO = 1.4;
 Draw.svgTextInput.MAXTEXTLENGTH = 40;
 Draw.svgTextInput.prototype.restore = function (text) {
     this.text = text;
-    this.text = this.text === "" ? "Untitled": this.text;
+    this.text = this.text === "" ? this.defaultText: this.text;
 };
 
 Draw.svgTextInput.prototype.draw = function () {
@@ -73,8 +74,8 @@ Draw.svgTextInput.prototype.onunclick = function (parent) {
     var normalText = Draw.svgElem ("text", {
         "text-anchor": this.anchor
     }, parent);
-    normalText.textContent = Util.truncate(this.text,
-                                           Draw.svgTextInput.MAXTEXTLENGTH);
+    normalText.textContent = Util.truncate(
+        this.text, Draw.svgTextInput.MAXTEXTLENGTH);
 };
 
 // user events

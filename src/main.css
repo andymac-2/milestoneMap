@@ -70,6 +70,9 @@ body {
 .svgTextBox, .svgDateBox{
     width: 90%;
 }
+.milestoneData .svgTextBox, .milestoneData .svgDateBox{
+    width: auto;
+}
 
 /* general */
 .transparent {
@@ -101,6 +104,15 @@ body {
 .milestone {
     stroke-width: 1;
     stroke: #505050;
+}
+.milestoneData {
+    stroke: none;
+    font-size: small;
+}
+.msComment {
+    stroke: none;
+    fill: #a0a0a0;
+    font-size: small;
 }
 
 .milestone .complete {

@@ -100,8 +100,8 @@ Milestone.prototype.deleteThis = function () {
 };
 
 // user modifications
-Milestone.prototype.modifyName = function (elem) {
-    this.name = elem.value;
+Milestone.prototype.modifyName = function (e, input) {
+    this.name = input.text;
 };
 Milestone.prototype.deleteDraw = function () {
     this.deleteThis ();
