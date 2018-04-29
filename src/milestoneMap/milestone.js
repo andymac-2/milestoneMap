@@ -27,8 +27,13 @@ Milestone.prototype.restore = function (obj) {
     if (this.project) {
         this.project.removeMilestone (this);
     }
-    
-    this.project = this.mMap.projects[obj.project];
+
+    if (obj.project >= 0) {
+        this.project = this.mMap.projects[obj.project];
+    }
+    else {// business milestone
+        this.project = this.mMap.businessMs;
+    }
     this.project.addMilestone (this);
 };
 Milestone.prototype.save = function () {
@@ -70,10 +75,10 @@ Milestone.prototype.draw = function () {
     };
 
     if (comparison) {
-        this.elem.appendChild (comparison.elem)
+        this.elem.appendChild (comparison.elem);
     }
     if (current) {
-        this.elem.appendChild (current.elem)
+        this.elem.appendChild (current.elem);
     }
 };
 

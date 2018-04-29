@@ -34,14 +34,16 @@ Report.prototype.drawMenu = function (parent) {
     return elem;
 };
 
-Report.prototype.drawHeader = function (text, attrs, parent) {
-    var g = Draw.svgElem ("g", attrs, parent);
+Report.prototype.drawHeader = function (attrs, parent) {
+    this.headerElem = Draw.svgElem ("g", attrs, parent);
+    var text = this === this.mMap.currReport ? "Current:": "Baseline:"
+    
     Draw.svgElem ("text", {
         "class": "reportHeader",
         "text-anchor": "end"
-    }, g).textContent = text;
+    }, this.headerElem).textContent = text;
     
-    var g2 = Draw.svgElem ("g", {}, g);
+    var g2 = Draw.svgElem ("g", {}, this.headerElem);
     new Draw.svgDateInput (
         this.date, Draw.ALIGNRIGHT, this.mMap.unclicker,
         this.modifyDate.bind(this), {
@@ -49,7 +51,7 @@ Report.prototype.drawHeader = function (text, attrs, parent) {
             "class": "reportDate"
         }, g2);
 
-    g2 = Draw.svgElem ("g", {}, g);
+    g2 = Draw.svgElem ("g", {}, this.headerElem);
     new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
@@ -57,7 +59,7 @@ Report.prototype.drawHeader = function (text, attrs, parent) {
             "class": "reportName"
         }, g2);
 
-    return g;
+    return this.headerElem;
 };
 
 Report.prototype.drawLine = function () {

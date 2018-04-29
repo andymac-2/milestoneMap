@@ -12,6 +12,11 @@ var MsAtReport = function (obj, index, mMap) {
     this.elem = Draw.svgElem("g", {
         "class": "msAtReport"
     });
+    this.elemLine = Draw.svgElem ("g", {
+        "class": "businessMsLine"
+    });
+    this.x;
+    
     // used to prevent click event accumulation
     this.g;
     this.diamond;
@@ -68,17 +73,17 @@ MsAtReport.prototype.draw = function () {
         return;
     }
 
-    var x = this.mMap.getXCoord (this.date);
-    this.elem.setAttribute("transform", "translate(" + x + " 0)");
+    this.x = this.mMap.getXCoord (this.date);
+    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
 
     this.g = Draw.svgElem("g", {}, this.elem);
 
     if (this.report === this.mMap.currReport) {
-        this.milestone.currX = x;
+        this.milestone.currX = this.x;
         this.drawCurrent();
     }   
     else if (this.report === this.mMap.cmpReport){
-        this.milestone.cmpX = x;
+        this.milestone.cmpX = this.x;
     }
 
     this.diamond = Draw.svgElem("path", {
@@ -89,11 +94,24 @@ MsAtReport.prototype.draw = function () {
             "L 0 -" + MsAtReport.DIAMONDSIZE + " Z"
     }, this.g);
     this.diamond.addEventListener ("click", this.diamondOnClick.bind(this));
-
 };
+MsAtReport.prototype.drawLine = function () {
+    this.elemLine.innerHTML = "";
+    
+    if (!this.isCurrent() || !this.isBusinessMs()) {
+        return this.elemLine;
+    }
+
+    Draw.svgElem("line", {
+        "x1": this.x, "y1": 0,
+        "x2": this.x, "y2": Draw.getElemHeight(this.mMap.elem)
+    }, this.elemLine);
+
+    return this.elemLine;
+}
 
 MsAtReport.prototype.resolveStatusClass = function () {
-    if (this.mMap.currReport === this.report) {
+    if (this.isCurrent()) {
         switch (this.status) {
         case MsAtReport.COMPLETE:
             return "complete";
@@ -109,6 +127,12 @@ MsAtReport.prototype.resolveStatusClass = function () {
         return "previous";
     }
     assert (() => false);
+};
+MsAtReport.prototype.isCurrent = function () {
+    return this.mMap.currReport === this.report;
+};
+MsAtReport.prototype.isBusinessMs = function () {
+    return this.milestone.project.index === -1;
 };
 
 MsAtReport.prototype.updateDiamond = function (cls) {
@@ -214,6 +238,7 @@ MsAtReport.prototype.modifyDate = function (elem) {
     this.date = this.mMap.clampDate (date);
 
     this.draw();
+    this.drawLine();
     this.milestone.draw();
     this.dependencies.forEach(dep => dep.draw());
     this.dependents.forEach(dep => dep.draw());

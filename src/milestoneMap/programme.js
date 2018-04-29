@@ -34,7 +34,6 @@ Programme.prototype.draw = function () {
     var g = Draw.svgElem ("g", {
         "class": "programmeHeader"
     } , this.elem);
-    Draw.fixedXElement(0, 0, g, this.mMap.scrollbox);
     
     var textBox = new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
@@ -60,6 +59,8 @@ Programme.prototype.draw = function () {
 
     this.projects.forEach(project => this.elem.appendChild (project.elem));
     this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
+
+    return this.elem;
 };
 
 // linking
@@ -81,12 +82,14 @@ Programme.prototype.deleteThis = function () {
 
 // user events
 Programme.prototype.newProject = function () {
-    this.mMap.addProject ({
+    var project = this.mMap.addProject ({
         "name": "New Project",
         "programme": this.index
     });
 
-    this.mMap.draw();
+    project.draw();
+    this.draw();
+    this.mMap.reflow();
 };
 
 Programme.prototype.moveUp = function () {
@@ -100,7 +103,7 @@ Programme.prototype.moveUp = function () {
 
     var programme2 = this.mMap.programmes[index - 1];
     Util.swapIndexedElements(this.mMap.programmes, programme2.index, this.index);
-    this.mMap.draw();
+    this.mMap.reflow();
 };
 
 Programme.prototype.moveDown = function () {
@@ -114,7 +117,7 @@ Programme.prototype.moveDown = function () {
 
     var programme2 = this.mMap.programmes[index + 1];
     Util.swapIndexedElements(this.mMap.programmes, programme2.index, this.index);
-    this.mMap.draw();
+    this.mMap.reflow();
 };
 
 Programme.prototype.deleteDraw = function () {

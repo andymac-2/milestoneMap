@@ -37,8 +37,10 @@ Util.removeFromIndexedArray = function (array, obj) {
     assert (() => array[obj.index] = obj);
     var index = obj.index;
 
-    array[index] = array[array.length - 1];
-    array[index].index = index;
+    for (var i = index; i < array.length - 1; i++){
+        array[index] = array[index + 1];
+        array[index].index = index;
+    }
     array.pop();
 };
 
@@ -107,4 +109,13 @@ Util.upload = function (parent, callback) {
     
     input.addEventListener("change", handleFiles);
     input.click();
+};
+
+
+// string functions
+Util.truncate = function (string, length) {
+    if (string.length > length - 3) {
+        return string.slice(0, length - 3) + "...";
+    }
+    return string;
 };

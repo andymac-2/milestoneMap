@@ -103,7 +103,7 @@ DateHeader.prototype.restore = function () {
 };
 
 DateHeader.TITLEY = 30;
-DateHeader.ROWY = 40;
+DateHeader.ROWY = 50;
 DateHeader.ROWHEIGHT = 20;
 DateHeader.TEXTOFFSET = 15;
 DateHeader.TWENTYDAYS = 1728000000;
@@ -280,12 +280,14 @@ DateHeader.prototype.drawEndDates = function () {
 };
 
 DateHeader.prototype.drawReports = function () {
-    this.mMap.currReport.drawHeader ("Current", {
-        "transform": "translate(250, 15)"
+    var x = this.mMap.width - 250;
+    this.mMap.currReport.drawHeader ({
+        "transform": "translate(" + x + ", 25)"
     }, this.fgElem);
 
-    this.mMap.cmpReport.drawHeader ("Baseline", {
-        "transform": "translate(500, 15)"
-    }, this.fgElem);
-    
+    if (this.mMap.currReport !== this.mMap.cmpReport) {
+        this.mMap.cmpReport.drawHeader ({
+            "transform": "translate(250, 25)"
+        }, this.fgElem);
+    }   
 };

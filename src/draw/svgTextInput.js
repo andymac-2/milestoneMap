@@ -30,6 +30,7 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
 
 Draw.svgTextInput.HEIGHTWIDTHRATIO = 10;
 Draw.svgTextInput.TEXTTOTEXTBOXRATIO = 1.4;
+Draw.svgTextInput.MAXTEXTLENGTH = 40;
 Draw.svgTextInput.prototype.restore = function (text) {
     this.text = text;
     this.text = this.text === "" ? "Untitled": this.text;
@@ -72,7 +73,8 @@ Draw.svgTextInput.prototype.onunclick = function (parent) {
     var normalText = Draw.svgElem ("text", {
         "text-anchor": this.anchor
     }, parent);
-    normalText.textContent = this.text;
+    normalText.textContent = Util.truncate(this.text,
+                                           Draw.svgTextInput.MAXTEXTLENGTH);
 };
 
 // user events

@@ -14,6 +14,8 @@ var MilestoneMap = function (obj) {
     
     this.currReport;
     this.cmpReport;
+
+    this.businessMs;
     
     //view
     this.scrollbox = Draw.elem ("div", {
@@ -22,6 +24,7 @@ var MilestoneMap = function (obj) {
     
     this.elem = Draw.svgElem("svg", {
         "class": "milestoneMap",
+        "height": 5000
     }, this.scrollbox);
     this.elem.addEventListener("click", this.deactivateOnUnclick.bind(this));
     
@@ -57,6 +60,8 @@ MilestoneMap.prototype.restore = function (obj) {
     this.start = obj.start;
     this.end = obj.end;
     this.name = obj.name;
+
+    this.businessMs = new BusinessMs (this);
 
     this.programmes = obj.programmes.map((programme, i) => {
         return new Programme (programme, i, this);
@@ -110,11 +115,9 @@ MilestoneMap.prototype.draw = function (obj) {
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
     this.projects.forEach (elem => elem.draw());
-    this.programmes.forEach (elem => {
-        elem.draw();
-        this.fg.appendChild (elem.elem);
-    });
+    this.programmes.forEach (elem => this.fg.appendChild(elem.draw()));
 
+    this.fg.appendChild(this.businessMs.draw());
     this.fg.appendChild(this.currReport.drawLine());
     
     this.reflow ();
@@ -127,7 +130,9 @@ MilestoneMap.prototype.drawDependencies = function () {
 };
 
 MilestoneMap.prototype.reflow = function () {
-    Draw.verticalReflow (this.dateHeader.endy, this.programmes);
+    var height = Draw.verticalReflow (this.dateHeader.endy, [this.businessMs]);
+    height = Draw.verticalReflow (height, this.programmes);
+    height = height < window.innerHeight ? window.innerHeight: height;
     this.drawDependencies();
 };
 MilestoneMap.prototype.deactivateOnUnclick = function (event) {
@@ -238,6 +243,16 @@ MilestoneMap.prototype.addReport = function (obj) {
         var obj = ms.save();
         obj.report = report.index;
         this.addMsAtReport (obj);
+    });
+
+    var dependencies = this.dependencies.filter(dep => {
+        return dep.report === this.currReport;
+    });
+
+    dependencies.forEach (dep => {
+        var obj = dep.save();
+        obj.report = report.index;
+        this.addDependency(obj);
     });
 
     this.cmpReport = this.currReport;

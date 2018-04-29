@@ -52,9 +52,9 @@ Project.prototype.draw = function () {
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
-        "class": "projectHeader"
+        "class": "projectHeader",
+        "transform": "translate(20, 10)"
     } , this.elem);
-    Draw.fixedXElement(20, 10, g, this.mMap.scrollbox);
     
     var name = new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
@@ -114,7 +114,7 @@ Project.prototype.newMilestone = function () {
         "project": this.index
     });
 
-    this.mMap.addMsAtReport({
+    var msAtReport = this.mMap.addMsAtReport({
         "milestone": milestone.index,
         "report": this.mMap.currReport.index,
         "comment": "",
@@ -122,7 +122,9 @@ Project.prototype.newMilestone = function () {
         "date": this.mMap.defaultDate()
     });
 
-    this.mMap.draw();
+    msAtReport.draw();
+    milestone.draw();
+    this.draw();
 };
 
 
@@ -140,7 +142,7 @@ Project.prototype.moveUp = function () {
     Util.swapIndexedElements(this.mMap.projects, project2.index, this.index);
     Util.swapElements(this.programme.projects, this, project2);
 
-    this.mMap.draw();
+    this.project.draw();
 };
 
 Project.prototype.moveDown = function () {
@@ -157,5 +159,5 @@ Project.prototype.moveDown = function () {
     Util.swapIndexedElements(this.mMap.projects, project2.index, this.index);
     Util.swapElements(this.programme.projects, this, project2);
 
-    this.mMap.draw();
+    this.project.draw();
 };
