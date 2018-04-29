@@ -9,27 +9,42 @@ body {
     border: 1px solid #888;
     border-radius: 3px;
     padding: 0px;
-    width: 99%;
-}
-.menuBarHeader {
-    fill: #444;
-    font-size: small;    
-}
-.reportSelector {
-    color: #444;
-    font-size: small;
-}
-.reportSelectorDropdown {
-    float: right;
-    width: 170px;
+    
+    display: flex;
+    flex-wrap: wrap;
 }
 .menuBarSegment {
     border: 1px solid #888;
     background-color: #f4f4f4;
     border-radius: 3px;
     margin: 2px;
-    margin-bottom: 0px;
-    margin-top: 4px;
+    padding: 2px;
+    
+    height: 55px;
+    overflow: hidden;
+    display: inline-block;
+}
+.menuBarHeader {
+    color: #444;
+    font-size: small;    
+}
+.reportSelectorContainer {
+    display: inline-block;
+    width: 250px;
+}
+.reportSelector {
+    color: #444;
+    font-size: small;
+    display: inline-block;
+    width: 100%;
+}
+.reportSelectorDropdown {
+    float: right;
+    width: 170px;
+}
+.menuBarSegment svg {
+    display: inline;
+    height: 65%;
 }
 
 /* milestone map total */
@@ -65,10 +80,16 @@ body {
     font-family: inherit;
     font-size: inherit;
     font-weight: inherit;
-    text-overflow: ellipsis;
 }
 .svgTextBox, .svgDateBox{
+    margin: 0px;
     width: 90%;
+    overflow: hidden;
+    /* white-space: nowrap; */
+    /* text-overflow: ellipsis; */
+}
+.svgTextBox br {
+    display: none;
 }
 .milestoneData .svgTextBox, .milestoneData .svgDateBox{
     width: auto;
@@ -153,20 +174,10 @@ body {
     fill: rgba(255, 102, 255, 0.5);
     stroke: none;
 }
-.msAtReport div {
-    overflow: hidden;
-    text-align: center;
-    text-overflow: ellipsis;
-    font-size: small;
-}
 .msAtReport .wide, .project .wide {
     min-width: 100%;
     max-width: 100%;
 }
-.msAtReport input {
-    text-align: center;
-}
-
 /* headers  */
 .programmeHeader, .businessMsHeader{
     font-weight: bold;

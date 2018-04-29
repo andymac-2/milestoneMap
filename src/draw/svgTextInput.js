@@ -25,6 +25,8 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
     //view
     this.elem;
 
+    this.textBox;
+
     this.restore(text);
     this.draw();
 };
@@ -49,18 +51,23 @@ Draw.svgTextInput.prototype.onclick = function (parent) {
     
     var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO;
     var x = this.anchor === "middle" ? width / -2 : 0;
+
+    var offset = Draw.getElemXY (parent);
+    var unx = -offset.x;
+    var uny = -offset.y
     
     var foreign = Draw.svgElem("foreignObject", {
         "width": width,
         "height": (height * Draw.svgTextInput.TEXTTOTEXTBOXRATIO),
-        "x": x,
-        "y": (0 - height)
+        "transform": "translate(" + unx + ", " + uny + ")",
+        "x": x - unx,
+        "y": (0 - height) - uny
     }, parent);
     
-    var textBox = Draw.htmlElem ("input", {
+    var textBox = Draw.elem ("input", {
         "class": "svgTextBox",
-        "value": this.text,
-        "type": "text"
+        "type": "text",
+        "value": this.text
     }, foreign);
     textBox.focus();
     textBox.select();

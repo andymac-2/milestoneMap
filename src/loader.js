@@ -31,9 +31,9 @@ Loader.prototype.draw = function () {
         "class": "menubar"
     }, this.elem);
 
-    var fileMenu = Draw.menuBarSegment("File", [{
+    Draw.menuBarSegment("File", [{
         "icon": "icons/new.svg",
-        "action": () => {}
+        "action": this.newFile.bind(this)
     }, {
         "icon": "icons/open.svg",
         "action": this.loadFile.bind(this)
@@ -42,14 +42,13 @@ Loader.prototype.draw = function () {
         "action": this.save.bind(this)
     }, {
         "icon": "icons/print.svg",
-        "action": () => {}
+        "action": () => {} // TODO
     }], menubar);
 
-    var programmeMenu = Draw.menuBarSegment("Programme", [{
+   Draw.menuBarSegment("Programme", [{
         "icon": "icons/plus.svg",
         "action": this.map.newProgramme.bind(this.map)
     }], menubar)
-    programmeMenu.setAttribute("width", "90");
 
     var reportMenu = Draw.menuBarSegment("Report", [{
         "icon": "icons/plus.svg",
@@ -58,20 +57,32 @@ Loader.prototype.draw = function () {
         "icon": "icons/delete.svg",
         "action": this.deleteCurrReport.bind(this)
     }], menubar);
-    reportMenu.setAttribute("width", "350");
+
+    var container = Draw.elem ("span", {
+        "class": "reportSelectorContainer"
+    }, reportMenu)
     
     
     this.reportSelector (
         "Current:", this.modifyCurrReport.bind(this), {
-            "transform": "translate(90, 35)"
-        }, reportMenu);
+            "class": "reportSelector"
+        }, container);
     this.reportSelector (
         "Baseline:", this.modifyCmpReport.bind(this), {
-            "transform": "translate(90, 55)"
-        }, reportMenu);
+            "class": "reportSelector"
+        }, container);
 
-    var version = Draw.elem ("span", {}, menubar)
-        .textContent = "Version: " + VERSION;
+    var version = Draw.elem ("span", {
+        "class": "menuBarSegment"
+    }, menubar);
+
+    var header = Draw.elem ("div", {
+        "class": "menuBarHeader"
+    }, version).textContent = "Version: " + VERSION;
+
+    Draw.svgElem ("svg", {
+        "width": "200"
+    }, version);
   
     this.elem.appendChild(this.map.scrollbox);
     var height = window.innerHeight - Draw.getElemHeight(menubar) - 10;
@@ -80,22 +91,13 @@ Loader.prototype.draw = function () {
     this.map.draw();
 };
 Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
-    var g = Draw.svgElem("g", attrs, parent);
+    var div = Draw.elem("span", attrs, parent);
 
-    var foreign = Draw.svgElem("foreignObject", {
-        "width": "240",
-        "height": "20",
-        "x": "0",
-        "y": "-20",
-        "class": "reportSelector"
-    }, g);
+    div.textContent = text;
     
-    Draw.elem ("span", {
-        "class": "reportSelectorHeader"
-    }, foreign).textContent = text;
     var select = Draw.elem ("select", {
         "class": "reportSelectorDropdown"
-    }, foreign);
+    }, div);
     select.addEventListener ("change", onchange);
 
     Draw.elem ("option", {
@@ -106,7 +108,7 @@ Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
     
     this.map.reports.forEach (report => report.drawMenu(select));
 
-    return g;
+    return div;
 };
 
 // modifications
