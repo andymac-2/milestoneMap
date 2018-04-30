@@ -94,9 +94,9 @@ Loader.prototype.draw = function () {
     this.map.draw();
 };
 Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
-    var div = Draw.elem("span", attrs, parent);
+    var div = Draw.elem("div", attrs, parent);
 
-    div.textContent = text;
+    Draw.elem("span", {}, div).textContent = text;
     
     var select = Draw.elem ("select", {
         "class": "reportSelectorDropdown"

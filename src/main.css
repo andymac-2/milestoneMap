@@ -35,12 +35,17 @@ body {
 .reportSelector {
     color: #444;
     font-size: small;
-    display: inline-block;
-    width: 100%;
+    width: 240px;
+    height: 18px;
+    
+    display: flex;
+    justify-content: space-between;
 }
 .reportSelectorDropdown {
     float: right;
     width: 170px;
+    max-height: 18px;
+    display: inline-block;
 }
 .menuBarSegment svg {
     display: inline;
