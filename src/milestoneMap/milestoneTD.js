@@ -33,7 +33,7 @@ MilestoneTD.prototype.draw = function () {
 };
 
 MilestoneTD.prototype.onclick = function (parent) {
-    var height = Draw.getElemHeight(parent);
+    var height = 15 //Draw.getElemHeight(parent);
     parent.innerHTML = "";
     
     var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO +
@@ -73,13 +73,20 @@ MilestoneTD.prototype.onunclick = function (parent) {
 
     var date = new Date (this.date);
     var datestring = DateHeader.getShortMonth(date) + " " +
-        DateHeader.getDate(date) + ": ";
+        DateHeader.getDate(date);
     
     var normalText = Draw.svgElem ("text", {
-        "text-anchor": "middle"
+        "text-anchor": "start",
+        "transform": "rotate(-30)"
     }, parent);
-    normalText.textContent = Util.truncate(
-        datestring + this.text, Draw.svgTextInput.MAXTEXTLENGTH);
+    normalText.textContent = Util.truncate(this.text);
+        //= Util.truncate(
+    // datestring + this.text, Draw.svgTextInput.MAXTEXTLENGTH);
+
+    var dateText = Draw.svgElem ("text", {
+        "transform": "translate(0, 30)",
+        "text-anchor": "middle"
+    }, parent).textContent = datestring;
 };
 
 // user events
