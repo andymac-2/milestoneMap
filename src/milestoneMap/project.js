@@ -19,7 +19,8 @@ var Project = function (obj, index, mMap) {
 };
 
 
-Project.HEIGHT = 70;
+Project.MINHEIGHT = 40;
+Project.MILESTONEOFFSET = 20;
 Project.prototype.restore = function (obj) {
     this.name = obj.name;
 
@@ -37,23 +38,27 @@ Project.prototype.save = function () {
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
     
-    Draw.svgElem("line", {
-        "x1": 0,
-        "y1": 20,
-        "x2": this.mMap.width,
-        "y2": 20,
-        "class": "projectLine"
-    }, this.elem);
+    this.flowMilestoneData();
     
     var milestones = Draw.svgElem("g", {
-        "transform": "translate(0, 20)"
-    }, this.elem);
+        "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
+    });
+    this.elem.insertBefore(milestones, this.elem.firstChild);
     this.milestones.forEach(milestone => milestones.appendChild(milestone.elem));
+
+    var line = Draw.svgElem("line", {
+        "x1": 0,
+        "y1": (this.height - Project.MILESTONEOFFSET),
+        "x2": this.mMap.width,
+        "y2": (this.height - Project.MILESTONEOFFSET),
+        "class": "projectLine"
+    });
+    this.elem.insertBefore(line, this.elem.firstChild);
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
         "class": "projectHeader",
-        "transform": "translate(20, 10)"
+        "transform": "translate(20, " + (this.height - 30) + ")"
     } , this.elem);
     
     var name = new Draw.svgTextInput (
@@ -76,9 +81,63 @@ Project.prototype.draw = function () {
     }], {
         "transform": "translate(180, -7)"              
     }, g);
+
+    return this.elem;
+};
+Project.prototype.flowMilestoneData = function () {
+    var spaces = [];
+    var layers = [];
+
+    // get current msAtReports
+    var milestones = this.milestones
+        .map(ms => ms.currentReport())
+        .filter(msAtReport => msAtReport);
+
+    // sort descending
+    milestones.sort((a, b) => b.x - a.x);
+    milestones.forEach(ms => {
+        // elements must be part of the DOM in order to get width, so I just hack it here.
+        this.mMap.elem.appendChild(ms.elemInfo);
+        var width = ms.getInfoWidth();
+        var lEdge = ms.x;
+        var rEdge = lEdge + width;
+
+        // find the first layer with no collision.
+        for (var i = 0; i < spaces.length && rEdge > spaces[i]; i++) {}
+        spaces[i] = lEdge;
+
+        // add milestone to that layer. Create a new one if required
+        if (!layers[i]) {
+            layers[i] = Draw.svgElem("g", {
+                "transform": "translate(0, " +
+                    (-i * MilestoneTD.HEIGHT) + ")"
+            });
+        }
+        layers[i].appendChild (ms.elemInfo);
+        ms.drawPointer (i);
+    });
+
+    // height dependent on how many layers.
+    this.height = layers.length * MilestoneTD.HEIGHT;
+
+    // add layers from top to bottom.
+    var milestoneData = Draw.svgElem ("g", {
+        "transform": "translate(0, " + this.height + ")"
+    }, this.elem);
+    for (var i = layers.length - 1; i >= 0; i--) {
+        milestoneData.appendChild(layers[i]);
+    }
+
+    this.height += Project.MINHEIGHT;
+
+    return milestoneData;
 };
 
-
+// call this if the height changes.
+Project.prototype.reflowUp = function () {
+    this.programme.draw();
+    this.mMap.reflow();
+};
 
 //linking
 Project.prototype.addMilestone = function (milestone) {
@@ -104,8 +163,7 @@ Project.prototype.deleteThis = function () {
 // user modifications
 Project.prototype.deleteDraw = function () {
     this.deleteThis();
-    this.programme.draw();
-    this.mMap.reflow();
+    this.reflowUp();
 };
 
 Project.prototype.newMilestone = function () {
@@ -125,6 +183,7 @@ Project.prototype.newMilestone = function () {
     msAtReport.draw();
     milestone.draw();
     this.draw();
+    this.reflowUp();
 };
 
 
@@ -142,7 +201,7 @@ Project.prototype.moveUp = function () {
     Util.swapIndexedElements(this.mMap.projects, project2.index, this.index);
     Util.swapElements(this.programme.projects, this, project2);
 
-    this.project.draw();
+    this.reflowUp();
 };
 
 Project.prototype.moveDown = function () {
@@ -159,5 +218,5 @@ Project.prototype.moveDown = function () {
     Util.swapIndexedElements(this.mMap.projects, project2.index, this.index);
     Util.swapElements(this.programme.projects, this, project2);
 
-    this.project.draw();
+    this.reflowUp();
 };

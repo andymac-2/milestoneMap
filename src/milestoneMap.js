@@ -115,9 +115,9 @@ MilestoneMap.prototype.draw = function (obj) {
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
     this.projects.forEach (elem => elem.draw());
+    this.fg.appendChild(this.businessMs.draw());
     this.programmes.forEach (elem => this.fg.appendChild(elem.draw()));
 
-    this.fg.appendChild(this.businessMs.draw());
     this.fg.appendChild(this.currReport.drawLine());
     
     this.reflow ();

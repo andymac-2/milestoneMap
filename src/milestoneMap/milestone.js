@@ -14,9 +14,10 @@ var Milestone = function (obj, index, mMap) {
     // view model
     this.mMap = mMap;
     this.index = index;
-    this.cmpX;
-    this.currX;
-    this.atReports = [];   
+    this.atReports = [];
+
+    this.currReport;
+    this.cmpReport;
 
     this.restore (obj);
 };
@@ -66,30 +67,30 @@ Milestone.prototype.draw = function () {
     this.elem.innerHTML = "";
 
     var current = this.currentReport();
-    var comparison = this.cmpReport();
+    var comparison = this.comparisonReport();
 
     if (current && comparison &&
         (this.mMap.currReport !== this.mMap.cmpReport)) {
         Draw.svgElem ("line", {
             "class": "compareLine",
-            "x1": this.cmpX, "y1": "0",
-            "x2": this.currX, "y2": "0"
+            "x1": comparison.x, "y1": "0",
+            "x2": current.x, "y2": "0"
         }, this.elem);
         
-        if (this.cmpX < this.currX) {
+        if (comparison.x < current.x) {
             Draw.svgElem ("path", {
                 "class": "compareArrow",
                 "d": "M -6 -6 L -6 6 L 0 0 Z",
                 "transform": "translate("+
-                    (this.currX - MsAtReport.DIAMONDSIZE) + ", 0)"
+                    (current.x - MsAtReport.DIAMONDSIZE) + ", 0)"
             }, this.elem);
         }
-        else if (this.cmpX > this.currX) {
+        else if (comparison.x > current.x) {
             Draw.svgElem ("path", {
                 "class": "compareArrow",
                 "d": "M 6 -6 L 6 6 L 0 0 Z",
                 "transform": "translate("+
-                    (this.currX + MsAtReport.DIAMONDSIZE) + ", 0)"
+                    (current.x + MsAtReport.DIAMONDSIZE) + ", 0)"
             }, this.elem);
         }
     };
@@ -121,7 +122,7 @@ Milestone.prototype.deleteThis = function () {
 
 // user modifications
 Milestone.prototype.modifyName = function (e, input) {
-    this.name = input.text;
+    this.name = input.title;
 };
 Milestone.prototype.deleteDraw = function () {
     this.deleteThis ();
@@ -135,8 +136,18 @@ Milestone.prototype.hasReport = function (report) {
     return this.atReports.find(msAtReport => msAtReport.report === report);
 };
 Milestone.prototype.currentReport = function () {
-    return this.hasReport (this.mMap.currReport);
+    if (this.currReport &&
+        this.currReport.report === this.mMap.currReport)
+    {
+        return this.currReport;
+    }
+    return this.currReport = this.hasReport (this.mMap.currReport);
 };
-Milestone.prototype.cmpReport = function () {
-    return this.hasReport (this.mMap.cmpReport);
+Milestone.prototype.comparisonReport = function () {
+    if (this.cmpReport &&
+        this.cmpReport.report === this.mMap.cmpReport)
+    {
+        return this.cmpReport;
+    }
+    return this.cmpReport = this.hasReport (this.mMap.cmpReport);
 };

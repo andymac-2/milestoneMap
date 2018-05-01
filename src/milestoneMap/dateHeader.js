@@ -106,6 +106,9 @@ DateHeader.TITLEY = 30;
 DateHeader.ROWY = 50;
 DateHeader.ROWHEIGHT = 20;
 DateHeader.TEXTOFFSET = 15;
+DateHeader.BUFFERHEIGHT = 20;
+
+
 DateHeader.TWENTYDAYS = 1728000000;
 DateHeader.THIRTYWEEKS = 18144000000;
 DateHeader.FOURYEARS = 126144000000;
@@ -165,8 +168,10 @@ DateHeader.prototype.draw = function () {
     else {
         this.drawRow(y, Draw.getElemHeight(this.mMap.elem), rows[0],
                  this.drawHighlightedBox.bind(this));
-        y += DateHeader.ROWHEIGHT;
+        this.endy = y + DateHeader.ROWHEIGHT;
     }
+
+    this.endy += DateHeader.BUFFERHEIGHT;
 };
 
 DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {

@@ -90,14 +90,12 @@ body {
     margin: 0px;
     width: 90%;
     overflow: hidden;
-    /* white-space: nowrap; */
-    /* text-overflow: ellipsis; */
-}
-.svgTextBox br {
-    display: none;
 }
 .milestoneData .svgTextBox, .milestoneData .svgDateBox{
     width: auto;
+}
+.svgCommentBox {
+    display: block;
 }
 
 /* general */

@@ -9,7 +9,7 @@ var BusinessMs = function (mMap) {
     
     // view
     this.elem = Draw.svgElem("g", {
-        "class": "businessMs"
+        "class": "businessMs",
     });
 
     // view model
@@ -17,26 +17,30 @@ var BusinessMs = function (mMap) {
     this.height = BusinessMs.HEIGHT;
 };
 
-
-BusinessMs.HEIGHT = 30;
+// TODO: variable height milestone data.
 BusinessMs.prototype.draw = function () {
     this.elem.innerHTML = "";
+
+    this.flowMilestoneData();
     
     Draw.svgElem("line", {
         "x1": 0,
-        "y1": 25,
+        "y1": (this.height - Project.MILESTONEOFFSET),
         "x2": this.mMap.width,
-        "y2": 25,
+        "y2": (this.height - Project.MILESTONEOFFSET),
         "class": "projectLine"
     }, this.elem);
-    
+
+    var milestoneLines = Draw.svgElem ("g", {
+        
+    }, this.elem)
     var milestones = Draw.svgElem("g", {
-        "transform": "translate(0, 25)"
+        "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
     }, this.elem);
     this.milestones.forEach(milestone => {
         var current = milestone.currentReport();
         if (current) {
-            this.elem.appendChild (milestone.currentReport().drawLine());
+            milestoneLines.appendChild (milestone.currentReport().drawLine());
         }
         milestones.appendChild (milestone.elem);
     });
@@ -44,7 +48,7 @@ BusinessMs.prototype.draw = function () {
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
         "class": "businessMsHeader",
-        "transform": "translate(0, 20)"
+        "transform": "translate(0, " + (this.height - 30) + ")"
     } , this.elem);
     
     var name = Draw.svgElem ("text", {}, g).textContent = "Business Milestones";
@@ -58,8 +62,12 @@ BusinessMs.prototype.draw = function () {
 
     return this.elem;
 };
+BusinessMs.prototype.flowMilestoneData = Project.prototype.flowMilestoneData;
 
-
+// call this if you expect the hieght to change.
+BusinessMs.prototype.reflowUp = function () {
+    this.mMap.reflow();
+};
 
 //linking
 BusinessMs.prototype.addMilestone = function (milestone) {

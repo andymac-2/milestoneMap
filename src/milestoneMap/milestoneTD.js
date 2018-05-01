@@ -1,29 +1,36 @@
 'use strict'
 
-var MilestoneTD = function (text, date, unclicker, onTextChange, onDateChange,
-                        attrs, parent) {
+var MilestoneTD = function (options, title, date, comment) {
+    
     // state
-    this.text;
+    this.title;
+    this.comment;
     this.date;
 
     // view model
-    this.unclicker = unclicker;
-    this.onTextChange = onTextChange;
-    this.onDateChange = onDateChange;
-    this.parent = parent;
-    this.attrs = attrs;
+    this.unclicker = options.unclicker;
+    this.onTitleChange = options.onTitleChange || (() => {});
+    this.onDateChange = options.onDateChange || (() => {});
+    this.onCommentChange = options.onCommentChange || (() => {});
+    this.parent = options.parent;
+    this.attrs = options.attrs || {};
 
     //view
     this.elem;
 
-    this.restore(text, date);
+    this.restore(title, date, comment);
     this.draw();
 };
-
-MilestoneTD.prototype.restore = function (text, date) {
-    this.text = text;
-    this.text = this.text === "" ? "Untitled": this.text;
+MilestoneTD.HEIGHT = 35;
+MilestoneTD.TEXTBOXHEIGHT = 45;
+MilestoneTD.YOFFSET = 40;
+MilestoneTD.HEIGHTWIDTHRATIO = 6;
+MilestoneTD.prototype.restore = function (title, date, comment) {
+    this.title = title;
+    this.title = this.title === "" ? "Untitled": this.title;
     this.date = date;
+    this.comment = comment;
+    this.comment = this.comment === "" ? "" : this.comment;
 };
 
 MilestoneTD.prototype.draw = function () {
@@ -33,17 +40,16 @@ MilestoneTD.prototype.draw = function () {
 };
 
 MilestoneTD.prototype.onclick = function (parent) {
-    var height = Draw.getElemHeight(parent);
+    var height = MilestoneTD.TEXTBOXHEIGHT;
     parent.innerHTML = "";
     
-    var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO +
-        height * Draw.svgDateInput.HEIGHTWIDTHRATIO;
+    var width = height * MilestoneTD.HEIGHTWIDTHRATIO;
     
     var foreign = Draw.svgElem("foreignObject", {
         "width": width,
-        "height": (height * Draw.svgDateInput.TEXTTOTEXTBOXRATIO),
-        "x": 0 - width / 2,
-        "y": (0 - height)
+        "height": (height),
+        "x": 0,
+        "y": (0 - MilestoneTD.YOFFSET)
     }, parent);
 
     var dateBox = Draw.htmlElem ("input", {
@@ -53,19 +59,28 @@ MilestoneTD.prototype.onclick = function (parent) {
         "required": ""
     }, foreign);
     
-    dateBox.addEventListener("blur", this.modifyDate.bind(this, dateBox));
+    dateBox.addEventListener("change", this.modifyDate.bind(this, dateBox));
     dateBox.addEventListener("blur", e => this.onDateChange(e, this));
     
-    var textBox = Draw.htmlElem ("input", {
+    var titleBox = Draw.htmlElem ("input", {
         "class": "svgTextBox",
-        "value": this.text,
-        "type": "text"
+        "value": this.title,
+        "type": "text",
+        "placeholder": "Milestone Name"
     }, foreign);
     
-    textBox.focus();
-    textBox.select();
-    textBox.addEventListener("change", this.modifyText.bind(this, textBox));
-    textBox.addEventListener("change", e => this.onTextChange(e, this));
+    titleBox.addEventListener("change", this.modifyTitle.bind(this, titleBox));
+    titleBox.addEventListener("blur", e => this.onTitleChange(e, this));
+
+    var commentBox = Draw.htmlElem ("input", {
+        "class": "svgCommentBox",
+        "value": this.comment,
+        "type": "text",
+        "placeholder": "Milestone Comment"
+    }, foreign);
+    
+    commentBox.addEventListener("change", this.modifyComment.bind(this, commentBox));
+    commentBox.addEventListener("blur", e => this.onCommentChange(e, this));
 };
 
 MilestoneTD.prototype.onunclick = function (parent) {
@@ -75,16 +90,27 @@ MilestoneTD.prototype.onunclick = function (parent) {
     var datestring = DateHeader.getShortMonth(date) + " " +
         DateHeader.getDate(date) + ": ";
     
-    var normalText = Draw.svgElem ("text", {
-        "text-anchor": "middle"
+    var dateTitle = Draw.svgElem ("text", {
+        "text-anchor": "start",
+        "transform": "translate(5, -15)",
     }, parent);
-    normalText.textContent = Util.truncate(
-        datestring + this.text, Draw.svgTextInput.MAXTEXTLENGTH);
+    dateTitle.textContent = Util.truncate(
+        datestring + this.title, Draw.svgTextInput.MAXTEXTLENGTH);
+
+    var comment = Draw.svgElem ("text", {
+        "class": "msComment",
+        "transform": "translate(5, 0)"
+    }, parent);
+    comment.textContent = Util.truncate(this.comment, Draw.svgTextInput.MAXTEXTLENGTH);
 };
 
 // user events
-MilestoneTD.prototype.modifyText = function (elem) {
-    this.restore(elem.value, this.date);
+MilestoneTD.prototype.modifyTitle = function (elem) {
+    this.restore(elem.value, this.date, this.comment);
+};
+
+MilestoneTD.prototype.modifyComment = function (elem) {
+    this.restore(this.title, this.date, elem.value);
 };
 
 MilestoneTD.prototype.modifyDate = function (elem) {

@@ -15,6 +15,12 @@ var MsAtReport = function (obj, index, mMap) {
     this.elemLine = Draw.svgElem ("g", {
         "class": "businessMsLine"
     });
+    this.elemInfo = Draw.svgElem ("g", {
+        "class": "milestoneInfo"
+    });
+    this.elemPointer = Draw.svgElem("g", {
+        "class": "milestonePointer"
+    });
     this.x;
     
     // used to prevent click event accumulation
@@ -64,10 +70,14 @@ MsAtReport.prototype.save = function () {
     };
 };
 
+
+
+// drawing methods
 MsAtReport.prototype.draw = function () {
     this.elem.innerHTML = "";
+    this.elemPointer.innerHTML = "";
     
-    if (this.report !== this.mMap.currReport &&
+    if (!this.isCurrent() &&
         this.report !== this.mMap.cmpReport)
     {
         return;
@@ -76,15 +86,10 @@ MsAtReport.prototype.draw = function () {
     this.x = this.mMap.getXCoord (this.date);
     this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
 
-    this.g = Draw.svgElem("g", {}, this.elem);
+    this.drawInfo();
+    this.elem.appendChild (this.elemPointer);
 
-    if (this.report === this.mMap.currReport) {
-        this.milestone.currX = this.x;
-        this.drawCurrent();
-    }   
-    else if (this.report === this.mMap.cmpReport){
-        this.milestone.cmpX = this.x;
-    }
+    var g = Draw.svgElem("g", {}, this.elem);
 
     this.diamond = Draw.svgElem("path", {
         "class": this.resolveStatusClass (),
@@ -92,7 +97,7 @@ MsAtReport.prototype.draw = function () {
             "L 0 " +  MsAtReport.DIAMONDSIZE +
             "L " + MsAtReport.DIAMONDSIZE + " 0" +
             "L 0 -" + MsAtReport.DIAMONDSIZE + " Z"
-    }, this.g);
+    }, g);
     this.diamond.addEventListener ("click", this.diamondOnClick.bind(this));
 };
 MsAtReport.prototype.drawLine = function () {
@@ -108,7 +113,61 @@ MsAtReport.prototype.drawLine = function () {
     }, this.elemLine);
 
     return this.elemLine;
-}
+};
+
+MsAtReport.prototype.drawInfo = function () {
+    this.elemInfo.innerHTML = "";
+
+    if (!this.isCurrent()) {
+        return this.elemInfo;
+    }
+    var g = Draw.svgElem ("g", {
+        "transform": "translate(" + this.x + " 0)"
+    }, this.elemInfo);
+    
+    var nameDate = new MilestoneTD ({
+        unclicker: this.mMap.unclicker,
+        onTitleChange: this.milestone.modifyName.bind(this.milestone),
+        onDateChange: this.modifyDate.bind(this),
+        onCommentChange: this.modifyComment.bind(this),
+        parent: g,
+        attrs: {
+            "class": "milestoneData"
+        }
+    }, this.milestone.name, this.date, this.comment);
+    
+    Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
+        "icon": "icons/health.svg",
+        "action": this.cycleStatus.bind(this)
+    },{
+        "icon": "icons/delete.svg",
+        "action": this.deleteDraw.bind(this)
+    },{
+        "icon": "icons/arrow-right.svg",
+        "action": this.createDependency.bind(this)
+    }], {
+        "transform": "translate(0, -60)"
+    }, g);
+
+    return this.elemInfo;
+};
+
+MsAtReport.prototype.drawPointer = function (level) {
+    this.elemPointer.innerHTML = "";
+    var height = Project.MILESTONEOFFSET -
+        level * MilestoneTD.HEIGHT -
+        Project.MINHEIGHT - 20;;
+    var line = Draw.svgElem ("line", {
+        "x1": "0", "y1":  height,
+        "x2": "0", "y2": 0
+    }, this.elemPointer);
+    var circle = Draw.svgElem ("circle", {
+        "cx": "0", "cy": height,
+        "r": "2"
+    }, this.elemPointer);
+};
+
+
 
 MsAtReport.prototype.resolveStatusClass = function () {
     if (this.isCurrent()) {
@@ -139,36 +198,15 @@ MsAtReport.prototype.updateDiamond = function (cls) {
     this.diamond.setAttribute("class", this.resolveStatusClass());
 };
 
-MsAtReport.prototype.drawCurrent = function () {
-    var comment = new Draw.svgTextInput (
-        this.comment, Draw.ALIGNCENTER, this.mMap.unclicker,
-        this.modifyComment.bind(this), {
-            "transform": "translate(0, 20)",
-            "class": "msComment"
-        }, this.g, "\xA0"); // nbsp allows comment field to actually appear
-    
-    var nameDate = new MilestoneTD (
-        this.milestone.name, this.date, this.mMap.unclicker,
-        this.milestone.modifyName.bind(this.milestone),
-        this.modifyDate.bind(this), {
-            "transform": "translate(0, -10)",
-            "class": "milestoneData"
-        }, this.g)
-    
-    Draw.menu (Draw.ALIGNCENTER, this.mMap.unclicker, [{
-        "icon": "icons/health.svg",
-        "action": this.cycleStatus.bind(this)
-    },{
-        "icon": "icons/delete.svg",
-        "action": this.deleteDraw.bind(this)
-    },{
-        "icon": "icons/arrow-right.svg",
-        "action": this.createDependency.bind(this)
-    }], {
-        "transform": "translate(0, -50)"
-    }, this.g);
+MsAtReport.INFOMARGIN = 15;
+MsAtReport.prototype.getInfoWidth = function () {
+    return Draw.getElemWidth (this.elemInfo) + MsAtReport.INFOMARGIN;
+};
 
-    // TODO put other text here
+MsAtReport.prototype.reflowUp = function () {
+    var project = this.milestone.project;
+    project.draw();
+    project.reflowUp();
 };
 
 // linking
@@ -211,17 +249,18 @@ MsAtReport.prototype.deleteThis = function () {
 // user modifications
 MsAtReport.prototype.modifyDate = function (e, input) {
     var date = input.date;
-
     this.date = this.mMap.clampDate (date);
 
     this.draw();
     this.drawLine();
     this.milestone.draw();
-    this.dependencies.forEach(dep => dep.draw());
-    this.dependents.forEach(dep => dep.draw());
+
+    this.reflowUp();
 };
 MsAtReport.prototype.modifyComment = function (e, input) {
-    this.comment = input.text;
+    this.comment = input.comment;
+
+    this.reflowUp();
 };
 MsAtReport.prototype.cycleStatus = function () {
     this.status = this.status >= MsAtReport.LATE ? 0 : this.status + 1;
