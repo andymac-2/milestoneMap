@@ -106,7 +106,7 @@ DateHeader.TITLEY = 30;
 DateHeader.ROWY = 50;
 DateHeader.ROWHEIGHT = 20;
 DateHeader.TEXTOFFSET = 15;
-DateHeader.BUFFERHEIGHT = 20;
+DateHeader.BUFFERHEIGHT = 10;
 
 
 DateHeader.TWENTYDAYS = 1728000000;

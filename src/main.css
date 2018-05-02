@@ -137,6 +137,11 @@ body {
     stroke: none;
     fill: #a0a0a0;
     font-size: small;
+    font-style: italic;
+}
+.milestonePointer {
+    stroke-width: 1;
+    stroke: #C0C0C0;
 }
 
 .milestone .complete {

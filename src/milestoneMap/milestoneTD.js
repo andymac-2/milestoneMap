@@ -25,6 +25,7 @@ MilestoneTD.HEIGHT = 35;
 MilestoneTD.TEXTBOXHEIGHT = 45;
 MilestoneTD.YOFFSET = 40;
 MilestoneTD.HEIGHTWIDTHRATIO = 6;
+MilestoneTD.MAXTEXTLENGTH = 100;
 MilestoneTD.prototype.restore = function (title, date, comment) {
     this.title = title;
     this.title = this.title === "" ? "Untitled": this.title;
@@ -95,13 +96,13 @@ MilestoneTD.prototype.onunclick = function (parent) {
         "transform": "translate(5, -15)",
     }, parent);
     dateTitle.textContent = Util.truncate(
-        datestring + this.title, Draw.svgTextInput.MAXTEXTLENGTH);
+        datestring + this.title, MilestoneTD.MAXTEXTLENGTH);
 
     var comment = Draw.svgElem ("text", {
         "class": "msComment",
         "transform": "translate(5, 0)"
     }, parent);
-    comment.textContent = Util.truncate(this.comment, Draw.svgTextInput.MAXTEXTLENGTH);
+    comment.textContent = Util.truncate(this.comment, MilestoneTD.MAXTEXTLENGTH);
 };
 
 // user events

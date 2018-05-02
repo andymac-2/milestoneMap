@@ -67,3 +67,14 @@ Draw.fixedXElement = function (xoffset, y, elem, parentElem) {
     parentElem.addEventListener("scroll", move)
     moveNow ();
 };
+
+Draw.getTextWidth = function (font, text) {
+    if (!Draw.getTextWidth.ctx) {
+        Draw.getTextWidth.ctx =
+            document.createElement("canvas").getContext("2d");
+    }
+    
+    var ctx = Draw.getTextWidth.ctx;
+    ctx.font = font;
+    return ctx.measureText(text).width;
+};

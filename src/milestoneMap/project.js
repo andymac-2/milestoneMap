@@ -96,8 +96,6 @@ Project.prototype.flowMilestoneData = function () {
     // sort descending
     milestones.sort((a, b) => b.x - a.x);
     milestones.forEach(ms => {
-        // elements must be part of the DOM in order to get width, so I just hack it here.
-        this.mMap.elem.appendChild(ms.elemInfo);
         var width = ms.getInfoWidth();
         var lEdge = ms.x;
         var rEdge = lEdge + width;

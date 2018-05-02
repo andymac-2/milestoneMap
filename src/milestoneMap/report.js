@@ -68,7 +68,7 @@ Report.prototype.drawLine = function () {
     var x = this.mMap.getXCoord(this.date);
 
     Draw.svgElem("line", {
-        "x1": x, "y1": this.mMap.dateHeader.endy,
+        "x1": x, "y1": DateHeader.ROWY,
         "x2": x, "y2": Draw.getElemHeight(this.mMap.elem)
     }, this.lineElem);
 

@@ -87,8 +87,8 @@ MsAtReport.prototype.draw = function () {
     this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
 
     this.drawInfo();
-    this.elem.appendChild (this.elemPointer);
-
+    this.elem.appendChild(this.elemPointer);
+    
     var g = Draw.svgElem("g", {}, this.elem);
 
     this.diamond = Draw.svgElem("path", {
@@ -198,9 +198,14 @@ MsAtReport.prototype.updateDiamond = function (cls) {
     this.diamond.setAttribute("class", this.resolveStatusClass());
 };
 
+MsAtReport.COMMENTFONT = "small italic sans-serif";
+MsAtReport.NAMEFONT = "small sans-serif";
 MsAtReport.INFOMARGIN = 15;
 MsAtReport.prototype.getInfoWidth = function () {
-    return Draw.getElemWidth (this.elemInfo) + MsAtReport.INFOMARGIN;
+    var commentWidth = Draw.getTextWidth(MsAtReport.COMMENTFONT, this.comment);
+    var nameWidth = Draw.getTextWidth(MsAtReport.NAMEFONT, this.milestone.name + "MMM 00: ");
+    return MsAtReport.INFOMARGIN +
+        (commentWidth > nameWidth ? commentWidth : nameWidth);
 };
 
 MsAtReport.prototype.reflowUp = function () {
