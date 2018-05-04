@@ -23,7 +23,8 @@ var MilestoneTD = function (options, title, date, comment) {
 };
 MilestoneTD.HEIGHT = 35;
 MilestoneTD.TEXTBOXHEIGHT = 45;
-MilestoneTD.YOFFSET = 40;
+MilestoneTD.YOFFSET = 55;
+MilestoneTD.XOFFSET = 5;
 MilestoneTD.HEIGHTWIDTHRATIO = 6;
 MilestoneTD.MAXTEXTLENGTH = 100;
 MilestoneTD.prototype.restore = function (title, date, comment) {
@@ -49,7 +50,7 @@ MilestoneTD.prototype.onclick = function (parent) {
     var foreign = Draw.svgElem("foreignObject", {
         "width": width,
         "height": (height),
-        "x": 0,
+        "x": MilestoneTD.XOFFSET,
         "y": (0 - MilestoneTD.YOFFSET)
     }, parent);
 

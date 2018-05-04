@@ -96,19 +96,33 @@ Project.prototype.flowMilestoneData = function () {
     // sort descending
     milestones.sort((a, b) => b.x - a.x);
     milestones.forEach(ms => {
-        var width = ms.getInfoWidth();
         var lEdge = ms.x;
-        var rEdge = lEdge + width;
+        
+        var width1 = ms.getLine1Width();
+        var rEdge1 = lEdge + width1;
+        
+        var width2 = ms.getLine2Width();
+        var rEdge2 = lEdge + width2;
 
-        // find the first layer with no collision.
-        for (var i = 0; i < spaces.length && rEdge > spaces[i]; i++) {}
-        spaces[i] = lEdge;
+        // find the first layer with no collisions.
+        for (var i = 0; i < spaces.length; i++) {
+            if ((!spaces[i] || rEdge2 <= spaces[i]) &&
+                (!spaces [i + 1] || rEdge1 <= spaces [i + 1]))
+            {
+                break;
+            }
+        }
+        // insert layer, if comment exists, add that too.
+        spaces[i + 1] = lEdge;
+        if (width2 !== 0) {
+            spaces [i] = lEdge;
+        }
 
         // add milestone to that layer. Create a new one if required
         if (!layers[i]) {
             layers[i] = Draw.svgElem("g", {
                 "transform": "translate(0, " +
-                    (-i * MilestoneTD.HEIGHT) + ")"
+                    (-i * MilestoneTD.HEIGHT / 2) + ")"
             });
         }
         layers[i].appendChild (ms.elemInfo);
@@ -116,14 +130,16 @@ Project.prototype.flowMilestoneData = function () {
     });
 
     // height dependent on how many layers.
-    this.height = layers.length * MilestoneTD.HEIGHT;
+    this.height = layers.length * MilestoneTD.HEIGHT / 2;
 
     // add layers from top to bottom.
     var milestoneData = Draw.svgElem ("g", {
         "transform": "translate(0, " + this.height + ")"
     }, this.elem);
     for (var i = layers.length - 1; i >= 0; i--) {
-        milestoneData.appendChild(layers[i]);
+        if (layers[i]) {
+            milestoneData.appendChild(layers[i]);
+        }
     }
 
     this.height += Project.MINHEIGHT;

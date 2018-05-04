@@ -144,7 +144,7 @@ MsAtReport.prototype.drawInfo = function () {
         "icon": "icons/arrow-right.svg",
         "action": this.createDependency.bind(this)
     }], {
-        "transform": "translate(0, -60)"
+        "transform": "translate(0, -75)"
     }, g);
 
     return this.elemInfo;
@@ -153,7 +153,7 @@ MsAtReport.prototype.drawInfo = function () {
 MsAtReport.prototype.drawPointer = function (level) {
     this.elemPointer.innerHTML = "";
     var height = Project.MILESTONEOFFSET -
-        level * MilestoneTD.HEIGHT -
+        level * (MilestoneTD.HEIGHT / 2) -
         Project.MINHEIGHT - 20;;
     var line = Draw.svgElem ("line", {
         "x1": "0", "y1":  height,
@@ -199,11 +199,14 @@ MsAtReport.prototype.updateDiamond = function (cls) {
 MsAtReport.COMMENTFONT = "small italic sans-serif";
 MsAtReport.NAMEFONT = "small sans-serif";
 MsAtReport.INFOMARGIN = 15;
-MsAtReport.prototype.getInfoWidth = function () {
-    var commentWidth = Draw.getTextWidth(MsAtReport.COMMENTFONT, this.comment);
-    var nameWidth = Draw.getTextWidth(MsAtReport.NAMEFONT, this.milestone.name + "MMM 00: ");
-    return MsAtReport.INFOMARGIN +
-        (commentWidth > nameWidth ? commentWidth : nameWidth);
+MsAtReport.prototype.getLine1Width = function () {
+    var width = Draw.getTextWidth(
+        MsAtReport.NAMEFONT, this.milestone.name + "MMM 00: ");
+    return width + MsAtReport.INFOMARGIN;
+};
+MsAtReport.prototype.getLine2Width = function () {
+    var width = Draw.getTextWidth(MsAtReport.COMMENTFONT, this.comment);
+    return width === 0 ? 0 : width + MsAtReport.INFOMARGIN;
 };
 
 MsAtReport.prototype.reflowUp = function () {
