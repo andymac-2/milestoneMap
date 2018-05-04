@@ -9,11 +9,11 @@ var MilestoneTD = function (options, title, date, comment) {
 
     // view model
     this.unclicker = options.unclicker;
-    this.onTitleChange = options.onTitleChange || (() => {});
-    this.onDateChange = options.onDateChange || (() => {});
-    this.onCommentChange = options.onCommentChange || (() => {});
+    this.onChange = options.onChange || (() => {});
     this.parent = options.parent;
     this.attrs = options.attrs || {};
+
+    this.modified = false;
 
     //view
     this.elem;
@@ -61,7 +61,6 @@ MilestoneTD.prototype.onclick = function (parent) {
     }, foreign);
     
     dateBox.addEventListener("change", this.modifyDate.bind(this, dateBox));
-    dateBox.addEventListener("blur", e => this.onDateChange(e, this));
     
     var titleBox = Draw.htmlElem ("input", {
         "class": "svgTextBox",
@@ -71,7 +70,6 @@ MilestoneTD.prototype.onclick = function (parent) {
     }, foreign);
     
     titleBox.addEventListener("change", this.modifyTitle.bind(this, titleBox));
-    titleBox.addEventListener("blur", e => this.onTitleChange(e, this));
 
     var commentBox = Draw.htmlElem ("input", {
         "class": "svgCommentBox",
@@ -81,10 +79,14 @@ MilestoneTD.prototype.onclick = function (parent) {
     }, foreign);
     
     commentBox.addEventListener("change", this.modifyComment.bind(this, commentBox));
-    commentBox.addEventListener("blur", e => this.onCommentChange(e, this));
 };
 
 MilestoneTD.prototype.onunclick = function (parent) {
+    if (this.modified) {
+        this.onChange(this);
+        this.modified = false;
+    }
+
     parent.innerHTML = "";
 
     var date = new Date (this.date);
@@ -108,12 +110,15 @@ MilestoneTD.prototype.onunclick = function (parent) {
 // user events
 MilestoneTD.prototype.modifyTitle = function (elem) {
     this.restore(elem.value, this.date, this.comment);
+    this.modified = true;
 };
 
 MilestoneTD.prototype.modifyComment = function (elem) {
     this.restore(this.title, this.date, elem.value);
+    this.modified = true;
 };
 
 MilestoneTD.prototype.modifyDate = function (elem) {
     this.date = Util.getDateValueFromInputElem (elem);
+    this.modified = true;
 };

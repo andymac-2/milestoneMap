@@ -103,6 +103,12 @@ Milestone.prototype.draw = function () {
     }
 };
 
+Milestone.prototype.reflowUp = function () {
+    var project = this.milestone.project;
+    project.draw();
+    project.reflowUp();
+};
+
 
 // linking
 Milestone.prototype.addReport = function (report) {
@@ -119,16 +125,6 @@ Milestone.prototype.deleteThis = function () {
     this.atReports.forEach(atReport => atReport.deleteThis());
     this.mMap.removeMilestone (this);
 };
-
-// user modifications
-Milestone.prototype.modifyName = function (e, input) {
-    this.name = input.title;
-};
-Milestone.prototype.deleteDraw = function () {
-    this.deleteThis ();
-    this.project.draw ();
-};
-
 
 
 // other methods

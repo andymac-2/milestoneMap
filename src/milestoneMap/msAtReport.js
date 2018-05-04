@@ -127,9 +127,7 @@ MsAtReport.prototype.drawInfo = function () {
     
     var nameDate = new MilestoneTD ({
         unclicker: this.mMap.unclicker,
-        onTitleChange: this.milestone.modifyName.bind(this.milestone),
-        onDateChange: this.modifyDate.bind(this),
-        onCommentChange: this.modifyComment.bind(this),
+        onChange: this.modifyData.bind(this),
         parent: g,
         attrs: {
             "class": "milestoneData"
@@ -252,18 +250,14 @@ MsAtReport.prototype.deleteThis = function () {
 
 
 // user modifications
-MsAtReport.prototype.modifyDate = function (e, input) {
-    var date = input.date;
-    this.date = this.mMap.clampDate (date);
+MsAtReport.prototype.modifyData = function (input) {
+    this.date = this.mMap.clampDate (input.date);
+    this.comment = input.comment;
+    this.milestone.name = input.title;
 
     this.draw();
     this.drawLine();
     this.milestone.draw();
-
-    this.reflowUp();
-};
-MsAtReport.prototype.modifyComment = function (e, input) {
-    this.comment = input.comment;
 
     this.reflowUp();
 };
@@ -275,11 +269,13 @@ MsAtReport.prototype.deleteDraw = function () {
     this.deleteThis ();
 
     if (this.milestone.atReports.length === 0) {
-        this.milestone.deleteDraw ();
+        this.milestone.deleteThis ();
     }
     else {
         this.milestone.draw();
     }
+
+    this.reflowUp ();
 };
 MsAtReport.prototype.createDependency = function () {
     this.mMap.globalMode = MilestoneMap.CREATEDEPENDENCY;
