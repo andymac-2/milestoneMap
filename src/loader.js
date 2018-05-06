@@ -42,7 +42,7 @@ Loader.prototype.draw = function () {
         "action": this.save.bind(this)
     }, {
         "icon": "icons/print.svg",
-        "action": () => {} // TODO
+        "action": this.print.bind(this)
     }, {
         "icon": "icons/exportCSV.svg",
         "action": this.exportCSV.bind(this)
@@ -81,7 +81,8 @@ Loader.prototype.draw = function () {
 
     var header = Draw.elem ("div", {
         "class": "menuBarHeader"
-    }, version).textContent = "Version: " + VERSION;
+    }, version).textContent = "Version: " + VERSION +
+        " \xA9 Andrew Pritchard 2018";
 
     Draw.svgElem ("svg", {
         "width": "200"
@@ -173,4 +174,16 @@ Loader.prototype.exportCSV = function () {
     var string = this.map.exportCSVMilestones();
     Util.download (this.map.name + ".csv", string, "application/json",
                    this.elem);
-}
+};
+
+Loader.prototype.print = function () {
+    var newWindow = window.open (window.location.href, "_blank", "");
+    newWindow.document.write (this.map.elem.outerHTML);
+    var child = newWindow.document.firstChild;
+        
+    Draw.svgElem ("link", {
+        "rel": "stylesheet",
+        "href": "./main.css"
+    }, child);
+    newWindow.print();
+};
