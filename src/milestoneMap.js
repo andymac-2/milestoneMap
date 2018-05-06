@@ -1,6 +1,6 @@
 'use strict'
 
-var MilestoneMap = function (obj) {
+var MilestoneMap = function (obj, pagesize) {
     
     //state
     this.start;
@@ -40,10 +40,16 @@ var MilestoneMap = function (obj) {
         "class": "fg"
     }, this.elem);
 
+    this.printElem = Draw.elem("html", {
+        "class": "printablePages"
+    })
+    
     //view model
     this.width;
     this.unclicker = new Unclicker (this.elem);
     this.dateHeader;
+
+    this.pageSize = pagesize;
 
     // events
     this.globalMode = MilestoneMap.SELECT;
@@ -102,7 +108,7 @@ MilestoneMap.prototype.save = function () {
 };
 
 // drawing methods
-MilestoneMap.prototype.draw = function (obj) {
+MilestoneMap.prototype.draw = function () {
     this.fg.innerHTML = "";
     this.bg.innerHTML = "";
     this.depLayer.innerHTML = "";
@@ -110,7 +116,7 @@ MilestoneMap.prototype.draw = function (obj) {
     this.width = this.elem.getBoundingClientRect().width
 
     // maybe this would be better as a series of functions rather than a class.
-    this.dateHeader = new DateHeader (this);
+    this.dateHeader = new DateHeader (this, this.bg);
     
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
@@ -121,6 +127,79 @@ MilestoneMap.prototype.draw = function (obj) {
     this.fg.appendChild(this.currReport.drawLine());
     
     this.reflow ();
+};
+
+MilestoneMap.prototype.PX_PER_MM = 4.0;
+MilestoneMap.prototype.drawPrint = function () {
+    this.printElem.innerHTML = "";
+
+    var styles = Draw.elem ("style", {
+        "type": "text/css"
+    }, this.printElem);
+
+    styles.innerHTML = Util.getCSS();
+    
+    this.width = this.pageSize.width * MilestoneMap.prototype.PX_PER_MM;
+
+    this.msAtReports.forEach (elem => elem.draw());
+    this.milestones.forEach (elem => elem.draw());
+    this.projects.forEach (elem => elem.draw());
+
+    this.programmes.forEach(programme => programme.draw());
+
+    var programmei = 0;
+    var projecti = 0;
+    // draw at least one page
+    do {
+        var page = Draw.svgElem ("svg", {
+            "class": "milestoneMapPage",
+            "viewbox": "0 0 " +
+                (this.pageSize.width * MilestoneMap.prototype.PX_PER_MM) + " " +
+                (this.pageSize.height * MilestoneMap.prototype.PX_PER_MM),
+            "style": "width:100%;height:auto;"
+        }, this.printElem);
+
+        var yoffset = new DateHeader (this, page).endy;
+        var spaceLeft = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM - yoffset;
+
+        // nothing more to draw;
+        if (programmei >= this.programmes.length) {
+            break;
+        }
+
+        // TODO: leave business milestones for now. will require element duplication
+        // page.appendChild(this.businessMs.draw());
+        // var children = [this.buinessMs];
+
+        // also TODO: dependencies, report line
+        
+        var first = true;
+        
+        do {
+            var programme = this.programmes[programmei];
+            var vals = programme.drawPrint (spaceLeft, projecti, first);
+            first = false;
+
+            page.appendChild(vals.elem);
+            vals.elem.setAttribute("transform", "translate(0, " + yoffset + ")");
+
+            //completely drawn
+            if (vals.index === programme.projects.length) {
+                programmei ++;
+                projecti = 0;
+                yoffset += spaceLeft - vals.spaceLeft;
+                spaceLeft = vals.spaceLeft;
+            }
+            // incompletely drawn, continue to next page
+            else {
+                projecti = vals.index;
+                break;
+            }
+        } while (programmei < this.programmes.length);
+    } while (programmei < this.programmes.length);
+    
+
+    return this.printElem;
 };
 MilestoneMap.prototype.drawDependencies = function () {
     this.dependencies.forEach (elem => {
@@ -151,7 +230,6 @@ MilestoneMap.prototype.deactivateOnUnclick = function (event) {
         this.globalData = null;
     }
 };
-
 
 // x coordinate methods
 MilestoneMap.prototype.getXCoord = function (date) {

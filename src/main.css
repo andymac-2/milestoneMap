@@ -3,6 +3,9 @@ body {
     overflow: hidden;
 }
 /* overall */
+/* .milestoneMapPage { */
+/*     page-break-after: always; */
+/* } */
 
 /* menu bar */
 .menubar {
@@ -57,7 +60,6 @@ body {
     overflow: scroll;
     max-height: 90vh;
 }
-
 .milestoneMap {
     width: 100%;
 }

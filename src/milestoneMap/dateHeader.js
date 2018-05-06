@@ -1,15 +1,19 @@
 'use strict'
 
 // maybe better as a function rather than a class
-var DateHeader = function (mMap) { 
+var DateHeader = function (mMap, parent) { 
     // view
-    this.bgElem = Draw.svgElem ("g", {}, mMap.bg);
-    this.fgElem = Draw.svgElem ("g", {}, mMap.fg);
+    this.elem = Draw.svgElem("g", {
+        "class": "dateHeader"
+    }, parent);
+    this.bgElem =Draw.svgElem ("g", {}, this.elem);
+    this.fgElem = Draw.svgElem ("g", {}, this.elem);
 
     // view model
     this.mMap = mMap;
+    this.endy;
 
-    this.restore();
+    this.draw();
 };
 
 // zero dates
@@ -96,10 +100,6 @@ DateHeader.getDecade = function (date) {
     var year = date.getUTCFullYear();
     var decade = year - (year % 10);
     return ("" + decade + "'s");
-};
-
-DateHeader.prototype.restore = function () {
-    this.draw();
 };
 
 DateHeader.TITLEY = 30;

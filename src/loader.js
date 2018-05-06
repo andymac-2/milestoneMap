@@ -177,13 +177,10 @@ Loader.prototype.exportCSV = function () {
 };
 
 Loader.prototype.print = function () {
-    var newWindow = window.open (window.location.href, "_blank", "");
-    newWindow.document.write (this.map.elem.outerHTML);
-    var child = newWindow.document.firstChild;
-        
-    Draw.svgElem ("link", {
-        "rel": "stylesheet",
-        "href": "./main.css"
-    }, child);
+    var mMap = new MilestoneMap (this.map.save(), {width: 385, height: 262});
+    mMap.drawPrint();
+    var newWindow = window.open ("", "_blank", "");
+    
+    newWindow.document.body.innerHTML = mMap.printElem.outerHTML;
     newWindow.print();
 };
