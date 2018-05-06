@@ -113,7 +113,8 @@ MilestoneMap.prototype.draw = function () {
     this.bg.innerHTML = "";
     this.depLayer.innerHTML = "";
 
-    this.width = this.elem.getBoundingClientRect().width
+    this.width = Draw.getElemWidth(this.elem);
+    this.height = Draw.getElemHeight(this.elem);
 
     // maybe this would be better as a series of functions rather than a class.
     this.dateHeader = new DateHeader (this, this.bg);
@@ -140,6 +141,7 @@ MilestoneMap.prototype.drawPrint = function () {
     styles.innerHTML = Util.getCSS();
     
     this.width = this.pageSize.width * MilestoneMap.prototype.PX_PER_MM;
+    this.height = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM
 
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
@@ -232,9 +234,24 @@ MilestoneMap.prototype.deactivateOnUnclick = function (event) {
 };
 
 // x coordinate methods
+MilestoneMap.SIDEBARFRACTION = 0.2;
+MilestoneMap.MAXSIDEBARWIDTH = 350;
+MilestoneMap.prototype.getSideBarWidth = function () {
+    var maxWidth = this.width * MilestoneMap.SIDEBAFRACTION;
+    return maxWidth < MilestoneMap.MAXSIDEBARWIDTH ?
+        maxWidth : MilestoneMap.MAXSIDEBARWIDTH;
+};
+MilestoneMap.prototype.getUsableWidth = function () {
+    return this.width - this.getSideBarWidth();
+};
 MilestoneMap.prototype.getXCoord = function (date) {
+    var maxWidth = this.width * MilestoneMap.SIDEBAFRACTION;
+    var sideBarWidth = maxWidth < MilestoneMap.MAXSIDEBARWIDTH ?
+        maxWidth : MilestoneMap.MAXSIDEBARWIDTH;
+    var usableWidth = this.width - sideBarWidth;
+    
     var z = (date.valueOf() - this.start)/(this.end - this.start)
-    return z * this.width;
+    return z * usableWidth + sideBarWidth;
 };
 MilestoneMap.prototype.defaultDate = function () {
     var now = new Date(Date.now());

@@ -72,6 +72,10 @@ body {
 .mMapEdgeDate {
     font-weight: bold;
 }
+.whiteBackground {
+    fill: #FFFFFF
+}
+
 /* reports */
 .reportHeader {
     font-size: small;
@@ -108,10 +112,10 @@ body {
 
 /* date headers */
 .even {
-    fill: none;
+    fill: #fbfbfb;
 }
 .odd {
-    fill: #fbfbfb;
+    fill: none;
 }
 .dateHeaderSeparator {
     stroke: black;

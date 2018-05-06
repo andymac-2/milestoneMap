@@ -183,4 +183,5 @@ Loader.prototype.print = function () {
     
     newWindow.document.body.innerHTML = mMap.printElem.outerHTML;
     newWindow.print();
+    newWindow.close();
 };

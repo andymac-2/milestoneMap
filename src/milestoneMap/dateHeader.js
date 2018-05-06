@@ -156,8 +156,9 @@ DateHeader.prototype.draw = function () {
         y += DateHeader.ROWHEIGHT;
     }
 
+    // TODO all calls to Draw.getElemHEight replaced with something printer friendly
     if (rows.length > 1) {
-    this.drawRow(y, Draw.getElemHeight(this.mMap.elem), rows[rows.length - 2],
+    this.drawRow(y, this.mMap.height, rows[rows.length - 2],
                  this.drawHighlightedBox.bind(this));
         y += DateHeader.ROWHEIGHT;
     
@@ -166,12 +167,19 @@ DateHeader.prototype.draw = function () {
         this.endy = y + DateHeader.ROWHEIGHT;
     }
     else {
-        this.drawRow(y, Draw.getElemHeight(this.mMap.elem), rows[0],
+        this.drawRow(y, this.mMap.height, rows[0],
                  this.drawHighlightedBox.bind(this));
         this.endy = y + DateHeader.ROWHEIGHT;
     }
 
     this.endy += DateHeader.BUFFERHEIGHT;
+    
+    Draw.svgElem ("rect", {
+        "x" : "0", "y": "0",
+        "width": this.mMap.getSideBarWidth(),
+        "height": this.mMap.height,
+        "class": "whiteBackground"
+    }, this.bgElem)
 };
 
 DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
@@ -188,7 +196,7 @@ DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
         "y": y1 + DateHeader.TEXTOFFSET,
         "x": (x1 + x2) /2,
         "text-anchor": "middle"
-    }, this.fgElem).textContent = text;
+    }, this.bgElem).textContent = text;
 };
 DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, y2, text, cls) {
     Draw.svgElem ("line", {
@@ -202,7 +210,7 @@ DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, y2, text, cls) {
         "y": y1 + DateHeader.TEXTOFFSET,
         "x": (x1 + x2) /2,
         "text-anchor": "middle"
-    }, this.fgElem).textContent = text;
+    }, this.bgElem).textContent = text;
 };
 
 DateHeader.DAYS = 0;

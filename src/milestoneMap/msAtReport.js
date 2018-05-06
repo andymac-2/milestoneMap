@@ -77,8 +77,7 @@ MsAtReport.prototype.draw = function () {
     this.elem.innerHTML = "";
     this.elemPointer.innerHTML = "";
     
-    if (!this.isCurrent() &&
-        this.report !== this.mMap.cmpReport)
+    if (!this.isDrawable())
     {
         return;
     }
@@ -185,8 +184,15 @@ MsAtReport.prototype.resolveStatusClass = function () {
     }
     assert (() => false);
 };
+MsAtReport.prototype.isDrawable = function () {
+    return (this.isCurrent() || this.isComparison())
+        && this.mMap.isInInterval(this.date);
+};
 MsAtReport.prototype.isCurrent = function () {
     return this.mMap.currReport === this.report;
+};
+MsAtReport.prototype.isComparison = function () {
+    return this.report === this.mMap.cmpReport
 };
 MsAtReport.prototype.isBusinessMs = function () {
     return this.milestone.project.index === -1;
