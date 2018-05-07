@@ -64,6 +64,7 @@ Programme.prototype.draw = function () {
 };
 
 Programme.prototype.drawPrint = function (spaceLeft, startIndex, first) {
+    var saveStartIndex = startIndex;
     var printable = Draw.svgElem ("g", {
         "class": "programme"
     });
@@ -113,7 +114,7 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first) {
         return {
             elem: Draw.svgElem ("g", {}),
             spaceLeft: 0,
-            index: startIndex - 1
+            index: saveStartIndex
         };
     }
     // some projects fit, but not all

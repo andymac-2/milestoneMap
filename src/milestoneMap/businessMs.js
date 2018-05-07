@@ -31,17 +31,11 @@ BusinessMs.prototype.draw = function () {
         "class": "projectLine"
     }, this.elem);
 
-    var milestoneLines = Draw.svgElem ("g", {
-        
-    }, this.elem)
     var milestones = Draw.svgElem("g", {
         "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
     }, this.elem);
     this.milestones.forEach(milestone => {
-        var current = milestone.currentReport();
-        if (current) {
-            milestoneLines.appendChild (milestone.currentReport().drawLine());
-        }
+        milestone.currentReport().drawLine();
         milestones.appendChild (milestone.elem);
     });
 

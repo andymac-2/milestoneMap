@@ -120,12 +120,13 @@ Util.truncate = function (string, length) {
     return string;
 };
 
+// this functio9n lacks compatibility TODO: create alternative.
 Util.getCSS = function () {
     var css= [];
 
-    for (var sheeti= 0; sheeti<document.styleSheets.length; sheeti++) {
-        var sheet= document.styleSheets[sheeti];
-        var rules= ('cssRules' in sheet)? sheet.cssRules : sheet.rules;
+    for (var sheeti = 0; sheeti < document.styleSheets.length; sheeti++) {
+        var sheet = document.styleSheets[sheeti];
+        var rules = ('cssRules' in sheet)? sheet.cssRules : sheet.rules;
         for (var rulei= 0; rulei<rules.length; rulei++) {
             var rule= rules[rulei];
             if ('cssText' in rule)

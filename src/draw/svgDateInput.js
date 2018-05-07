@@ -1,7 +1,9 @@
 'use strict'
 
-Draw.svgDateInput = function (date, alignment, unclicker, onchange, attrs, parent) {
+Draw.svgDateInput = function (options, date) {
     this.date;
+
+    var alignment = options.alignment;
 
     switch (alignment) {
     case Draw.ALIGNLEFT:
@@ -15,10 +17,12 @@ Draw.svgDateInput = function (date, alignment, unclicker, onchange, attrs, paren
         break;
     }
 
-    this.unclicker = unclicker;
-    this.onchange = onchange;
-    this.parent = parent;
-    this.attrs = attrs;
+    this.unclicker = options.unclicker;
+    this.onchange = options.onchange || (() => {});
+    this.parent = options.parent;
+    this.attrs = options.attrs || {};
+    this.min = options.min || null;
+    this.max = options.max || null;
 
     this.elem;
 
@@ -51,13 +55,21 @@ Draw.svgDateInput.prototype.onclick = function (parent) {
         "x": x,
         "y": 0 - height
     }, parent);
-    
-    var dateBox = Draw.htmlElem ("input", {
+
+    var attrs = {
         "class": "svgDateBox",
         "value": Util.getISODateOnly (this.date),
         "type": "date",
         "required": ""
-    }, foreign);
+    };
+    if (this.min) {
+        attrs["min"] = Util.getISODateOnly (this.min);
+    }
+    if (this.max) {
+        attrs["max"] = Util.getISODateOnly (this.max);
+    }
+    
+    var dateBox = Draw.htmlElem ("input", attrs, foreign);
     dateBox.focus();
     dateBox.select();
     dateBox.addEventListener("blur", this.modifyDate.bind(this, dateBox));

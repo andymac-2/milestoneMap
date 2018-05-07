@@ -272,24 +272,35 @@ DateHeader.prototype.drawTitle = function () {
         }, g);
 };
 
+DateHeader.TWODAYS = 172800000;
 DateHeader.prototype.drawEndDates = function () {
     var g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.start, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.mMap.modifyStartDate.bind(this.mMap), {
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.mMap.modifyStartDate.bind(this.mMap),
+        parent: g,
+        max: this.mMap.end - DateHeader.TWODAYS,
+        alignment: Draw.ALIGNLEFT,
+        attrs: {
             "transform": "translate(10 " + DateHeader.TITLEY + ")",
             "class":  "mMapEdgeDate"
-        }, g);
+        }
+    }, this.mMap.start);
 
     g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.end, Draw.ALIGNRIGHT, this.mMap.unclicker,
-        this.mMap.modifyEndDate.bind(this.mMap), {
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.mMap.modifyEndDate.bind(this.mMap),
+        parent: g,
+        min: this.mMap.start + DateHeader.TWODAYS,
+        alignment: Draw.ALIGNRIGHT,
+        attrs: {
             "transform": "translate(" + 
                 (this.mMap.width - 10) + " " +
                 DateHeader.TITLEY + ")",
             "class": "mMapEdgeDate"
-        }, g);
+        }
+    }, this.mMap.end);
 };
 
 DateHeader.prototype.drawReports = function () {

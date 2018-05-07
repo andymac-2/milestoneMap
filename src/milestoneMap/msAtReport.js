@@ -87,6 +87,10 @@ MsAtReport.prototype.draw = function () {
 
     this.drawInfo();
     this.elem.appendChild(this.elemPointer);
+    if (this.isCurrent() && this.isBusinessMs() && this.isDrawable()) {
+        this.elem.appendChild(this.elemLine);
+    }
+    
     
     var g = Draw.svgElem("g", {}, this.elem);
 
@@ -101,14 +105,10 @@ MsAtReport.prototype.draw = function () {
 };
 MsAtReport.prototype.drawLine = function () {
     this.elemLine.innerHTML = "";
-    
-    if (!this.isCurrent() || !this.isBusinessMs()) {
-        return this.elemLine;
-    }
 
     Draw.svgElem("line", {
-        "x1": this.x, "y1": 0,
-        "x2": this.x, "y2": Draw.getElemHeight(this.mMap.elem)
+        "x1": 0, "y1": 0,
+        "x2": 0, "y2": this.mMap.height
     }, this.elemLine);
 
     return this.elemLine;

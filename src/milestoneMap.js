@@ -149,6 +149,9 @@ MilestoneMap.prototype.drawPrint = function () {
 
     this.programmes.forEach(programme => programme.draw());
 
+    var reportNode = this.currReport.drawLine();
+    var businessMsNode = this.businessMs.draw();
+
     var programmei = 0;
     var projecti = 0;
     // draw at least one page
@@ -162,18 +165,24 @@ MilestoneMap.prototype.drawPrint = function () {
         }, this.printElem);
 
         var yoffset = new DateHeader (this, page).endy;
+        
+        var clone = businessMsNode.cloneNode(true);
+        clone.setAttribute("transform", "translate(0, " + yoffset + ")");
+        page.appendChild(clone);
+        yoffset += this.businessMs.height;
+        
         var spaceLeft = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM - yoffset;
+
+        if (spaceLeft <= 0) {
+            throw new Error ("Page size not large enough for Business Milestones.");
+        }
 
         // nothing more to draw;
         if (programmei >= this.programmes.length) {
+            page.appendChild(this.currReport.drawLine().cloneNode(true));
             break;
         }
-
-        // TODO: leave business milestones for now. will require element duplication
-        // page.appendChild(this.businessMs.draw());
-        // var children = [this.buinessMs];
-
-        // also TODO: dependencies, report line
+        // TODO: dependencies
         
         var first = true;
         
@@ -198,6 +207,8 @@ MilestoneMap.prototype.drawPrint = function () {
                 break;
             }
         } while (programmei < this.programmes.length);
+        
+        page.appendChild(reportNode.cloneNode(true));
     } while (programmei < this.programmes.length);
     
 
