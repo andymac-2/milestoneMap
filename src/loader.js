@@ -31,7 +31,8 @@ Loader.prototype.draw = function () {
         "class": "menubar"
     }, this.elem);
 
-    Draw.menuBarSegment("File", [{
+    var fileSegment = Draw.menuBarSegment("File", menubar);
+    Draw.iconBar ([{
         "icon": "icons/new.svg",
         "action": this.newFile.bind(this)
     }, {
@@ -46,47 +47,34 @@ Loader.prototype.draw = function () {
     }, {
         "icon": "icons/exportCSV.svg",
         "action": this.exportCSV.bind(this)
-    }], menubar);
+    }], {}, fileSegment.body);
 
-   Draw.menuBarSegment("Programme", [{
+    var programmeSegment = Draw.menuBarSegment("Programme", menubar);
+    Draw.iconBar([{
         "icon": "icons/plus.svg",
         "action": this.map.newProgramme.bind(this.map)
-    }], menubar)
+    }], {}, programmeSegment.body);
 
-    var reportMenu = Draw.menuBarSegment("Report", [{
+    var reportSegment = Draw.menuBarSegment("Report", menubar);
+    Draw.iconBar ([{
         "icon": "icons/plus.svg",
         "action": this.newReport.bind(this)
     }, {
         "icon": "icons/delete.svg",
         "action": this.deleteCurrReport.bind(this)
-    }], menubar);
-
-    var container = Draw.elem ("span", {
-        "class": "reportSelectorContainer"
-    }, reportMenu)
-    
+    }], {}, reportSegment.body);  
     
     this.reportSelector (
         "Current:", this.modifyCurrReport.bind(this), {
             "class": "reportSelector"
-        }, container);
+        }, reportSegment.body);
     this.reportSelector (
         "Baseline:", this.modifyCmpReport.bind(this), {
             "class": "reportSelector"
-        }, container);
+        }, reportSegment.body);
 
-    var version = Draw.elem ("span", {
-        "class": "menuBarSegment"
-    }, menubar);
-
-    var header = Draw.elem ("div", {
-        "class": "menuBarHeader"
-    }, version).textContent = "Version: " + VERSION +
-        " \xA9 Andrew Pritchard 2018";
-
-    Draw.svgElem ("svg", {
-        "width": "200"
-    }, version);
+    var versionSegment = Draw.menuBarSegment ("Version: " + VERSION +
+        " \xA9 Andrew Pritchard 2018", menubar);
   
     this.elem.appendChild(this.map.scrollbox);
     var height = window.innerHeight - Draw.getElemHeight(menubar) - 10;
@@ -95,24 +83,8 @@ Loader.prototype.draw = function () {
     this.map.draw();
 };
 Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
-    var div = Draw.elem("div", attrs, parent);
-
-    Draw.elem("span", {}, div).textContent = text;
-    
-    var select = Draw.elem ("select", {
-        "class": "reportSelectorDropdown"
-    }, div);
-    select.addEventListener ("change", onchange);
-
-    Draw.elem ("option", {
-        "selected": "",
-        "disabled": "",
-        "hidden": ""
-    }, select).textContent = "Select a report";
-    
-    this.map.reports.forEach (report => report.drawMenu(select));
-
-    return div;
+    var entries = this.map.reports.map (report => report.getMenuText());
+    return Draw.dropDownSegment (text, onchange, entries, attrs, parent);
 };
 
 // modifications
@@ -128,7 +100,7 @@ Loader.prototype.modifyCmpReport = function (evt) {
     this.map.draw ();
 };
 Loader.prototype.newReport = function () {
-    this.map.addReport ({"name": "New Report", "date": Date.now()});
+    this.map.addReport ({"name": "New Report", "date": this.map.defaultDate()});
     this.draw();
 };
 Loader.prototype.deleteCurrReport = function () {
@@ -137,7 +109,7 @@ Loader.prototype.deleteCurrReport = function () {
 };
 
 Loader.prototype.newFile = function () {
-    var now = Date.now();
+    var now = MilestoneMap.prototype.defaultDate();
     var twoMonths = 60 * 24 * 60 * 60 * 1000;
     var twoMonthsAgo = now - twoMonths;
     var date = new Date(twoMonthsAgo);

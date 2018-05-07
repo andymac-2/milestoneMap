@@ -50,7 +50,7 @@ Draw.menu = function (alignment, unclicker, entries, attrs, parent) {
     return menu;
 };
 
-Draw.menuBarSegment = function (name, entries, parent) {
+Draw.menuBarSegment = function (name, parent) {
     var elem = Draw.elem ("span", {
         "class": "menuBarSegment",
     }, parent);
@@ -58,13 +58,52 @@ Draw.menuBarSegment = function (name, entries, parent) {
     var header = Draw.elem ("div", {
         "class": "menuBarHeader"
     }, elem).textContent = name;
+
+    var body = Draw.elem ("div", {
+        "class": "menuBarContent"
+    }, elem);
+
+    return {elem: elem, body: body};
+};
+
+Draw.ICONBARHEIGHT = 40;
+Draw.iconBar = function (entries, attrs, parent) {
+    var container = Draw.elem ("span", attrs, parent);
     
     var svg = Draw.svgElem ("svg", {
         "width": Draw.MENUSPACING * (entries.length),
-    }, elem);
+        "height": Draw.ICONBARHEIGHT
+    }, container);
 
     var menu = Draw.visibleMenu (Draw.ALIGNLEFT, entries, svg);
     menu.setAttribute ("transform", "translate (0, 20)");
 
-    return elem
+    return container;
+};
+
+Draw.dropDownSegment = function (name, onchange, entries, attrs, parent) {
+    var elem = Draw.elem("span", attrs, parent);
+
+    Draw.elem("div", {
+        "class": "dropdownSegmentHeading"
+    }, elem).textContent = name;
+    
+    var select = Draw.elem ("select", {
+        "class": "dropdownSegmentDropdown"
+    }, elem);
+    select.addEventListener ("change", onchange);
+
+    Draw.elem ("option", {
+        "selected": "",
+        "disabled": "",
+        "hidden": ""
+    }, select).textContent = "Please choose:";
+
+    for (var i = 0; i < entries.length; i++) {
+        var elem = Draw.elem ("option", {
+            "value": i,
+        }, select).textContent = entries[i];
+    };
+    
+    return elem;
 };

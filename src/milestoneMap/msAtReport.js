@@ -76,14 +76,14 @@ MsAtReport.prototype.save = function () {
 MsAtReport.prototype.draw = function () {
     this.elem.innerHTML = "";
     this.elemPointer.innerHTML = "";
+
+    this.x = this.mMap.getXCoord (this.date);
+    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
     
     if (!this.isDrawable())
     {
         return;
     }
-
-    this.x = this.mMap.getXCoord (this.date);
-    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
 
     this.drawInfo();
     this.elem.appendChild(this.elemPointer);

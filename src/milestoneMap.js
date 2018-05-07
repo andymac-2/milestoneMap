@@ -264,6 +264,7 @@ MilestoneMap.prototype.getXCoord = function (date) {
     var z = (date.valueOf() - this.start)/(this.end - this.start)
     return z * usableWidth + sideBarWidth;
 };
+// this is a static method, consider changing?
 MilestoneMap.prototype.defaultDate = function () {
     var now = new Date(Date.now());
     var offset = now.getTimezoneOffset() * 60 * 1000;

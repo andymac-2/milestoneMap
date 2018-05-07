@@ -26,12 +26,8 @@ Report.prototype.save = function () {
     return {"date": this.date, "name": this.name};
 };
 
-Report.prototype.drawMenu = function (parent) {
-    var elem = Draw.elem ("option", {
-        "value": this.index,
-    }, parent);
-    elem.textContent = this.name + ": "  + Util.getISODateOnly(this.date);
-    return elem;
+Report.prototype.getMenuText = function () {
+    return this.name + ": "  + Util.getISODateOnly(this.date);
 };
 
 Report.prototype.drawHeader = function (attrs, parent) {

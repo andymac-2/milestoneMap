@@ -31,28 +31,22 @@ body {
     color: #444;
     font-size: small;    
 }
-.reportSelectorContainer {
+.menuBarContent {
+     text-align: center;
+}
+.menuBarContent span {
     display: inline-block;
-    width: 250px;
+    height: 45px;
+    overflow: hidden;
+}
+.dropdownSegmentDropdown {
+    width: 90%;
+    display: inline;
 }
 .reportSelector {
     color: #444;
     font-size: small;
-    width: 240px;
-    height: 18px;
-    
-    display: flex;
-    justify-content: space-between;
-}
-.reportSelectorDropdown {
-    float: right;
-    width: 170px;
-    max-height: 18px;
-    display: inline-block;
-}
-.menuBarSegment svg {
-    display: inline;
-    height: 65%;
+    width: 140px;
 }
 
 /* milestone map total */
