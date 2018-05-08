@@ -257,13 +257,8 @@ MilestoneMap.prototype.getUsableWidth = function () {
     return this.width - this.getSideBarWidth();
 };
 MilestoneMap.prototype.getXCoord = function (date) {
-    var maxWidth = this.width * MilestoneMap.SIDEBAFRACTION;
-    var sideBarWidth = maxWidth < MilestoneMap.MAXSIDEBARWIDTH ?
-        maxWidth : MilestoneMap.MAXSIDEBARWIDTH;
-    var usableWidth = this.width - sideBarWidth;
-    
     var z = (date.valueOf() - this.start)/(this.end - this.start)
-    return z * usableWidth + sideBarWidth;
+    return z * this.getUsableWidth() + this.getSideBarWidth();
 };
 // this is a static method, consider changing?
 MilestoneMap.prototype.defaultDate = function () {
