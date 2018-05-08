@@ -37,6 +37,7 @@ BusinessMs.prototype.draw = function () {
     this.milestones
         .filter (milestone => milestone.currentReport())
         .forEach(milestone => {
+            assert (() => milestone.currentReport());
             milestone.currentReport().drawLine();
             milestones.appendChild (milestone.elem);
         });
