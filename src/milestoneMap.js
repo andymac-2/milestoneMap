@@ -361,12 +361,7 @@ MilestoneMap.prototype.addReport = function (obj) {
     this.cmpReport = this.currReport;
     this.currReport = report;
 };
-MilestoneMap.prototype.addReportFromCSV = function (arr) {
-    var report = new Report ({
-        "name": "New Report", "date": this.defaultDate()
-    }, this.reports.length, this);
-    this.reports.push (report);
-
+MilestoneMap.prototype.validateReportFromCSV = function (arr) {
     for (var i = 1; i < arr.length; i++) {
         var row = arr[i];
         if (row.length !== 6) {
@@ -378,7 +373,7 @@ MilestoneMap.prototype.addReportFromCSV = function (arr) {
             status !== "at-risk" && status !== "late" && status !== "previous")
         {
             throw new Error ("Milestone health on row " + i + " is invalid." +
-                            "Must be one of 'complete', 'on-track', 'at-risk', 'late', or 'previous'")
+                             "Must be one of 'complete', 'on-track', 'at-risk', 'late', or 'previous'")
         }
 
         var date = Util.fromISODateOnly(row [3]);
@@ -387,16 +382,17 @@ MilestoneMap.prototype.addReportFromCSV = function (arr) {
                              ". The Date must be formatted as YYYY-MM-DD");
         }
     }
+};
 
-    for (var i = 1; i < arr.length; i++) {
-        var row = arr[i];
-        var programmeName = row [0];
-        var projectName = row [1];
-        var milestoneName = row [2];
-        var milestoneDate = row [3];
-        var milestoneHealth = row [4];
-        var milestoneComment = row [5];
-
+MilestoneMap.prototype.addCSVRow = function (row) {
+    var programmeName = row [0];
+    var projectName = row [1];
+    var milestoneName = row [2];
+    var milestoneDate = row [3];
+    var milestoneHealth = row [4];
+    var milestoneComment = row [5];
+    
+    if (programmeName !== "Business Milestones") {
         var programme = this.programmes.find(programme => {
             return programme.name === programmeName;
         });
@@ -413,29 +409,44 @@ MilestoneMap.prototype.addReportFromCSV = function (arr) {
                 "programme": programme.index
             });
         }
-
-        var milestone = project.milestones.find(milestone => {
-            return milestone.name === milestoneName;
-        });
-        if (!milestone) {
-            milestone = this.addMilestone({
-                "name": milestoneName,
-                "project": project.index
-            });
-        }
-        
-        var msAtReport = this.addMsAtReport({
-            "milestone": milestone.index,
-            "report": report.index,
-            "comment": milestoneComment,
-            "status": MsAtReport.classToStatus(milestoneHealth),
-            "date": Util.fromISODateOnly(milestoneDate)
-        });
-        
+    }
+    else {
+        project = this.businessMs;
     }
 
-    this.cmpReport = this.currReport;
-    this.currReport = report;
+    var milestone = project.milestones.find(milestone => {
+        return milestone.name === milestoneName;
+    });
+    if (!milestone) {
+        milestone = this.addMilestone({
+            "name": milestoneName,
+            "project": project.index
+        });
+    }
+
+    var msAtReport = milestone.currentReport();
+    var obj = {
+        "milestone": milestone.index,
+        "report": this.currReport.index,
+        "comment": milestoneComment,
+        "status": MsAtReport.classToStatus(milestoneHealth),
+        "date": Util.fromISODateOnly(milestoneDate)
+    };
+    if (!msAtReport) {
+        this.addMsAtReport(obj);
+    }
+    else {
+        msAtReport.restore(obj);
+    }
+    
+};
+
+MilestoneMap.prototype.addReportFromCSV = function (arr) {
+    this.validateReportFromCSV(arr);
+
+    for (var i = 1; i < arr.length; i++) {
+        this.addCSVRow(arr[i]);
+    }
 };
 MilestoneMap.prototype.removeReport = function (report) {
     Util.removeFromIndexedArray (this.reports, report);
