@@ -1,15 +1,19 @@
 'use strict'
 
 // maybe better as a function rather than a class
-var DateHeader = function (mMap) { 
+var DateHeader = function (mMap, parent) { 
     // view
-    this.bgElem = Draw.svgElem ("g", {}, mMap.bg);
-    this.fgElem = Draw.svgElem ("g", {}, mMap.fg);
+    this.elem = Draw.svgElem("g", {
+        "class": "dateHeader"
+    }, parent);
+    this.bgElem =Draw.svgElem ("g", {}, this.elem);
+    this.fgElem = Draw.svgElem ("g", {}, this.elem);
 
     // view model
     this.mMap = mMap;
+    this.endy;
 
-    this.restore();
+    this.draw();
 };
 
 // zero dates
@@ -98,10 +102,6 @@ DateHeader.getDecade = function (date) {
     return ("" + decade + "'s");
 };
 
-DateHeader.prototype.restore = function () {
-    this.draw();
-};
-
 DateHeader.TITLEY = 30;
 DateHeader.ROWY = 50;
 DateHeader.ROWHEIGHT = 20;
@@ -156,8 +156,9 @@ DateHeader.prototype.draw = function () {
         y += DateHeader.ROWHEIGHT;
     }
 
+    // TODO all calls to Draw.getElemHEight replaced with something printer friendly
     if (rows.length > 1) {
-    this.drawRow(y, Draw.getElemHeight(this.mMap.elem), rows[rows.length - 2],
+    this.drawRow(y, this.mMap.height, rows[rows.length - 2],
                  this.drawHighlightedBox.bind(this));
         y += DateHeader.ROWHEIGHT;
     
@@ -166,12 +167,19 @@ DateHeader.prototype.draw = function () {
         this.endy = y + DateHeader.ROWHEIGHT;
     }
     else {
-        this.drawRow(y, Draw.getElemHeight(this.mMap.elem), rows[0],
+        this.drawRow(y, this.mMap.height, rows[0],
                  this.drawHighlightedBox.bind(this));
         this.endy = y + DateHeader.ROWHEIGHT;
     }
 
     this.endy += DateHeader.BUFFERHEIGHT;
+    
+    Draw.svgElem ("rect", {
+        "x" : "0", "y": "0",
+        "width": this.mMap.getSideBarWidth(),
+        "height": this.mMap.height,
+        "class": "whiteBackground"
+    }, this.bgElem)
 };
 
 DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
@@ -188,7 +196,7 @@ DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
         "y": y1 + DateHeader.TEXTOFFSET,
         "x": (x1 + x2) /2,
         "text-anchor": "middle"
-    }, this.fgElem).textContent = text;
+    }, this.bgElem).textContent = text;
 };
 DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, y2, text, cls) {
     Draw.svgElem ("line", {
@@ -202,7 +210,7 @@ DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, y2, text, cls) {
         "y": y1 + DateHeader.TEXTOFFSET,
         "x": (x1 + x2) /2,
         "text-anchor": "middle"
-    }, this.fgElem).textContent = text;
+    }, this.bgElem).textContent = text;
 };
 
 DateHeader.DAYS = 0;
@@ -264,24 +272,35 @@ DateHeader.prototype.drawTitle = function () {
         }, g);
 };
 
+DateHeader.TWODAYS = 172800000;
 DateHeader.prototype.drawEndDates = function () {
     var g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.start, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.mMap.modifyStartDate.bind(this.mMap), {
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.mMap.modifyStartDate.bind(this.mMap),
+        parent: g,
+        max: this.mMap.end - DateHeader.TWODAYS,
+        alignment: Draw.ALIGNLEFT,
+        attrs: {
             "transform": "translate(10 " + DateHeader.TITLEY + ")",
             "class":  "mMapEdgeDate"
-        }, g);
+        }
+    }, this.mMap.start);
 
     g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgDateInput (
-        this.mMap.end, Draw.ALIGNRIGHT, this.mMap.unclicker,
-        this.mMap.modifyEndDate.bind(this.mMap), {
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.mMap.modifyEndDate.bind(this.mMap),
+        parent: g,
+        min: this.mMap.start + DateHeader.TWODAYS,
+        alignment: Draw.ALIGNRIGHT,
+        attrs: {
             "transform": "translate(" + 
                 (this.mMap.width - 10) + " " +
                 DateHeader.TITLEY + ")",
             "class": "mMapEdgeDate"
-        }, g);
+        }
+    }, this.mMap.end);
 };
 
 DateHeader.prototype.drawReports = function () {

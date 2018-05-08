@@ -26,12 +26,8 @@ Report.prototype.save = function () {
     return {"date": this.date, "name": this.name};
 };
 
-Report.prototype.drawMenu = function (parent) {
-    var elem = Draw.elem ("option", {
-        "value": this.index,
-    }, parent);
-    elem.textContent = this.name + ": "  + Util.getISODateOnly(this.date);
-    return elem;
+Report.prototype.getMenuText = function () {
+    return this.name + ": "  + Util.getISODateOnly(this.date);
 };
 
 Report.prototype.drawHeader = function (attrs, parent) {
@@ -44,12 +40,16 @@ Report.prototype.drawHeader = function (attrs, parent) {
     }, this.headerElem).textContent = text;
     
     var g2 = Draw.svgElem ("g", {}, this.headerElem);
-    new Draw.svgDateInput (
-        this.date, Draw.ALIGNRIGHT, this.mMap.unclicker,
-        this.modifyDate.bind(this), {
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.modifyDate.bind(this),
+        parent: g2,
+        alignment: Draw.ALIGNRIGHT,
+        attrs: {
             "transform": "translate(0, 20)",
             "class": "reportDate"
-        }, g2);
+        }
+    }, this.date);
 
     g2 = Draw.svgElem ("g", {}, this.headerElem);
     new Draw.svgTextInput (
@@ -65,11 +65,15 @@ Report.prototype.drawHeader = function (attrs, parent) {
 Report.prototype.drawLine = function () {
     this.lineElem.innerHTML = "";
 
+    if (!this.mMap.isInInterval(this.date)) {
+        return this.lineElem;
+    }
+
     var x = this.mMap.getXCoord(this.date);
 
     Draw.svgElem("line", {
         "x1": x, "y1": DateHeader.ROWY,
-        "x2": x, "y2": Draw.getElemHeight(this.mMap.elem)
+        "x2": x, "y2": this.mMap.height
     }, this.lineElem);
 
     return this.lineElem;

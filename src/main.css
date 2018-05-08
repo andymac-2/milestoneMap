@@ -3,6 +3,9 @@ body {
     overflow: hidden;
 }
 /* overall */
+/* .milestoneMapPage { */
+/*     page-break-after: always; */
+/* } */
 
 /* menu bar */
 .menubar {
@@ -28,28 +31,22 @@ body {
     color: #444;
     font-size: small;    
 }
-.reportSelectorContainer {
-    display: inline-block;
-    width: 250px;
-}
-.reportSelector {
+.menuBarContent {
+    text-align: center;
     color: #444;
     font-size: small;
-    width: 240px;
-    height: 18px;
-    
-    display: flex;
-    justify-content: space-between;
 }
-.reportSelectorDropdown {
-    float: right;
-    width: 170px;
-    max-height: 18px;
+.menuBarContent span {
     display: inline-block;
+    height: 45px;
+    overflow: hidden;
 }
-.menuBarSegment svg {
+.dropdownSegmentHeading {
+    width: 140px;
+}
+.dropdownSegmentDropdown {
+    width: 90%;
     display: inline;
-    height: 65%;
 }
 
 /* milestone map total */
@@ -57,7 +54,6 @@ body {
     overflow: scroll;
     max-height: 90vh;
 }
-
 .milestoneMap {
     width: 100%;
 }
@@ -70,6 +66,10 @@ body {
 .mMapEdgeDate {
     font-weight: bold;
 }
+.whiteBackground {
+    fill: #FFFFFF
+}
+
 /* reports */
 .reportHeader {
     font-size: small;
@@ -106,10 +106,10 @@ body {
 
 /* date headers */
 .even {
-    fill: none;
+    fill: #fbfbfb;
 }
 .odd {
-    fill: #fbfbfb;
+    fill: none;
 }
 .dateHeaderSeparator {
     stroke: black;

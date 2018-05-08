@@ -63,6 +63,72 @@ Programme.prototype.draw = function () {
     return this.elem;
 };
 
+Programme.prototype.drawPrint = function (spaceLeft, startIndex, first) {
+    var saveStartIndex = startIndex;
+    var printable = Draw.svgElem ("g", {
+        "class": "programme"
+    });
+
+    var g = Draw.svgElem ("g", {
+        "class": "programmeHeader"
+    }, printable);
+    
+    var textBox = new Draw.svgTextInput (
+        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
+        this.modifyName.bind(this), {
+            "transform": "translate(0, 25)"
+        }, g);
+
+    var yOffset = Programme.HEADERHEIGHT;
+    for (var projects = [];
+         startIndex < this.projects.length && yOffset < spaceLeft;
+         startIndex++)
+    {
+        var project = this.projects[startIndex];
+        project.elem.setAttribute("transform", "translate(0, " + yOffset + ")");
+        projects.push (project);
+        yOffset += project.height;
+    }
+
+    // all fit
+    if (yOffset < spaceLeft) {
+        projects.forEach(project => printable.appendChild (project.elem));
+        return {
+            elem: printable,
+            spaceLeft: spaceLeft - yOffset,
+            index: this.projects.length
+        };
+    }
+    // the header doesn't fit on an entire page
+    else if (projects.length === 0 && first) {
+        throw new Error ("Not enough room on page for programme headers.");
+    }
+    // the first project doesn't fit on an entire page
+    else if (projects.length === 1 && first) {
+        throw new Error (
+            "Project: '" + projects[0].name +
+                "' is larger than a single page, and cannot be printed");
+    }
+    // the first project doesn't fit, but we can put it on the next page
+    else if (projects.length <= 1) {
+        return {
+            elem: Draw.svgElem ("g", {}),
+            spaceLeft: 0,
+            index: saveStartIndex
+        };
+    }
+    // some projects fit, but not all
+    else {
+        projects.pop();
+        projects.forEach(project => printable.appendChild (project.elem));
+        return {
+            elem: printable,
+            spaceLeft: 0,
+            index: startIndex - 1
+        }
+    }
+};
+
 // linking
 Programme.prototype.addProject = function (project) {
     this.projects.push (project);

@@ -28,6 +28,7 @@ Dependency.prototype.restore = function (obj) {
     }
     
     this.dependent = this.mMap.milestones[obj.dependent].hasReport(this.report);
+    assert (() => this.dependent);
     this.dependent.addDependency (this);
 
     if (this.dependency) {
@@ -35,6 +36,7 @@ Dependency.prototype.restore = function (obj) {
     }
     
     this.dependency = this.mMap.milestones[obj.dependency].hasReport(this.report);
+    assert (() => this.dependency);
     this.dependency.addDependent (this);
 };
 
@@ -55,7 +57,9 @@ Dependency.prototype.save = function () {
 Dependency.prototype.draw = function () {
     this.elem.innerHTML = "";
     
-    if (this.report !== this.mMap.currReport) {
+    if (this.report !== this.mMap.currReport ||
+        !this.dependent.isDrawable() || !this.dependency.isDrawable())
+    {
         return;
     }
 
@@ -64,9 +68,9 @@ Dependency.prototype.draw = function () {
     var end = Draw.getElemXY(this.dependent.elem);
     end.x -=  MsAtReport.DIAMONDSIZE;
 
-    var line = Draw.quadrupleAngledLine (start, end, Dependency.HSPACE,
-                                         Dependency.VSPACE, "dependencyLine",
-                                         this.elem);
+    var line = Draw.quadrupleAngledLine (
+        start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
+        this.elem);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",

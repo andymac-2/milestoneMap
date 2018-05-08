@@ -76,18 +76,21 @@ MsAtReport.prototype.save = function () {
 MsAtReport.prototype.draw = function () {
     this.elem.innerHTML = "";
     this.elemPointer.innerHTML = "";
+
+    this.x = this.mMap.getXCoord (this.date);
+    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
     
-    if (!this.isCurrent() &&
-        this.report !== this.mMap.cmpReport)
+    if (!this.isDrawable())
     {
         return;
     }
 
-    this.x = this.mMap.getXCoord (this.date);
-    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
-
     this.drawInfo();
     this.elem.appendChild(this.elemPointer);
+    if (this.isCurrent() && this.isBusinessMs() && this.isDrawable()) {
+        this.elem.appendChild(this.elemLine);
+    }
+    
     
     var g = Draw.svgElem("g", {}, this.elem);
 
@@ -102,14 +105,10 @@ MsAtReport.prototype.draw = function () {
 };
 MsAtReport.prototype.drawLine = function () {
     this.elemLine.innerHTML = "";
-    
-    if (!this.isCurrent() || !this.isBusinessMs()) {
-        return this.elemLine;
-    }
 
     Draw.svgElem("line", {
-        "x1": this.x, "y1": 0,
-        "x2": this.x, "y2": Draw.getElemHeight(this.mMap.elem)
+        "x1": 0, "y1": 0,
+        "x2": 0, "y2": this.mMap.height
     }, this.elemLine);
 
     return this.elemLine;
@@ -185,8 +184,30 @@ MsAtReport.prototype.resolveStatusClass = function () {
     }
     assert (() => false);
 };
+MsAtReport.classToStatus = function (classString) {
+    switch (classString) {
+    case "complete":
+        return MsAtReport.COMPLETE;
+    case "on-track":
+        return MsAtReport.ONTRACK;
+    case "at-risk":
+        return MsAtReport.ATRISK;
+    case "late":
+        return MsAtReport.LATE;
+    case "previous":
+        return MsAtReport.PREVIOUS;
+    }
+    assert (() => false);
+};
+MsAtReport.prototype.isDrawable = function () {
+    return (this.isCurrent() || this.isComparison())
+        && this.mMap.isInInterval(this.date);
+};
 MsAtReport.prototype.isCurrent = function () {
     return this.mMap.currReport === this.report;
+};
+MsAtReport.prototype.isComparison = function () {
+    return this.report === this.mMap.cmpReport
 };
 MsAtReport.prototype.isBusinessMs = function () {
     return this.milestone.project.index === -1;

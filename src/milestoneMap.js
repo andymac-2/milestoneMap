@@ -1,6 +1,6 @@
 'use strict'
 
-var MilestoneMap = function (obj) {
+var MilestoneMap = function (obj, pagesize) {
     
     //state
     this.start;
@@ -40,10 +40,17 @@ var MilestoneMap = function (obj) {
         "class": "fg"
     }, this.elem);
 
+    this.printElem = Draw.elem("html", {
+        "class": "printablePages"
+    })
+    
     //view model
     this.width;
     this.unclicker = new Unclicker (this.elem);
     this.dateHeader;
+
+    // {width, height}
+    this.pageSize = pagesize || Loader.A3SIZE;
 
     // events
     this.globalMode = MilestoneMap.SELECT;
@@ -102,15 +109,16 @@ MilestoneMap.prototype.save = function () {
 };
 
 // drawing methods
-MilestoneMap.prototype.draw = function (obj) {
+MilestoneMap.prototype.draw = function () {
     this.fg.innerHTML = "";
     this.bg.innerHTML = "";
     this.depLayer.innerHTML = "";
 
-    this.width = this.elem.getBoundingClientRect().width
+    this.width = Draw.getElemWidth(this.elem);
+    this.height = Draw.getElemHeight(this.elem);
 
     // maybe this would be better as a series of functions rather than a class.
-    this.dateHeader = new DateHeader (this);
+    this.dateHeader = new DateHeader (this, this.bg);
     
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
@@ -121,6 +129,91 @@ MilestoneMap.prototype.draw = function (obj) {
     this.fg.appendChild(this.currReport.drawLine());
     
     this.reflow ();
+};
+
+MilestoneMap.prototype.PX_PER_MM = 5.0;
+MilestoneMap.prototype.drawPrint = function () {
+    this.printElem.innerHTML = "";
+
+    var styles = Draw.elem ("style", {
+        "type": "text/css"
+    }, this.printElem);
+
+    styles.innerHTML = Util.getCSS();
+    
+    this.width = this.pageSize.width * MilestoneMap.prototype.PX_PER_MM;
+    this.height = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM
+
+    this.msAtReports.forEach (elem => elem.draw());
+    this.milestones.forEach (elem => elem.draw());
+    this.projects.forEach (elem => elem.draw());
+
+    this.programmes.forEach(programme => programme.draw());
+
+    var reportNode = this.currReport.drawLine();
+    var businessMsNode = this.businessMs.draw();
+
+    var programmei = 0;
+    var projecti = 0;
+    // draw at least one page
+    do {
+        var page = Draw.svgElem ("svg", {
+            "class": "milestoneMapPage",
+            "viewbox": "0 0 " +
+                (this.pageSize.width * MilestoneMap.prototype.PX_PER_MM) + " " +
+                (this.pageSize.height * MilestoneMap.prototype.PX_PER_MM),
+            "style": "width:100%;height:auto;"
+        }, this.printElem);
+
+        var yoffset = new DateHeader (this, page).endy;
+        
+        var clone = businessMsNode.cloneNode(true);
+        clone.setAttribute("transform", "translate(0, " + yoffset + ")");
+        page.appendChild(clone);
+        yoffset += this.businessMs.height;
+        
+        var spaceLeft = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM - yoffset;
+
+        if (spaceLeft <= 0) {
+            throw new Error ("Page size not large enough for Business Milestones.");
+        }
+
+        // nothing more to draw;
+        if (programmei >= this.programmes.length) {
+            page.appendChild(this.currReport.drawLine().cloneNode(true));
+            break;
+        }
+        // TODO: dependencies
+        
+        var first = true;
+        
+        do {
+            var programme = this.programmes[programmei];
+            var vals = programme.drawPrint (spaceLeft, projecti, first);
+            first = false;
+
+            page.appendChild(vals.elem);
+            vals.elem.setAttribute("transform", "translate(0, " + yoffset + ")");
+
+            //completely drawn
+            if (vals.index === programme.projects.length) {
+                programmei ++;
+                projecti = 0;
+                yoffset += spaceLeft - vals.spaceLeft;
+                spaceLeft = vals.spaceLeft;
+            }
+            // incompletely drawn, continue to next page
+            else {
+                projecti = vals.index;
+                break;
+            }
+        } while (programmei < this.programmes.length);
+        
+        page.appendChild(reportNode.cloneNode(true));
+    } while (programmei < this.programmes.length);
+    
+
+    return this.printElem;
 };
 MilestoneMap.prototype.drawDependencies = function () {
     this.dependencies.forEach (elem => {
@@ -152,12 +245,22 @@ MilestoneMap.prototype.deactivateOnUnclick = function (event) {
     }
 };
 
-
 // x coordinate methods
+MilestoneMap.SIDEBARFRACTION = 0.2;
+MilestoneMap.MAXSIDEBARWIDTH = 350;
+MilestoneMap.prototype.getSideBarWidth = function () {
+    var maxWidth = this.width * MilestoneMap.SIDEBARFRACTION;
+    return maxWidth < MilestoneMap.MAXSIDEBARWIDTH ?
+        maxWidth : MilestoneMap.MAXSIDEBARWIDTH;
+};
+MilestoneMap.prototype.getUsableWidth = function () {
+    return this.width - this.getSideBarWidth();
+};
 MilestoneMap.prototype.getXCoord = function (date) {
     var z = (date.valueOf() - this.start)/(this.end - this.start)
-    return z * this.width;
+    return z * this.getUsableWidth() + this.getSideBarWidth();
 };
+// this is a static method, consider changing?
 MilestoneMap.prototype.defaultDate = function () {
     var now = new Date(Date.now());
     var offset = now.getTimezoneOffset() * 60 * 1000;
@@ -258,6 +361,93 @@ MilestoneMap.prototype.addReport = function (obj) {
     this.cmpReport = this.currReport;
     this.currReport = report;
 };
+MilestoneMap.prototype.validateReportFromCSV = function (arr) {
+    for (var i = 1; i < arr.length; i++) {
+        var row = arr[i];
+        if (row.length !== 6) {
+            throw new Error ("CSV row " + i + " does not contain enough columns");
+        }
+
+        var status = row [4];
+        if (status !== "complete" && status !== "on-track" &&
+            status !== "at-risk" && status !== "late" && status !== "previous")
+        {
+            throw new Error ("Milestone health on row " + i + " is invalid." +
+                             "Must be one of 'complete', 'on-track', 'at-risk', 'late', or 'previous'")
+        }
+
+        var date = Util.fromISODateOnly(row [3]);
+        if (isNaN(date)) {
+            throw new Error ("Invalid date format on row " + i +
+                             ". The Date must be formatted as YYYY-MM-DD");
+        }
+    }
+};
+
+MilestoneMap.prototype.addCSVRow = function (row) {
+    var programmeName = row [0];
+    var projectName = row [1];
+    var milestoneName = row [2];
+    var milestoneDate = row [3];
+    var milestoneHealth = row [4];
+    var milestoneComment = row [5];
+    
+    if (programmeName !== "Business Milestones") {
+        var programme = this.programmes.find(programme => {
+            return programme.name === programmeName;
+        });
+        if (!programme) {
+            programme = this.addProgramme({"name": programmeName});
+        }
+
+        var project = programme.projects.find (project => {
+            return project.name === projectName;
+        });
+        if (!project) {
+            project = this.addProject ({
+                "name": projectName,
+                "programme": programme.index
+            });
+        }
+    }
+    else {
+        project = this.businessMs;
+    }
+
+    var milestone = project.milestones.find(milestone => {
+        return milestone.name === milestoneName;
+    });
+    if (!milestone) {
+        milestone = this.addMilestone({
+            "name": milestoneName,
+            "project": project.index
+        });
+    }
+
+    var msAtReport = milestone.currentReport();
+    var obj = {
+        "milestone": milestone.index,
+        "report": this.currReport.index,
+        "comment": milestoneComment,
+        "status": MsAtReport.classToStatus(milestoneHealth),
+        "date": Util.fromISODateOnly(milestoneDate)
+    };
+    if (!msAtReport) {
+        this.addMsAtReport(obj);
+    }
+    else {
+        msAtReport.restore(obj);
+    }
+    
+};
+
+MilestoneMap.prototype.addReportFromCSV = function (arr) {
+    this.validateReportFromCSV(arr);
+
+    for (var i = 1; i < arr.length; i++) {
+        this.addCSVRow(arr[i]);
+    }
+};
 MilestoneMap.prototype.removeReport = function (report) {
     Util.removeFromIndexedArray (this.reports, report);
 };
@@ -276,14 +466,13 @@ MilestoneMap.CSVHEADING =
         "Programme Name",
         "Project Name",
         "Milestone Name",
-        "Baseline Date",
-        "Comparison Date",
-        "Health",
+        "Date (YYYY-MM-DD)",
+        "Health ('complete', 'on-track', 'at-risk', 'late', or 'previous)",
         "Comment"
     ].map(JSON.stringify).join(",");
 MilestoneMap.prototype.exportCSVMilestones = function () {
     var data = this.milestones
-        .filter(milestone => milestone.currentReport)
+        .filter(milestone => milestone.currentReport())
         .map(milestone => milestone.exportCSVRow())
         .join("\n");
     return MilestoneMap.CSVHEADING + "\n" + data;

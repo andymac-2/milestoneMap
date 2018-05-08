@@ -91,7 +91,7 @@ Project.prototype.flowMilestoneData = function () {
     // get current msAtReports
     var milestones = this.milestones
         .map(ms => ms.currentReport())
-        .filter(msAtReport => msAtReport);
+        .filter(msAtReport => msAtReport && msAtReport.isDrawable());
 
     // sort descending
     milestones.sort((a, b) => b.x - a.x);
