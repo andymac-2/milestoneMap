@@ -32,21 +32,21 @@ body {
     font-size: small;    
 }
 .menuBarContent {
-     text-align: center;
+    text-align: center;
+    color: #444;
+    font-size: small;
 }
 .menuBarContent span {
     display: inline-block;
     height: 45px;
     overflow: hidden;
 }
+.dropdownSegmentHeading {
+    width: 140px;
+}
 .dropdownSegmentDropdown {
     width: 90%;
     display: inline;
-}
-.reportSelector {
-    color: #444;
-    font-size: small;
-    width: 140px;
 }
 
 /* milestone map total */

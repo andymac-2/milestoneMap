@@ -49,7 +49,8 @@ var MilestoneMap = function (obj, pagesize) {
     this.unclicker = new Unclicker (this.elem);
     this.dateHeader;
 
-    this.pageSize = pagesize;
+    // {width, height}
+    this.pageSize = pagesize || Loader.A3SIZE;
 
     // events
     this.globalMode = MilestoneMap.SELECT;
@@ -130,7 +131,7 @@ MilestoneMap.prototype.draw = function () {
     this.reflow ();
 };
 
-MilestoneMap.prototype.PX_PER_MM = 4.0;
+MilestoneMap.prototype.PX_PER_MM = 5.0;
 MilestoneMap.prototype.drawPrint = function () {
     this.printElem.innerHTML = "";
 
@@ -248,7 +249,7 @@ MilestoneMap.prototype.deactivateOnUnclick = function (event) {
 MilestoneMap.SIDEBARFRACTION = 0.2;
 MilestoneMap.MAXSIDEBARWIDTH = 350;
 MilestoneMap.prototype.getSideBarWidth = function () {
-    var maxWidth = this.width * MilestoneMap.SIDEBAFRACTION;
+    var maxWidth = this.width * MilestoneMap.SIDEBARFRACTION;
     return maxWidth < MilestoneMap.MAXSIDEBARWIDTH ?
         maxWidth : MilestoneMap.MAXSIDEBARWIDTH;
 };

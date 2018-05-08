@@ -41,10 +41,7 @@ Loader.prototype.draw = function () {
     }, {
         "icon": "icons/save.svg",
         "action": this.save.bind(this)
-    }, {
-        "icon": "icons/print.svg",
-        "action": this.print.bind(this)
-    }, {
+    },  {
         "icon": "icons/exportCSV.svg",
         "action": this.exportCSV.bind(this)
     }], {}, fileSegment.body);
@@ -73,6 +70,15 @@ Loader.prototype.draw = function () {
             "class": "reportSelector"
         }, reportSegment.body);
 
+    var printSegment = Draw.menuBarSegment ("Print", menubar);
+    Draw.iconBar ([{
+        "icon": "icons/print.svg",
+        "action": this.print.bind(this)
+    }], {}, printSegment.body);
+    this.printSizeSelector ({
+        "class": "pageSizeSelector"
+    }, printSegment.body);
+
     var versionSegment = Draw.menuBarSegment ("Version: " + VERSION +
         " \xA9 Andrew Pritchard 2018", menubar);
   
@@ -85,6 +91,35 @@ Loader.prototype.draw = function () {
 Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
     var entries = this.map.reports.map (report => report.getMenuText());
     return Draw.dropDownSegment (text, onchange, entries, attrs, parent);
+};
+
+// correspond to Loader.PAGESIZENAMES
+Loader.A3SIZE = {height: 297, width: 420};
+Loader.PAGEMARGIN = 35;
+Loader.PAGESIZES = [
+    {height: 1682, width: 2378},
+    {height: 1189, width: 1682},
+    {height: 841, width: 1189},
+    {height: 594, width: 841},
+    {height: 420, width: 594},
+    {height: 297, width: 420},
+    {height: 210, width: 297}
+].map(elem => {
+    return {
+        height: elem.height - Loader.PAGEMARGIN * 2,
+        width: elem.width - Loader.PAGEMARGIN * 2,
+    };
+});
+// correspond to Loader.PAGESIZES
+Loader.PAGESIZENAMES = [
+    "4A0", "2A0", "A0", "A1", "A2", "A3", "A4"
+];
+Loader.prototype.printSizeSelector = function (attrs, parent) {
+    var onchange = (evt) => {
+        this.map.pageSize = Loader.PAGESIZES[evt.currentTarget.value];
+    }
+    Draw.dropDownSegment (
+        "Page Size:", onchange, Loader.PAGESIZENAMES, attrs, parent);
 };
 
 // modifications
@@ -149,7 +184,7 @@ Loader.prototype.exportCSV = function () {
 };
 
 Loader.prototype.print = function () {
-    var mMap = new MilestoneMap (this.map.save(), {width: 385, height: 262});
+    var mMap = new MilestoneMap (this.map.save(), this.map.pageSize);
     mMap.drawPrint();
     var newWindow = window.open ("", "_blank", "");
     
