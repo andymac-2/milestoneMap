@@ -184,6 +184,21 @@ MsAtReport.prototype.resolveStatusClass = function () {
     }
     assert (() => false);
 };
+MsAtReport.classToStatus = function (classString) {
+    switch (classString) {
+    case "complete":
+        return MsAtReport.COMPLETE;
+    case "on-track":
+        return MsAtReport.ONTRACK;
+    case "at-risk":
+        return MsAtReport.ATRISK;
+    case "late":
+        return MsAtReport.LATE;
+    case "previous":
+        return MsAtReport.PREVIOUS;
+    }
+    assert (() => false);
+};
 MsAtReport.prototype.isDrawable = function () {
     return (this.isCurrent() || this.isComparison())
         && this.mMap.isInInterval(this.date);

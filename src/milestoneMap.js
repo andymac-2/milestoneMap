@@ -361,6 +361,82 @@ MilestoneMap.prototype.addReport = function (obj) {
     this.cmpReport = this.currReport;
     this.currReport = report;
 };
+MilestoneMap.prototype.addReportFromCSV = function (arr) {
+    var report = new Report ({
+        "name": "New Report", "date": this.defaultDate()
+    }, this.reports.length, this);
+    this.reports.push (report);
+
+    for (var i = 1; i < arr.length; i++) {
+        var row = arr[i];
+        if (row.length !== 6) {
+            throw new Error ("CSV row " + i + " does not contain enough columns");
+        }
+
+        var status = row [4];
+        if (status !== "complete" && status !== "on-track" &&
+            status !== "at-risk" && status !== "late" && status !== "previous")
+        {
+            throw new Error ("Milestone health on row " + i + " is invalid." +
+                            "Must be one of 'complete', 'on-track', 'at-risk', 'late', or 'previous'")
+        }
+
+        var date = Util.fromISODateOnly(row [3]);
+        if (isNaN(date)) {
+            throw new Error ("Invalid date format on row " + i +
+                             ". The Date must be formatted as YYYY-MM-DD");
+        }
+    }
+
+    for (var i = 1; i < arr.length; i++) {
+        var row = arr[i];
+        var programmeName = row [0];
+        var projectName = row [1];
+        var milestoneName = row [2];
+        var milestoneDate = row [3];
+        var milestoneHealth = row [4];
+        var milestoneComment = row [5];
+
+        var programme = this.programmes.find(programme => {
+            return programme.name === programmeName;
+        });
+        if (!programme) {
+            programme = this.addProgramme({"name": programmeName});
+        }
+
+        var project = programme.projects.find (project => {
+            return project.name === projectName;
+        });
+        if (!project) {
+            project = this.addProject ({
+                "name": projectName,
+                "programme": programme.index
+            });
+        }
+
+        var milestone = project.milestones.find(milestone => {
+            return milestone.name === milestoneName;
+        });
+        if (!milestone) {
+            milestone = this.addMilestone({
+                "name": milestoneName,
+                "project": project.index
+            });
+        }
+        
+        var msAtReport = this.addMsAtReport({
+            "milestone": milestone.index,
+            "report": report.index,
+            "comment": milestoneComment,
+            "status": MsAtReport.classToStatus(milestoneHealth),
+            "date": Util.fromISODateOnly(milestoneDate)
+        });
+        
+    }
+
+    this.cmpReport = this.currReport;
+    this.currReport = report;
+};
 MilestoneMap.prototype.removeReport = function (report) {
     Util.removeFromIndexedArray (this.reports, report);
 };
@@ -379,14 +455,13 @@ MilestoneMap.CSVHEADING =
         "Programme Name",
         "Project Name",
         "Milestone Name",
-        "Baseline Date",
-        "Comparison Date",
-        "Health",
+        "Date (YYYY-MM-DD)",
+        "Health ('complete', 'on-track', 'at-risk', 'late', or 'previous)",
         "Comment"
     ].map(JSON.stringify).join(",");
 MilestoneMap.prototype.exportCSVMilestones = function () {
     var data = this.milestones
-        .filter(milestone => milestone.currentReport)
+        .filter(milestone => milestone.currentReport())
         .map(milestone => milestone.exportCSVRow())
         .join("\n");
     return MilestoneMap.CSVHEADING + "\n" + data;

@@ -33,32 +33,35 @@ Loader.prototype.draw = function () {
 
     var fileSegment = Draw.menuBarSegment("File", menubar);
     Draw.iconBar ([{
-        "icon": "icons/new.svg",
-        "action": this.newFile.bind(this)
+        icon: "icons/new.svg",
+        action: this.newFile.bind(this)
     }, {
-        "icon": "icons/open.svg",
-        "action": this.loadFile.bind(this)
+        icon: "icons/open.svg",
+        action: this.loadFile.bind(this)
     }, {
-        "icon": "icons/save.svg",
-        "action": this.save.bind(this)
+        icon: "icons/save.svg",
+        action: this.save.bind(this)
     },  {
-        "icon": "icons/exportCSV.svg",
-        "action": this.exportCSV.bind(this)
+        icon: "icons/exportCSV.svg",
+        action: this.exportCSV.bind(this)
+    }, {
+        icon: "icons/import.svg",
+        action: this.importCSVReport.bind(this)
     }], {}, fileSegment.body);
 
     var programmeSegment = Draw.menuBarSegment("Programme", menubar);
     Draw.iconBar([{
-        "icon": "icons/plus.svg",
-        "action": this.map.newProgramme.bind(this.map)
+        icon: "icons/plus.svg",
+        action: this.map.newProgramme.bind(this.map)
     }], {}, programmeSegment.body);
 
     var reportSegment = Draw.menuBarSegment("Report", menubar);
     Draw.iconBar ([{
-        "icon": "icons/plus.svg",
-        "action": this.newReport.bind(this)
+        icon: "icons/plus.svg",
+        action: this.newReport.bind(this)
     }, {
-        "icon": "icons/delete.svg",
-        "action": this.deleteCurrReport.bind(this)
+        icon: "icons/delete.svg",
+        action: this.deleteCurrReport.bind(this)
     }], {}, reportSegment.body);  
     
     this.reportSelector (
@@ -72,8 +75,8 @@ Loader.prototype.draw = function () {
 
     var printSegment = Draw.menuBarSegment ("Print", menubar);
     Draw.iconBar ([{
-        "icon": "icons/print.svg",
-        "action": this.print.bind(this)
+        icon: "icons/print.svg",
+        action: this.print.bind(this)
     }], {}, printSegment.body);
     this.printSizeSelector ({
         "class": "pageSizeSelector"
@@ -172,23 +175,43 @@ Loader.prototype.loadFile = function () {
     var restoreDraw = (string) => {
         this.restore(string);
         this.draw();
-    }
+    };
     
-    Util.upload (this.elem, restoreDraw);
+    Util.upload (this.elem, restoreDraw, ".json");
+};
+Loader.prototype.importCSVReport = function () {
+    var restoreDraw = (string) => {
+        try {
+            var arr = Util.parseCSV (string);
+            this.map.addReportFromCSV (arr);
+            this.draw();
+        }
+        catch (err) {
+            Util.allertErr(err);
+        }
+    };
+    
+    Util.upload (this.elem, restoreDraw, ".csv");
 };
 
 Loader.prototype.exportCSV = function () {
     var string = this.map.exportCSVMilestones();
-    Util.download (this.map.name + ".csv", string, "application/json",
+    Util.download (this.map.name + ".csv", string, "text/csv",
                    this.elem);
 };
 
 Loader.prototype.print = function () {
     var mMap = new MilestoneMap (this.map.save(), this.map.pageSize);
-    mMap.drawPrint();
-    var newWindow = window.open ("", "_blank", "");
     
-    newWindow.document.body.innerHTML = mMap.printElem.outerHTML;
-    newWindow.print();
-    newWindow.close();
+    try {
+        mMap.drawPrint();
+        var newWindow = window.open ("", "_blank", "");
+        
+        newWindow.document.body.innerHTML = mMap.printElem.outerHTML;
+        newWindow.print();
+        newWindow.close();
+    }
+    catch (err) {
+        Util.allertErr(err);
+    }
 };

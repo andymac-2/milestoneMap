@@ -3,6 +3,9 @@
 // miscellaneous functions.
 
 var Util = {};
+Util.allertErr = function (err) {
+     alert (err.name + ": " + err.message);
+};
 
 Util.clamp = function (min, max, value) {
     value = value > max ? max : value;
@@ -73,6 +76,9 @@ Util.swapIndexedElements = function (array, index1, index2) {
 Util.getISODateOnly = function (date) {
     return new Date(date).toISOString().slice(0, 10);
 };
+Util.fromISODateOnly = function (string) {
+    return new Date(string + "T01:00:00.000Z").valueOf();
+};
 Util.getDateValueFromInputElem = function (elem) {
     return new Date(elem.value + "T01:00:00.000Z").valueOf();
 };
@@ -88,11 +94,15 @@ Util.download = function (filename, string, type, parent) {
     parent.removeChild(a);
 };
 
-Util.upload = function (parent, callback) {
-    var input = Draw.elem ("input", {
+Util.upload = function (parent, callback, type) {
+    var attrs = {
         "type": "file",
         "style": "display:none;"
-    }, parent);
+    };
+    if (type) {
+        attrs["accept"] = type;
+    }
+    var input = Draw.elem ("input", attrs, parent);
 
     var reader = new FileReader();
     reader.onload = () => {
@@ -137,4 +147,27 @@ Util.getCSS = function () {
     }
 
     return css.join('\n');
-}
+};
+
+Util.parseCSV = function (str) {
+    var arr = [];
+    var quote = false;  // true means we're inside a quoted field
+    var c, col, row;
+
+    // iterate over each character, keep track of current row and column (of the returned array)
+    for (var row = col = c = 0; c < str.length; c++) {
+        var cc = str[c], nc = str[c+1];      
+        arr[row] = arr[row] || [];
+        arr[row][col] = arr[row][col] || '';  
+
+        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }  
+        if (cc == '"') { quote = !quote; continue; }
+        if (cc == ',' && !quote) { ++col; continue; }
+        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+
+        arr[row][col] += cc;
+    }
+    return arr;
+};

@@ -43,11 +43,8 @@ Milestone.prototype.save = function () {
         project: this.project.index
     };
 };
-Milestone.prototype.exportCSVRow = function () {
-    var msAtReport = this.cmpReport();
-    var cmpReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
-    
-    msAtReport = this.currentReport();
+Milestone.prototype.exportCSVRow = function () {    
+    var msAtReport = this.currentReport();
     var currReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
 
     var programmeName = this.project.index === -1 ?
@@ -56,7 +53,6 @@ Milestone.prototype.exportCSVRow = function () {
         programmeName,
         this.project.name,
         this.name,
-        cmpReport,
         currReport,
         msAtReport.resolveStatusClass(),
         msAtReport.comment
