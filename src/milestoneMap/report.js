@@ -91,12 +91,12 @@ Report.prototype.deleteThis = function () {
 // user events
 Report.prototype.modifyDate = function (e, input) {
     this.date = input.date;
+    this.mMap.reportSelectors();
     this.drawLine();
 };
 
 Report.prototype.modifyName = function (e, input) {
     this.name = input.text;
-    // TODO: redraw dropdown lists
-    // TODO: redraw other report display.
+    this.mMap.reportSelectors();
 };
 

@@ -41,6 +41,10 @@ body {
     height: 45px;
     overflow: hidden;
 }
+.reportSelector {
+    width: 140px;
+    display: inline-block;
+}
 .dropdownSegmentHeading {
     width: 140px;
 }

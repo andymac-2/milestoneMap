@@ -62,16 +62,10 @@ Loader.prototype.draw = function () {
     }, {
         icon: "icons/delete.svg",
         action: this.deleteCurrReport.bind(this)
-    }], {}, reportSegment.body);  
-    
-    this.reportSelector (
-        "Current:", this.modifyCurrReport.bind(this), {
-            "class": "reportSelector"
-        }, reportSegment.body);
-    this.reportSelector (
-        "Baseline:", this.modifyCmpReport.bind(this), {
-            "class": "reportSelector"
-        }, reportSegment.body);
+    }], {}, reportSegment.body);
+
+    this.map.reportSelectors();
+    reportSegment.body.appendChild(this.map.elemReportSelectors);
 
     var printSegment = Draw.menuBarSegment ("Print", menubar);
     Draw.iconBar ([{
@@ -83,18 +77,15 @@ Loader.prototype.draw = function () {
     }, printSegment.body);
 
     var versionSegment = Draw.menuBarSegment ("Version: " + VERSION +
-        " \xA9 Andrew Pritchard 2018", menubar);
-  
+                                              " \xA9 Andrew Pritchard 2018", menubar);
+    
     this.elem.appendChild(this.map.scrollbox);
     var height = window.innerHeight - Draw.getElemHeight(menubar) - 10;
     this.map.scrollbox.setAttribute("style", "max-height:" + height + "px;");
     
     this.map.draw();
 };
-Loader.prototype.reportSelector = function (text, onchange, attrs, parent) {
-    var entries = this.map.reports.map (report => report.getMenuText());
-    return Draw.dropDownSegment (text, onchange, entries, attrs, parent);
-};
+
 
 // correspond to Loader.PAGESIZENAMES
 Loader.A3SIZE = {height: 297, width: 420};
@@ -129,14 +120,6 @@ Loader.prototype.printSizeSelector = function (attrs, parent) {
 
 
 // user events
-Loader.prototype.modifyCurrReport = function (evt) {
-    this.map.modifyCurrReport (evt.currentTarget.value);
-    this.map.draw ();
-};
-Loader.prototype.modifyCmpReport = function (evt) {
-    this.map.modifyCmpReport (evt.currentTarget.value);
-    this.map.draw ();
-};
 Loader.prototype.newReport = function () {
     this.map.addReport ({"name": "New Report", "date": this.map.defaultDate()});
     this.draw();

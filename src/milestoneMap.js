@@ -18,6 +18,7 @@ var MilestoneMap = function (obj, pagesize) {
     this.businessMs;
     
     //view
+    this.elemReportSelectors = Draw.elem ("span", {});
     this.scrollbox = Draw.elem ("div", {
         "class": "mMapScrollBox"
     });
@@ -109,6 +110,18 @@ MilestoneMap.prototype.save = function () {
 };
 
 // drawing methods
+MilestoneMap.prototype.reportSelectors = function () {
+    var parent = this.elemReportSelectors;
+    parent.innerHTML = "";
+    var attrs = {"class": "reportSelector"};
+
+    var entries = this.reports.map (report => report.getMenuText());
+    Draw.dropDownSegment (
+        "Current:", this.modifyCurrReport.bind(this), entries, attrs, parent);
+    Draw.dropDownSegment (
+        "Baseline:", this.modifyCmpReport.bind(this), entries, attrs, parent);
+};
+
 MilestoneMap.prototype.draw = function () {
     this.fg.innerHTML = "";
     this.bg.innerHTML = "";
@@ -364,21 +377,21 @@ MilestoneMap.prototype.addReport = function (obj) {
 MilestoneMap.prototype.validateReportFromCSV = function (arr) {
     for (var i = 1; i < arr.length; i++) {
         var row = arr[i];
-        if (row.length !== 6) {
-            throw new Error ("CSV row " + i + " does not contain enough columns");
+        if (row.length !== 6 && row.length !== 5) {
+            throw new Error ("CSV row " + (i + 1) + " does not contain the correct number of columns");
         }
 
         var status = row [4];
         if (status !== "complete" && status !== "on-track" &&
             status !== "at-risk" && status !== "late" && status !== "previous")
         {
-            throw new Error ("Milestone health on row " + i + " is invalid." +
+            throw new Error ("Milestone health on row " + (i + 1) + " is invalid." +
                              "Must be one of 'complete', 'on-track', 'at-risk', 'late', or 'previous'")
         }
 
         var date = Util.fromISODateOnly(row [3]);
         if (isNaN(date)) {
-            throw new Error ("Invalid date format on row " + i +
+            throw new Error ("Invalid date format on row " + (i + 1) +
                              ". The Date must be formatted as YYYY-MM-DD");
         }
     }
@@ -390,7 +403,7 @@ MilestoneMap.prototype.addCSVRow = function (row) {
     var milestoneName = row [2];
     var milestoneDate = row [3];
     var milestoneHealth = row [4];
-    var milestoneComment = row [5];
+    var milestoneComment = row [5] || "";
     
     if (programmeName !== "Business Milestones") {
         var programme = this.programmes.find(programme => {
@@ -493,4 +506,14 @@ MilestoneMap.prototype.modifyStartDate = function (e, input) {
 MilestoneMap.prototype.modifyEndDate = function (e, input) {
     this.end = input.date;
     this.draw();
+};
+
+
+MilestoneMap.prototype.modifyCurrReport = function (evt) {
+    this.modifyCurrReport (evt.currentTarget.value);
+    this.draw ();
+};
+MilestoneMap.prototype.modifyCmpReport = function (evt) {
+    this.modifyCmpReport (evt.currentTarget.value);
+    this.draw ();
 };

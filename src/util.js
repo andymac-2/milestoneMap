@@ -169,5 +169,8 @@ Util.parseCSV = function (str) {
 
         arr[row][col] += cc;
     }
+    if (arr[arr.length - 1].length === 0) {
+        arr.pop();
+    }
     return arr;
 };
