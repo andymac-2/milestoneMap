@@ -18,6 +18,14 @@ Util.removeAtIndex = function (array, index) {
     array.pop();   
 };
 
+Util.insertInSortedArray = function (arr, cmpFunc, elem) {
+    for (var i = arr.length; i > 0 && cmpFunc(arr[i - 1], elem) > 0; i--) {
+        arr[i] = arr[i - 1];
+    }
+    arr[i] = elem;
+    return arr;
+};
+
 Util.removeFromArray = function (array, obj) {
     var index = array.indexOf(obj);
     assert (() => index >= 0);
@@ -36,6 +44,38 @@ Util.safeRemoveFromArray = function (array, obj) {
     array.pop();
 };
 
+Util.refreshIndices = function (arr) {
+    for (var i = 0; i < arr.length; i++) {
+        arr[i].index = i;
+    }
+};
+Util.isSortedByIndex = function (arr) {
+    for (var i = 0; i < arr.length - 1; i++) {
+        if (arr[i].index < arr[i + 1]) {
+            return false;
+        }
+    }
+    return true;
+};
+Util.addToIndexedArray = function (arr, obj, index) {
+    assert (() => index <= arr.length);
+    assert (() => index >= 0);
+    for (var i = arr.length; i > index; i--) {
+        arr[i] = arr[i - 1];
+        arr[i].index = i;
+    }
+
+    arr[index] = obj;
+    obj.index = index;
+
+    return arr;
+};
+Util.addToIndexedArrayEnd = function (arr, obj) {
+    obj.index = arr.length;
+    arr.push (obj);
+
+    return arr;
+};
 Util.removeFromIndexedArray = function (array, obj) {
     assert (() => array[obj.index] = obj);
     var index = obj.index;

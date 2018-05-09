@@ -173,6 +173,64 @@ Project.prototype.deleteThis = function () {
     this.milestones.forEach (milestone => milestone.deleteThis());
     this.mMap.removeProject (this);
 };
+Project.prototype.moveUpProgramme = function () {
+    assert(() => this.programme.projects.indexOf(this) === 0);
+    assert(() => Util.isSortedByIndex(this.programme.projects));
+    var index = this.programme.index;
+    
+    // already the first programme
+    if (index <= 0) {
+        return;
+    }
+
+    this.programme.projects.shift();
+    Util.removeFromIndexedArray(this.mMap.projects, this);
+
+    index--;
+    this.programme = this.mMap.programmes[index];
+    assert(() => Util.isSortedByIndex(this.programme.projects));
+
+    var lastProject =
+        this.programme.projects[this.programme.projects.length - 1];
+    this.programme.addProject(this);
+
+    if (lastProject) {
+        Util.addToIndexedArray(this.mMap.projects, this, lastProject.index + 1);
+    }
+    else {
+        Util.addToIndexedArrayEnd(this.mMap.projects, this);
+    }
+    assert(() => Util.isSortedByIndex(this.mMap.projects));
+};
+
+Project.prototype.moveDownProgramme = function () {
+    assert(() => this.programme.projects.indexOf(this) === 0);
+    assert(() => Util.isSortedByIndex(this.programme.projects));
+    var index = this.programme.index;
+    
+    // already the last programme
+    if (index >= this.mMap.programmes.length - 1) {
+        return;
+    }
+
+    this.programme.projects.pop();
+    Util.removeFromIndexedArray(this.mMap.projects, this);
+
+    index++;
+    this.programme = this.mMap.programmes[index];
+    assert(() => Util.isSortedByIndex(this.programme.projects));
+
+    var firstProject = this.programme.projects[0];
+    this.programme.projects.unshift(this);
+
+    if (firstProject) {
+        Util.addToIndexedArray(this.mMap.projects, this, firstProject.index);
+    }
+    else {
+        Util.addToIndexedArrayEnd(this.mMap.projects, this);
+    }
+    assert(() => Util.isSortedByIndex(this.mMap.projects));
+};
 
 // user modifications
 Project.prototype.deleteDraw = function () {
@@ -207,6 +265,10 @@ Project.prototype.moveUp = function () {
 
     // already the first element
     if (index === 0) {
+        var programme = this.programme;
+        this.moveUpProgramme();
+        programme.draw();
+        this.reflowUp();
         return;
     }
 
@@ -224,6 +286,10 @@ Project.prototype.moveDown = function () {
 
     // already the first element
     if (index === this.programme.projects.length - 1) {
+        var programme = this.programme;
+        this.moveDownProgramme();
+        programme.draw();
+        this.reflowUp();
         return;
     }
 
