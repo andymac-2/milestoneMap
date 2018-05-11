@@ -11,6 +11,8 @@ var Loader = function (parent) {
     this.file;
     this.parent = parent;
 
+    Util.throttleEvent (window, "resize", this.draw.bind(this), 100);
+
     this.newFile();
 };
 

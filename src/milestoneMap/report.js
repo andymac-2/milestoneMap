@@ -67,6 +67,7 @@ Report.prototype.drawHeader = function (attrs, parent) {
 
 Report.prototype.drawLine = function () {
     this.lineElem.innerHTML = "";
+    this.lineElemMain.innerHTML = "";
 
     if (!this.mMap.isInInterval(this.date)) {
         return this.lineElem;

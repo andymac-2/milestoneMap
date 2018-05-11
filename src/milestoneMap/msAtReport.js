@@ -108,6 +108,7 @@ MsAtReport.prototype.draw = function () {
 };
 MsAtReport.prototype.drawLine = function () {
     this.elemLine.innerHTML = "";
+    this.elemLineMain.innerHTML = "";
 
     Draw.svgElem("line", {
         "x1": 0, "y1": 0,

@@ -189,6 +189,18 @@ Util.getCSS = function () {
     return css.join('\n');
 };
 
+Util.throttleEvent = function (elem, eventName, callback, time) {
+    time = time || 100;
+    var timer;
+    var throttle = function () {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+        timer = setTimeout(callback, time);
+    };
+    elem.addEventListener(eventName, throttle);
+}
+
 Util.parseCSV = function (str) {
     var arr = [];
     var quote = false;  // true means we're inside a quoted field
