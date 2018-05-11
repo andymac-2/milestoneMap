@@ -41,7 +41,7 @@ var MilestoneMap = function (obj, pagesize) {
         "class": "fg"
     }, this.elem);
 
-    this.printElem = Draw.elem("html", {
+    this.printElem = Draw.elem("span", {
         "class": "printablePages"
     })
     
@@ -147,12 +147,6 @@ MilestoneMap.prototype.draw = function () {
 MilestoneMap.prototype.PX_PER_MM = 5.0;
 MilestoneMap.prototype.drawPrint = function () {
     this.printElem.innerHTML = "";
-
-    var styles = Draw.elem ("style", {
-        "type": "text/css"
-    }, this.printElem);
-
-    styles.innerHTML = Util.getCSS();
     
     this.width = this.pageSize.width * MilestoneMap.prototype.PX_PER_MM;
     this.height = this.pageSize.height * MilestoneMap.prototype.PX_PER_MM
@@ -175,7 +169,6 @@ MilestoneMap.prototype.drawPrint = function () {
             "viewbox": "0 0 " +
                 (this.pageSize.width * MilestoneMap.prototype.PX_PER_MM) + " " +
                 (this.pageSize.height * MilestoneMap.prototype.PX_PER_MM),
-            "style": "width:100%;height:auto;"
         }, this.printElem);
 
         var yoffset = new DateHeader (this, page).endy;

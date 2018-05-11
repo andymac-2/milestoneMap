@@ -9,6 +9,7 @@ var Loader = function (parent) {
 
     this.map;
     this.file;
+    this.parent = parent;
 
     this.newFile();
 };
@@ -88,7 +89,6 @@ Loader.prototype.draw = function () {
 
 
 // correspond to Loader.PAGESIZENAMES
-Loader.A3SIZE = {height: 297, width: 420};
 Loader.PAGEMARGIN = 35;
 Loader.PAGESIZES = [
     {height: 1682, width: 2378},
@@ -104,6 +104,7 @@ Loader.PAGESIZES = [
         width: elem.width - Loader.PAGEMARGIN * 2,
     };
 });
+Loader.A3SIZE = Loader.PAGESIZES[5];
 // correspond to Loader.PAGESIZES
 Loader.PAGESIZENAMES = [
     "4A0", "2A0", "A0", "A1", "A2", "A3", "A4"
@@ -188,11 +189,12 @@ Loader.prototype.print = function () {
     
     try {
         mMap.drawPrint();
-        var newWindow = window.open ("", "_blank", "");
+        this.parent.innerHTML = mMap.printElem.innerHTML;
+        window.print();
+        this.parent.innerHTML = "";
+        this.parent.appendChild(this.elem);
         
-        newWindow.document.body.innerHTML = mMap.printElem.outerHTML;
-        newWindow.print();
-        newWindow.close();
+        //newWindow.close();
     }
     catch (err) {
         Util.allertErr(err);

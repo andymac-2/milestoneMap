@@ -62,6 +62,12 @@ body {
     width: 100%;
 }
 
+/* pages */
+.milestoneMapPage { 
+    width: 100%;
+    height: auto;
+}
+
 /* title bar */
 .mMapTitle {
     font-size: 2em;
