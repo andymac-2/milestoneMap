@@ -1,13 +1,17 @@
 'use strict'
 
 // maybe better as a function rather than a class
-var DateHeader = function (mMap, parent) { 
+var DateHeader = function (mMap, parentHeader, parentMain) { 
     // view
     this.elem = Draw.svgElem("g", {
         "class": "dateHeader"
-    }, parent);
+    }, parentHeader);
     this.bgElem =Draw.svgElem ("g", {}, this.elem);
     this.fgElem = Draw.svgElem ("g", {}, this.elem);
+
+    this.elemPageBackground = Draw.svgElem ("g", {
+        "class": "dateHeader"
+    }, parentMain);
 
     // view model
     this.mMap = mMap;
@@ -151,41 +155,60 @@ DateHeader.prototype.draw = function () {
 
     var y = DateHeader.ROWY;
     for (var i = 0; i < rows.length - 2; i++) {
-        this.drawRow(y, y + DateHeader.ROWHEIGHT, rows[i],
+        this.drawRow(y, DateHeader.ROWHEIGHT, rows[i],
                      this.drawHighlightedBox.bind(this));
         y += DateHeader.ROWHEIGHT;
     }
 
     // TODO all calls to Draw.getElemHEight replaced with something printer friendly
     if (rows.length > 1) {
-    this.drawRow(y, this.mMap.height, rows[rows.length - 2],
-                 this.drawHighlightedBox.bind(this));
+        this.drawRow(y, "100%", rows[rows.length - 2],
+                     this.drawHighlightedBox.bind(this));
+        this.drawRow(y, "100%", rows[rows.length - 2],
+                     this.drawBGBox.bind(this));
         y += DateHeader.ROWHEIGHT;
-    
-    this.drawRow(y, y + DateHeader.ROWHEIGHT, rows[rows.length - 1],
-                 this.drawOutlineBox.bind(this));
+        
+        this.drawRow(y, DateHeader.ROWHEIGHT, rows[rows.length - 1],
+                     this.drawOutlineBox.bind(this));
         this.endy = y + DateHeader.ROWHEIGHT;
     }
     else {
-        this.drawRow(y, this.mMap.height, rows[0],
-                 this.drawHighlightedBox.bind(this));
+        this.drawRow(y, "100%", rows[0],
+                     this.drawHighlightedBox.bind(this));
+        this.drawRow(y, "100%", rows[0],
+                     this.drawBGBox.bind(this));
         this.endy = y + DateHeader.ROWHEIGHT;
     }
 
     this.endy += DateHeader.BUFFERHEIGHT;
     
     Draw.svgElem ("rect", {
-        "x" : "0", "y": "0",
+        "x" : 0, "y": 0,
         "width": this.mMap.getSideBarWidth(),
-        "height": this.mMap.height,
+        "height": "100%",
         "class": "whiteBackground"
-    }, this.bgElem)
-};
+    }, this.bgElem);
 
-DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
+    Draw.svgElem ("rect", {
+        "x" : 0, "y": 0,
+        "width": this.mMap.getSideBarWidth(),
+        "height": "100%",
+        "class": "whiteBackground"
+    }, this.elemPageBackground);
+};
+DateHeader.prototype.drawBGBox = function (x1, x2, y1, height, text, cls) {
     Draw.svgElem ("rect", {
         "class": cls,
-        "height": y2 - y1,
+        "height": "100%",
+        "y": "0",
+        "x": x1,
+        "width": x2 - x1
+    }, this.elemPageBackground);
+};
+DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, height, text, cls) {
+    Draw.svgElem ("rect", {
+        "class": cls,
+        "height": height,
         "y": y1,
         "x": x1,
         "width": x2 - x1
@@ -198,7 +221,8 @@ DateHeader.prototype.drawHighlightedBox = function (x1, x2, y1, y2, text, cls) {
         "text-anchor": "middle"
     }, this.bgElem).textContent = text;
 };
-DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, y2, text, cls) {
+DateHeader.prototype.drawOutlineBox = function (x1, x2, y1, height, text, cls) {
+    var y2 = y1 + height;
     Draw.svgElem ("line", {
         "class": "dateHeaderSeparator",
         "x1": x1, "y1": y1 + 3,
@@ -218,7 +242,7 @@ DateHeader.WEEKS = 1;
 DateHeader.MONTHS = 2;
 DateHeader.YEARS = 3;
 DateHeader.DECADES = 4;
-DateHeader.prototype.drawRow = function (y1, y2, interval, drawfunc) {
+DateHeader.prototype.drawRow = function (y1, height, interval, drawfunc) {
     switch (interval) {
     case DateHeader.DAYS:
         var zero = DateHeader.zeroTimeOfDay;
@@ -255,7 +279,7 @@ DateHeader.prototype.drawRow = function (y1, y2, interval, drawfunc) {
         var x1 = this.mMap.getXCoord(cursor);
         var x2 = this.mMap.getXCoord(increment(cursor));
         
-        drawfunc (x1, x2, y1, y2, text, num % 2 === 0 ? "even": "odd");
+        drawfunc (x1, x2, y1, height, text, num % 2 === 0 ? "even": "odd");
         num ++;
     };
 };

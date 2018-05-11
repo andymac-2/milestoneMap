@@ -77,13 +77,14 @@ Loader.prototype.draw = function () {
         "class": "pageSizeSelector"
     }, printSegment.body);
 
-    var versionSegment = Draw.menuBarSegment ("Version: " + VERSION +
-                                              " \xA9 Andrew Pritchard 2018", menubar);
-    
-    this.elem.appendChild(this.map.scrollbox);
-    var height = window.innerHeight - Draw.getElemHeight(menubar) - 10;
-    this.map.scrollbox.setAttribute("style", "max-height:" + height + "px;");
-    
+    var aboutSegment = Draw.menuBarSegment ("About", menubar);
+    Draw.iconBar ([{
+        icon: "icons/info.svg",
+        action: () => alert(Loader.aboutText)
+    }], {}, aboutSegment.body);
+
+    this.map.maxHeight = window.innerHeight - Draw.getElemHeight(menubar) - 5;
+    this.elem.appendChild(this.map.elemContainer);
     this.map.draw();
 };
 
@@ -200,3 +201,10 @@ Loader.prototype.print = function () {
         Util.allertErr(err);
     }
 };
+
+
+Loader.aboutText = `Milestone Map, Version: ` + VERSION + `
+
+Copyright (c) 2018 Andrew Pritchard, all rights reserved.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.`;

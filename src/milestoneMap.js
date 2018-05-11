@@ -19,35 +19,23 @@ var MilestoneMap = function (obj, pagesize) {
     
     //view
     this.elemReportSelectors = Draw.elem ("span", {});
-    this.scrollbox = Draw.elem ("div", {
-        "class": "mMapScrollBox"
-    });
     
-    this.elem = Draw.svgElem("svg", {
-        "class": "milestoneMap",
-        "height": 5000
-    }, this.scrollbox);
-    this.elem.addEventListener("click", this.deactivateOnUnclick.bind(this));
-    
-    this.bg = Draw.svgElem("g", {
-        "class": "bg"
-    }, this.elem);
-    
-    this.depLayer = Draw.svgElem("g", {
-        "class": "dependencies"
-    }, this.elem);
-    
-    this.fg = Draw.svgElem("g", {
-        "class": "fg"
-    }, this.elem);
+    this.elemContainer = Draw.elem ("div", {
+        "class": "mMapContainer"
+    }, this.elemContaine);
+    //this.elemContainer.addEventListener("click", this.deactivateOnUnclick.bind(this));
 
     this.printElem = Draw.elem("span", {
         "class": "printablePages"
-    })
+    });
+    this.depLayer;
+    this.scrollbox;
+    this.elemFixed;
     
     //view model
     this.width;
-    this.unclicker = new Unclicker (this.elem);
+    this.maxHeight;
+    this.unclicker = new Unclicker (this.elemContainer);
     this.dateHeader;
 
     // {width, height}
@@ -123,23 +111,46 @@ MilestoneMap.prototype.reportSelectors = function () {
 };
 
 MilestoneMap.prototype.draw = function () {
-    this.fg.innerHTML = "";
-    this.bg.innerHTML = "";
-    this.depLayer.innerHTML = "";
+    this.elemContainer.innerHTML = "";
+    
+    this.elemFixed = Draw.svgElem ("svg", {
+        "class": "mMapFixed"
+    }, this.elemContainer);
+    this.scrollbox = Draw.elem ("div", {
+        "class": "mMapScrollBox"
+    }, this.elemContainer);
+    
+    this.elemMain = Draw.svgElem("svg", {
+        "class": "milestoneMap",
+        "height": 5000
+    }, this.scrollbox);
+    
+    var bg = Draw.svgElem("g", {
+        "class": "bg"
+    }, this.elemMain);
+    
+    this.depLayer = Draw.svgElem("g", {
+        "class": "dependencies"
+    }, this.elemMain);
+    
+    var fg = Draw.svgElem("g", {
+        "class": "fg"
+    }, this.elemMain);
 
-    this.width = Draw.getElemWidth(this.elem);
-    this.height = Draw.getElemHeight(this.elem);
+    this.width = Draw.getElemWidth(this.elemMain);
 
     // maybe this would be better as a series of functions rather than a class.
-    this.dateHeader = new DateHeader (this, this.bg);
+    this.dateHeader = new DateHeader (this, this.elemFixed, bg);
     
     this.msAtReports.forEach (elem => elem.draw());
     this.milestones.forEach (elem => elem.draw());
     this.projects.forEach (elem => elem.draw());
-    this.fg.appendChild(this.businessMs.draw());
-    this.programmes.forEach (elem => this.fg.appendChild(elem.draw()));
+    this.elemFixed.appendChild(this.businessMs.draw());
+    bg.appendChild (this.businessMs.elemLines);
+    this.programmes.forEach (elem => fg.appendChild(elem.draw()));
 
-    this.fg.appendChild(this.currReport.drawLine());
+    this.elemFixed.appendChild(this.currReport.drawLine());
+    fg.appendChild (this.currReport.lineElemMain);
     
     this.reflow ();
 };
@@ -229,26 +240,18 @@ MilestoneMap.prototype.drawDependencies = function () {
 };
 
 MilestoneMap.prototype.reflow = function () {
-    var height = Draw.verticalReflow (this.dateHeader.endy, [this.businessMs]);
-    height = Draw.verticalReflow (height, this.programmes);
-    height = height < window.innerHeight ? window.innerHeight: height;
-    this.drawDependencies();
-};
-MilestoneMap.prototype.deactivateOnUnclick = function (event) {
-    var active = [].slice.call(this.elem.getElementsByClassName("active"));
-    for (var i = 0; i < active.length; i++) {
-        if (!active[i].parentNode.contains(event.target)) {
-            Draw.deactivate(active[i]);
-        }
-    }
+    var headerHeight = Draw.verticalReflow (this.dateHeader.endy, [this.businessMs]);
+    this.elemFixed.setAttribute("height", headerHeight);
+
+    var bodyHeight = this.maxHeight - headerHeight;
+    this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
+    bodyHeight -= 4;
     
-    if (this.globalModeSet) {
-        this.globalModeSet = false;
-    }
-    else {
-        this.globalMode = MilestoneMap.SELECT;
-        this.globalData = null;
-    }
+    var mainHeight = Draw.verticalReflow (0, this.programmes);
+    mainHeight = mainHeight < bodyHeight ? bodyHeight : mainHeight;
+    this.elemMain.setAttribute("height", mainHeight);
+    
+    this.drawDependencies();
 };
 
 // x coordinate methods

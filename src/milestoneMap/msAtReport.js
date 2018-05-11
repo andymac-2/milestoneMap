@@ -15,6 +15,9 @@ var MsAtReport = function (obj, index, mMap) {
     this.elemLine = Draw.svgElem ("g", {
         "class": "businessMsLine"
     });
+    this.elemLineMain = Draw.svgElem ("g", {
+        "class": "businessMsLine"
+    });
     this.elemInfo = Draw.svgElem ("g", {
         "class": "milestoneInfo"
     });
@@ -108,8 +111,13 @@ MsAtReport.prototype.drawLine = function () {
 
     Draw.svgElem("line", {
         "x1": 0, "y1": 0,
-        "x2": 0, "y2": this.mMap.height
+        "x2": 0, "y2": "100%"
     }, this.elemLine);
+
+    Draw.svgElem("line", {
+        "x1": this.x, "y1": 0,
+        "x2": this.x, "y2": "100%"
+    }, this.elemLineMain);
 
     return this.elemLine;
 };

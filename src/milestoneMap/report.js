@@ -9,6 +9,9 @@ var Report = function (obj, index, mMap) {
     this.lineElem = Draw.svgElem ("g", {
         "class": "reportLine"
     });
+    this.lineElemMain = Draw.svgElem ("g", {
+        "class": "reportLine"
+    });
 
     //model
     this.index = index;
@@ -73,8 +76,13 @@ Report.prototype.drawLine = function () {
 
     Draw.svgElem("line", {
         "x1": x, "y1": DateHeader.ROWY,
-        "x2": x, "y2": this.mMap.height
+        "x2": x, "y2":"100%"
     }, this.lineElem);
+
+    Draw.svgElem("line", {
+        "x1": x, "y1": 0,
+        "x2": x, "y2":"100%"
+    }, this.lineElemMain);
 
     return this.lineElem;
 };

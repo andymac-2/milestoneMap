@@ -11,6 +11,9 @@ var BusinessMs = function (mMap) {
     this.elem = Draw.svgElem("g", {
         "class": "businessMs",
     });
+    this.elemLines = Draw.svgElem("g", {
+        "class": "businessMs",
+    });
 
     // view model
     this.mMap = mMap;
@@ -20,6 +23,7 @@ var BusinessMs = function (mMap) {
 // TODO: variable height milestone data.
 BusinessMs.prototype.draw = function () {
     this.elem.innerHTML = "";
+    this.elemLines.innerHTML = "";
 
     this.flowMilestoneData();
     
@@ -37,9 +41,12 @@ BusinessMs.prototype.draw = function () {
     this.milestones
         .filter (milestone => milestone.currentReport())
         .forEach(milestone => {
-            assert (() => milestone.currentReport());
-            milestone.currentReport().drawLine();
+            var msAtReport = milestone.currentReport();
+            assert (() => msAtReport);
+            
+            msAtReport.drawLine();
             milestones.appendChild (milestone.elem);
+            this.elemLines.appendChild (msAtReport.elemLineMain);
         });
 
     // this group stops multiple click events on the parent elem occuring
@@ -76,21 +83,4 @@ BusinessMs.prototype.removeMilestone = function (milestone) {
 };
 
 // user modifications
-BusinessMs.prototype.newMilestone = function () {
-    var milestone = this.mMap.addMilestone({
-        "name": "New Milestone",
-        "project": this.index
-    });
-
-    var msAtReport = this.mMap.addMsAtReport({
-        "milestone": milestone.index,
-        "report": this.mMap.currReport.index,
-        "comment": "",
-        "status": MsAtReport.ONTRACK,
-        "date": this.mMap.defaultDate()
-    });
-
-    msAtReport.draw();
-    milestone.draw();
-    this.draw();
-};
+BusinessMs.prototype.newMilestone = Project.prototype.newMilestone;

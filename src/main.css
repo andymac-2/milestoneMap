@@ -9,8 +9,6 @@ body {
 
 /* menu bar */
 .menubar {
-    border: 1px solid #888;
-    border-radius: 3px;
     padding: 0px;
     
     display: flex;
@@ -55,11 +53,15 @@ body {
 
 /* milestone map total */
 .mMapScrollBox {
-    overflow: scroll;
-    max-height: 90vh;
+    overflow: auto;
 }
 .milestoneMap {
     width: 100%;
+    display: block;
+}
+.mMapFixed {
+    width: 100%;
+    display: block;
 }
 
 /* pages */
