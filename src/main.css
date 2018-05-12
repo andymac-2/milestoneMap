@@ -204,15 +204,19 @@ body {
 }
 
 /* dependencies */
+.dependency {
+    stroke-width: 3;
+    stroke: hsl(240, 50%, 85%);
+}
+.dependency:hover {
+    stroke-width: 6;
+}
 .dependencyLine {
     fill: none;
-    stroke: hsl(240, 50%, 80%);
-    stroke-width: 2;
 }
 
 .dependencyArrow {
     fill: hsl(240, 50%, 80%);
-    stroke: none;
 }
 
 
@@ -275,3 +279,13 @@ body {
 }
 
 
+
+/* style types */
+.transparentLine {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0%);
+}
+
+.thick {
+    stroke-width: 8px;
+}

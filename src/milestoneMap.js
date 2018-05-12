@@ -23,7 +23,7 @@ var MilestoneMap = function (obj, pagesize) {
     this.elemContainer = Draw.elem ("div", {
         "class": "mMapContainer"
     }, this.elemContaine);
-    //this.elemContainer.addEventListener("click", this.deactivateOnUnclick.bind(this));
+    this.elemContainer.addEventListener("click", this.deactivateOnUnclick.bind(this));
 
     this.printElem = Draw.elem("span", {
         "class": "printablePages"
@@ -239,6 +239,17 @@ MilestoneMap.prototype.drawDependencies = function () {
     });
 };
 
+MilestoneMap.prototype.deactivateOnUnclick = function () {
+    if (this.globalModeSet) {
+        this.globalModeSet = false;
+    }
+    else {
+        this.globalMode = MilestoneMap.SELECT;
+        this.globalData = null;
+    }
+};
+
+MilestoneMap.SPACEFORFIRSTPROJECT = 35;
 MilestoneMap.prototype.reflow = function () {
     var headerHeight = Draw.verticalReflow (this.dateHeader.endy, [this.businessMs]);
     this.elemFixed.setAttribute("height", headerHeight);
@@ -247,7 +258,7 @@ MilestoneMap.prototype.reflow = function () {
     this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
     bodyHeight -= 4;
     
-    var mainHeight = Draw.verticalReflow (0, this.programmes);
+    var mainHeight = Draw.verticalReflow (MilestoneMap.SPACEFORFIRSTPROJECT, this.programmes);
     mainHeight = mainHeight < bodyHeight ? bodyHeight : mainHeight;
     this.elemMain.setAttribute("height", mainHeight);
     

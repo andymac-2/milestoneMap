@@ -10,8 +10,10 @@ var Dependency = function (obj, index, mMap) {
     this.elem = Draw.svgElem("g", {
         "class": "dependency"
     });
+    this.elem.addEventListener("dblclick", this.deleteDraw.bind(this));
 
     // model
+    this.selected = false;
     this.index = index;
     this.mMap = mMap;
 
@@ -56,7 +58,8 @@ Dependency.prototype.save = function () {
 
 Dependency.prototype.draw = function () {
     this.elem.innerHTML = "";
-    
+
+    // TODO: somehow draw and signify milestones that are off the sides of the page.
     if (this.report !== this.mMap.currReport ||
         !this.dependent.isDrawable() || !this.dependency.isDrawable())
     {
@@ -68,16 +71,20 @@ Dependency.prototype.draw = function () {
     var end = Draw.getElemXY(this.dependent.elem);
     end.x -=  MsAtReport.DIAMONDSIZE;
 
-    var line = Draw.quadrupleAngledLine (
+    Draw.quadrupleAngledLine (
         start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
+        this.elem);
+
+    Draw.quadrupleAngledLine (
+        start, end, Dependency.HSPACE, Dependency.VSPACE, "thick transparentLine",
         this.elem);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",
-        "d": "M -6 -6 L -6 6 L 0 0 Z",
+        "d": "M -4 -4 L -4 4 L 0 0 Z",
         "transform": "translate("+ end.x + ", " + end.y + ")"
-    }, this.elem);
-};
+    }, this.elem);    
+}
 
 // modifications
 Dependency.prototype.deleteThis = function () {

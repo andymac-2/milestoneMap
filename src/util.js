@@ -49,13 +49,16 @@ Util.refreshIndices = function (arr) {
         arr[i].index = i;
     }
 };
-Util.isSortedByIndex = function (arr) {
+Util.isStrictlySorted = function (arr, cmpFunc) {
     for (var i = 0; i < arr.length - 1; i++) {
-        if (arr[i].index < arr[i + 1]) {
+        if (cmpFunc(arr[i], arr[i + 1]) > 0) {
             return false;
         }
     }
     return true;
+};
+Util.isSortedByIndex = function (arr) {
+    return Util.isSorted (arr, (a, b) => a.index - b.index);
 };
 Util.addToIndexedArray = function (arr, obj, index) {
     assert (() => index <= arr.length);
