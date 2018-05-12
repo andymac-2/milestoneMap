@@ -67,17 +67,20 @@ Dependency.prototype.draw = function () {
     }
 
     var start = Draw.getElemXY(this.dependency.elem);
-    start.x +=  MsAtReport.DIAMONDSIZE;
+    //start.x +=  MsAtReport.DIAMONDSIZE;
     var end = Draw.getElemXY(this.dependent.elem);
     end.x -=  MsAtReport.DIAMONDSIZE;
 
-    Draw.quadrupleAngledLine (
-        start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
-        this.elem);
+    // Draw.quadrupleAngledLine (
+    //     start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
+    //     this.elem);
 
-    Draw.quadrupleAngledLine (
-        start, end, Dependency.HSPACE, Dependency.VSPACE, "thick transparentLine",
-        this.elem);
+    // Draw.quadrupleAngledLine (
+    //     start, end, Dependency.HSPACE, Dependency.VSPACE, "thick transparentLine",
+    //     this.elem);
+
+    Draw.sLine (start, end, 150, "dependencyLine", this.elem);
+    Draw.sLine (start, end, 150, "thick transparentLine", this.elem);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",
