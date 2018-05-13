@@ -100,17 +100,42 @@ Loader.PAGESIZES = [
     {height: 594, width: 841},
     {height: 420, width: 594},
     {height: 297, width: 420},
-    {height: 210, width: 297}
+    {height: 210, width: 297},
+    {width: 1682, height: 2378},
+    {width: 1189, height: 1682},
+    {width: 841, height: 1189},
+    {width: 594, height: 841},
+    {width: 420, height: 594},
+    {width: 297, height: 420},
+    {width: 210, height: 297},
 ].map(elem => {
-    return {
-        height: elem.height - Loader.PAGEMARGIN * 2,
-        width: elem.width - Loader.PAGEMARGIN * 2,
-    };
+    if (elem.width > elem.height) {
+        return {
+            height: elem.height - Loader.PAGEMARGIN * 2,
+            width: elem.width - Loader.PAGEMARGIN * 2,
+        };
+    }
+    else {
+        return elem;
+    }
 });
 Loader.A3SIZE = Loader.PAGESIZES[5];
 // correspond to Loader.PAGESIZES
 Loader.PAGESIZENAMES = [
-    "4A0", "2A0", "A0", "A1", "A2", "A3", "A4"
+    "4A0 Landscape",
+    "2A0 Landscape",
+    "A0 Landscape",
+    "A1 Landscape",
+    "A2 Landscape",
+    "A3 Landscape",
+    "A4 Landscape",
+    "4A0 Portrait",
+    "2A0 Portrait",
+    "A0 Portrait",
+    "A1 Portrait",
+    "A2 Portrait",
+    "A3 Portrait",
+    "A4 Portrait",
 ];
 Loader.prototype.printSizeSelector = function (attrs, parent) {
     var onchange = (evt) => {

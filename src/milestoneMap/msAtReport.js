@@ -264,6 +264,9 @@ MsAtReport.prototype.removeDependent = function (dependent) {
 // events
 MsAtReport.prototype.diamondOnClick = function () {
     if (this.mMap.globalMode === MilestoneMap.CREATEDEPENDENCY) {
+        if (this.isBusinessMs()) {
+            return;
+        };
         var dep = this.mMap.addDependency ({
             "report": this.mMap.currReport.index,
             "dependency": this.mMap.globalData,
@@ -311,6 +314,9 @@ MsAtReport.prototype.deleteDraw = function () {
     this.reflowUp ();
 };
 MsAtReport.prototype.createDependency = function () {
+    if (this.isBusinessMs()) {
+        return;
+    }
     this.mMap.globalMode = MilestoneMap.CREATEDEPENDENCY;
     this.mMap.globalData = this.milestone.index;
     this.mMap.globalModeSet = true;

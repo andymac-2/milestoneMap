@@ -27,6 +27,18 @@ Draw.quadrupleAngledLine = function (start, end, hspace, vspace, lnClass, parent
             "H" + end.x
     }, parent);
 };
+// create an s shaped curve, going to the right of the start and into the left of end.
+// strength indicates how curved the line will be
+Draw.sLine = function (start, end, strength, lnClass, parent) {
+    return Draw.svgElem ("path", {
+        "class": lnClass,
+        "d" : "M" + start.x + " " + start.y + " " +
+            "C" + (start.x + strength) + " " + start.y + " " +
+            (end.x - strength) + " " + end.y + " " +
+            end.x + " " + end.y
+    }, parent);
+};
+
 Draw.doubleAngledLine = function (start, end, hspace, vspace, lnClass, parent){
 /* Creates an angled line like so:
              end
