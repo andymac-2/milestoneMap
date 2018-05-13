@@ -105,9 +105,9 @@ MilestoneMap.prototype.reportSelectors = function () {
 
     var entries = this.reports.map (report => report.getMenuText());
     Draw.dropDownSegment (
-        "Current:", this.modifyCurrReport.bind(this), entries, attrs, parent);
+        "Current:", this.modifyCurrReportEvt.bind(this), entries, attrs, parent);
     Draw.dropDownSegment (
-        "Baseline:", this.modifyCmpReport.bind(this), entries, attrs, parent);
+        "Baseline:", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
 };
 
 MilestoneMap.prototype.draw = function () {
@@ -516,11 +516,11 @@ MilestoneMap.prototype.modifyEndDate = function (e, input) {
 };
 
 
-MilestoneMap.prototype.modifyCurrReport = function (evt) {
+MilestoneMap.prototype.modifyCurrReportEvt = function (evt) {
     this.modifyCurrReport (evt.currentTarget.value);
     this.draw ();
 };
-MilestoneMap.prototype.modifyCmpReport = function (evt) {
+MilestoneMap.prototype.modifyCmpReportEvt = function (evt) {
     this.modifyCmpReport (evt.currentTarget.value);
     this.draw ();
 };
