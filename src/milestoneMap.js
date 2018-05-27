@@ -105,9 +105,9 @@ MilestoneMap.prototype.reportSelectors = function () {
 
     var entries = this.reports.map (report => report.getMenuText());
     Draw.dropDownSegment (
-        "Current:", this.modifyCurrReportEvt.bind(this), entries, attrs, parent);
+        "Snapshot 1", this.modifyCurrReportEvt.bind(this), entries, attrs, parent);
     Draw.dropDownSegment (
-        "Baseline:", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
+        "Snapshot 2", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
 };
 
 MilestoneMap.prototype.draw = function () {

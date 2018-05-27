@@ -58,9 +58,9 @@ Loader.prototype.draw = function () {
         action: this.map.newProgramme.bind(this.map)
     }], {}, programmeSegment.body);
 
-    var reportSegment = Draw.menuBarSegment("Report", menubar);
+    var reportSegment = Draw.menuBarSegment("Comparison", menubar);
     Draw.iconBar ([{
-        icon: "icons/plus.svg",
+        icon: "icons/camera.svg",
         action: this.newReport.bind(this)
     }, {
         icon: "icons/delete.svg",
