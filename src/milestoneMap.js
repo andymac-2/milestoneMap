@@ -103,11 +103,12 @@ MilestoneMap.prototype.reportSelectors = function () {
     parent.innerHTML = "";
     var attrs = {"class": "reportSelector"};
 
-    var entries = this.reports.map (report => report.getMenuText());
+    var entries = this.reports.sort ((a, b) => a.date - b.date)
+        .map (report => report.getMenuText());
     Draw.dropDownSegment (
-        "Snapshot 1", this.modifyCurrReportEvt.bind(this), entries, attrs, parent);
+        "Snapshot 1 (Current)", this.modifyCurrReportEvt.bind(this), entries, attrs, parent);
     Draw.dropDownSegment (
-        "Snapshot 2", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
+        "Snapshot 2 (Baseline)", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
 };
 
 MilestoneMap.prototype.draw = function () {
