@@ -23,6 +23,8 @@ var Milestone = function (obj, index, mMap) {
 };
 
 Milestone.prototype.restore = function (obj) {
+    runTAssert (() => Number.isInteger(obj.project));
+    runTAssert (() => this.mMap.projects[obj.project] || obj.project < 0);
     this.name = obj.name;
     
     if (this.project) {

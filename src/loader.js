@@ -185,8 +185,14 @@ Loader.prototype.newFile = function () {
 
 Loader.prototype.loadFile = function () {
     var restoreDraw = (string) => {
-        this.restore(string);
-        this.draw();
+        try {
+            this.restore(string);
+            this.draw();
+        }
+        catch (e) {
+            alert ("Error: Invalid file.");
+            throw e;
+        }
     };
     
     Util.upload (this.elem, restoreDraw, ".json");
@@ -200,6 +206,7 @@ Loader.prototype.importCSVReport = function () {
         }
         catch (err) {
             Util.allertErr(err);
+            throw err;
         }
     };
     

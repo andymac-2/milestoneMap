@@ -22,6 +22,10 @@ var Project = function (obj, index, mMap) {
 Project.MINHEIGHT = 40;
 Project.MILESTONEOFFSET = 20;
 Project.prototype.restore = function (obj) {
+    runTAssert (() => typeof obj.name === "string");
+    runTAssert (() => Number.isInteger(obj.programme));
+    runTAssert (() => this.mMap.programmes[obj.programme]);
+    
     this.name = obj.name;
 
     if (this.programme) {

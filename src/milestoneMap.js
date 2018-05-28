@@ -53,6 +53,10 @@ MilestoneMap.CREATEDEPENDENCY = 1;
 
 // restore here will also draw as well
 MilestoneMap.prototype.restore = function (obj) {
+    runTAssert (() => Number.isInteger(obj.start));
+    runTAssert (() => Number.isInteger(obj.end));
+    runTAssert (() => typeof obj.name === "string"); 
+    
     this.start = obj.start;
     this.end = obj.end;
     this.name = obj.name;
@@ -71,6 +75,11 @@ MilestoneMap.prototype.restore = function (obj) {
     this.reports = obj.reports.map ((report, i) => {
         return new Report (report, i, this);
     });
+    
+    runTAssert (() => Number.isInteger(obj.currReport));
+    runTAssert (() => this.reports[obj.currReport]);
+    runTAssert (() => Number.isInteger(obj.cmpReport));
+    runTAssert (() => this.reports[obj.cmpReport]);
     this.currReport = this.reports[obj.currReport];
     this.cmpReport = this.reports[obj.cmpReport];
     
@@ -252,14 +261,21 @@ MilestoneMap.prototype.deactivateOnUnclick = function () {
 
 MilestoneMap.SPACEFORFIRSTPROJECT = 35;
 MilestoneMap.prototype.reflow = function () {
-    var headerHeight = Draw.verticalReflow (this.dateHeader.endy, [this.businessMs]);
+    var headerHeight = Draw.verticalReflow (
+        this.dateHeader.endy, [this.businessMs]);
     this.elemFixed.setAttribute("height", headerHeight);
 
     var bodyHeight = this.maxHeight - headerHeight;
     this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
+    
+    // I've forgotten what this line is for. the number 4 is
+    // apparently the difference between the height of the containing
+    // scroll box, and the height if the inner content. maybe to stop
+    // the scroll bar appearing when the height is small?
     bodyHeight -= 4;
     
-    var mainHeight = Draw.verticalReflow (MilestoneMap.SPACEFORFIRSTPROJECT, this.programmes);
+    var mainHeight = Draw.verticalReflow (
+        MilestoneMap.SPACEFORFIRSTPROJECT, this.programmes);
     mainHeight = mainHeight < bodyHeight ? bodyHeight : mainHeight;
     this.elemMain.setAttribute("height", mainHeight);
     

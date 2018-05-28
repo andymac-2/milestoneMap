@@ -48,6 +48,15 @@ MsAtReport.PREVIOUS = 4;
 MsAtReport.DIAMONDSIZE = 7;
 
 MsAtReport.prototype.restore = function (obj) {
+    runTAssert (() => Number.isInteger(obj.milestone));
+    runTAssert (() => this.mMap.milestones[obj.milestone]);
+    runTAssert (() => Number.isInteger(obj.report));
+    runTAssert (() => this.mMap.reports[obj.report]);
+    runTAssert (() => typeof obj.comment === "string");
+    runTAssert (() => Number.isInteger(obj.date));
+    runTAssert (() => Number.isInteger(obj.status));
+    runTAssert (() => obj.status >= 0 && obj.status <= MsAtReport.PREVIOUS);
+    
     if (this.milestone) {
         this.milestone.removeReport (this);
     }

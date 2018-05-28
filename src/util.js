@@ -80,12 +80,12 @@ Util.addToIndexedArrayEnd = function (arr, obj) {
     return arr;
 };
 Util.removeFromIndexedArray = function (array, obj) {
-    assert (() => array[obj.index] = obj);
+    assert (() => array[obj.index] === obj);
     var index = obj.index;
 
     for (var i = index; i < array.length - 1; i++){
-        array[index] = array[index + 1];
-        array[index].index = index;
+        array[i] = array[i + 1];
+        array[i].index = i;
     }
     array.pop();
 };

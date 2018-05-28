@@ -20,6 +20,7 @@ var Programme = function (obj, index, mMap) {
 Programme.HEADERHEIGHT = 40;
 
 Programme.prototype.restore = function (obj) {
+    runTAssert (() => typeof obj.name === "string");
     this.name = obj.name;
 };
 Programme.prototype.save = function () {
