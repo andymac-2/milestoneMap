@@ -80,7 +80,7 @@ Dependency.prototype.draw = function () {
     //     this.elem);
 
     Draw.sLine (start, end, 150, "dependencyLine", this.elem);
-    Draw.sLine (start, end, 150, "thick transparentLine", this.elem);
+    Draw.sLine (start, end, 150, "vthick transparentLine", this.elem);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",

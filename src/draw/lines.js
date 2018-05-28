@@ -27,6 +27,19 @@ Draw.quadrupleAngledLine = function (start, end, hspace, vspace, lnClass, parent
             "H" + end.x
     }, parent);
 };
+Draw.bowedLine = function (start, end, lnClass, parent) {
+    var ybow = (start.x - end.x) * 0.1;
+    ybow = Util.clamp (-45, 45, ybow);
+    var xbow = ybow * 4;
+    return Draw.svgElem ("path", {
+        "class": lnClass,
+        "d" : "M" + start.x + " " + start.y + " " +
+            "C" + (start.x - xbow) + " " + (start.y + ybow) + " " +
+            (end.x + xbow) + " " + (end.y + ybow) + " " +
+            end.x + " " + end.y
+    }, parent);
+};
+
 // create an s shaped curve, going to the right of the start and into the left of end.
 // strength indicates how curved the line will be
 Draw.sLine = function (start, end, strength, lnClass, parent) {

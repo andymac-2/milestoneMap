@@ -69,28 +69,25 @@ Milestone.prototype.draw = function () {
 
     if (current && comparison &&
         (this.mMap.currReport !== this.mMap.cmpReport)) {
-        Draw.svgElem ("line", {
-            "class": "compareLine",
-            "x1": comparison.x, "y1": "0",
-            "x2": current.x, "y2": "0"
-        }, this.elem);
+        Draw.bowedLine ({x: comparison.x, y: 0}, {x: current.x, y: 0},
+                        "thick evenDashed brightPink noFill", this.elem);
         
-        if (comparison.x < current.x) {
-            Draw.svgElem ("path", {
-                "class": "compareArrow",
-                "d": "M -6 -6 L -6 6 L 0 0 Z",
-                "transform": "translate("+
-                    (current.x - MsAtReport.DIAMONDSIZE) + ", 0)"
-            }, this.elem);
-        }
-        else if (comparison.x > current.x) {
-            Draw.svgElem ("path", {
-                "class": "compareArrow",
-                "d": "M 6 -6 L 6 6 L 0 0 Z",
-                "transform": "translate("+
-                    (current.x + MsAtReport.DIAMONDSIZE) + ", 0)"
-            }, this.elem);
-        }
+        // if (comparison.x < current.x) {
+        //     Draw.svgElem ("path", {
+        //         "class": "compareArrow",
+        //         "d": "M -6 -6 L -6 6 L 0 0 Z",
+        //         "transform": "translate("+
+        //             (current.x - MsAtReport.DIAMONDSIZE) + ", 0)"
+        //     }, this.elem);
+        // }
+        // else if (comparison.x > current.x) {
+        //     Draw.svgElem ("path", {
+        //         "class": "compareArrow",
+        //         "d": "M 6 -6 L 6 6 L 0 0 Z",
+        //         "transform": "translate("+
+        //             (current.x + MsAtReport.DIAMONDSIZE) + ", 0)"
+        //     }, this.elem);
+        // }
     };
 
     if (comparison) {

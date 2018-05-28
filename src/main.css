@@ -184,12 +184,6 @@ body {
     stroke: #505050;
 }
 
-
-.milestone .compareLine {
-    stroke: rgba(255, 102, 255, 0.5);
-    stroke-width: 3;
-    stroke-dasharray: 5, 5;
-}
 .milestone .compareArrow {
     fill: rgba(255, 102, 255, 0.5);
     stroke: none;
@@ -286,6 +280,21 @@ body {
     stroke: rgba(0, 0, 0, 0%);
 }
 
-.thick {
+.vthick {
     stroke-width: 8px;
+}
+.thick {
+    stroke-width: 3px;
+}
+
+.evenDashed {
+    stroke-dasharray: 5, 5;
+}
+
+.brightPink {
+    stroke: rgba(255, 102, 255, 0.5);
+}
+
+.noFill {
+    fill: none;
 }
