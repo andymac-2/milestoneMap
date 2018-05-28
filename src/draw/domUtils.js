@@ -1,9 +1,10 @@
 'use strict'
 
 Draw.verticalReflow = function (yOffset, elements) {
-    elements.forEach(elem => {
-        elem.elem.setAttribute("transform", "translate(0, " + yOffset + ")");
-        yOffset += elem.height;
+    elements.forEach(model => {
+        model.elem.setAttribute("transform", "translate(0, " + yOffset + ")");
+        model.yOffset = yOffset;
+        yOffset += model.height;
     });
     return yOffset;
 };

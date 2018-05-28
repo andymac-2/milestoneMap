@@ -23,6 +23,13 @@ Dependency.HSPACE = 30;
 Dependency.VSPACE = 30;
 
 Dependency.prototype.restore = function (obj) {
+    runTAssert (() => Number.isInteger(obj.report));
+    runTAssert (() => this.mMap.reports[obj.report]);
+    runTAssert (() => Number.isInteger(obj.dependent));
+    runTAssert (() => this.mMap.milestones[obj.dependent]);
+    runTAssert (() => Number.isInteger(obj.dependency));
+    runTAssert (() => this.mMap.milestones[obj.dependency]);
+    
     this.report = this.mMap.reports[obj.report];
     
     if (this.dependent) {
@@ -30,7 +37,7 @@ Dependency.prototype.restore = function (obj) {
     }
     
     this.dependent = this.mMap.milestones[obj.dependent].hasReport(this.report);
-    assert (() => this.dependent);
+    runTAssert (() => this.dependent);
     this.dependent.addDependency (this);
 
     if (this.dependency) {
@@ -38,16 +45,21 @@ Dependency.prototype.restore = function (obj) {
     }
     
     this.dependency = this.mMap.milestones[obj.dependency].hasReport(this.report);
-    assert (() => this.dependency);
+    runTAssert (() => this.dependency);
     this.dependency.addDependent (this);
 };
 
 
 Dependency.prototype.save = function () {
-    assert (() => this.mMap.msAtReports[this.dependency.milestone.index] ===
+    assert (() => this.mMap.msAtReports[this.dependency.index] ===
             this.dependency);
-    assert (() => this.mMap.msAtReports[this.dependent.milestone.index] ===
+    assert (() => this.mMap.msAtReports[this.dependent.index] ===
             this.dependent);
+    assert (() => this.mMap.milestones[this.dependency.milestone.index] ===
+            this.dependency.milestone);
+    assert (() => this.mMap.milestones[this.dependent.milestone.index] ===
+            this.dependent.milestone);
+    
 
     return {
         dependent: this.dependent.milestone.index,
@@ -66,9 +78,9 @@ Dependency.prototype.draw = function () {
         return;
     }
 
-    var start = Draw.getElemXY(this.dependency.elem);
+    var start = this.dependency.getXY();
     //start.x +=  MsAtReport.DIAMONDSIZE;
-    var end = Draw.getElemXY(this.dependent.elem);
+    var end = this.dependent.getXY()
     end.x -=  MsAtReport.DIAMONDSIZE;
 
     // Draw.quadrupleAngledLine (

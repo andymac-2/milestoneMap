@@ -15,6 +15,7 @@ var Project = function (obj, index, mMap) {
     this.height = Project.HEIGHT;
     this.milestones = [];
     this.index = index;
+    this.yOffset = 0;
     this.restore (obj);
 };
 

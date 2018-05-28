@@ -248,6 +248,15 @@ MsAtReport.prototype.getLine2Width = function () {
     return width === 0 ? 0 : width + MsAtReport.INFOMARGIN;
 };
 
+MsAtReport.prototype.getXY = function () {
+    var project = this.milestone.project;
+    var y = project.programme.yOffset +
+        project.yOffset +
+        project.height - Project.MILESTONEOFFSET;
+        
+    return {x: this.x, y: y}
+};
+
 MsAtReport.prototype.reflowUp = function () {
     var project = this.milestone.project;
     project.draw();

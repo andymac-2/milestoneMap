@@ -14,6 +14,7 @@ var Programme = function (obj, index, mMap) {
     this.index = index;
     this.height = Programme.HEADERHEIGHT;
     this.projects = [];
+    this.yOffset = 0;
 
     this.restore (obj);
 };

@@ -111,6 +111,12 @@ Milestone.prototype.addReport = function (report) {
     this.atReports.push(report);
 };
 Milestone.prototype.removeReport = function (msAtReport) {
+    if (msAtReport.report === this.mMap.currReport) {
+        this.currReport = null;
+    }
+    if (msAtReport.report === this.mMap.cmpReport) {
+        this.cmpReport = null;
+    }
     this.atReports = this.atReports.filter(elem => elem !== msAtReport);
 };
 
