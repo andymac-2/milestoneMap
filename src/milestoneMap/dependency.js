@@ -80,7 +80,7 @@ Dependency.prototype.draw = function () {
 
     var start = this.dependency.getXY();
     //start.x +=  MsAtReport.DIAMONDSIZE;
-    var end = this.dependent.getXY()
+    var end = this.dependent.getXY();
     end.x -=  MsAtReport.DIAMONDSIZE;
 
     // Draw.quadrupleAngledLine (
@@ -91,15 +91,64 @@ Dependency.prototype.draw = function () {
     //     start, end, Dependency.HSPACE, Dependency.VSPACE, "thick transparentLine",
     //     this.elem);
 
-    Draw.sLine (start, end, 150, "dependencyLine", this.elem);
-    Draw.sLine (start, end, 150, "vthick transparentLine", this.elem);
+    Dependency.drawLine (start, end, this.elem);  
+};
+
+Dependency.drawLine = function (start, end, parent) {
+    Draw.sLine (start, end, 150, "dependencyLine", parent);
+    Draw.sLine (start, end, 150, "vthick transparentLine", parent);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",
         "d": "M -4 -4 L -4 4 L 0 0 Z",
         "transform": "translate("+ end.x + ", " + end.y + ")"
-    }, this.elem);    
-}
+    }, parent);  
+};
+
+Dependency.prototype.drawPrint = function (depLayers) {   
+    if (this.report !== this.mMap.currReport ||
+        !this.dependent.isDrawable() || !this.dependency.isDrawable())
+    {
+        return;
+    }
+
+    // TODO fix getXY code to work on pages
+    var start = this.dependency.getXYPrint();
+    var end = this.dependent.getXYPrint();
+    end.x -=  MsAtReport.DIAMONDSIZE;
+    var dependentPage = this.dependent.milestone.project.pageNo;
+    var dependencyPage = this.dependency.milestone.project.pageNo;
+
+    if (dependentPage === dependencyPage) {
+        var elem = Draw.svgElem ("g", {
+            "class": "dependency"
+        }, depLayers[dependentPage]);
+        Dependency.drawLine (start, end, elem);
+    }
+    else {
+        var height = this.mMap.pageSize.height * MilestoneMap.prototype.PX_PER_MM;
+        if (dependentPage > dependencyPage) {
+            var otherEndY = end.y + height;
+            var otherStartY = start.y - height;
+        }
+        else {
+            otherEndY = end.y - height;
+            otherStartY = start.y + height;
+        }
+        
+        var elem1 = Draw.svgElem ("g", {
+            "class": "dependency"
+        }, depLayers[dependencyPage]);
+        var elem2 = Draw.svgElem ("g", {
+            "class": "dependency"
+        }, depLayers[dependentPage]);
+        
+        Dependency.drawLine (
+            start, {x: end.x, y: otherEndY}, elem1);
+        Dependency.drawLine (
+            {x: start.x, y: otherStartY}, end, elem2);
+    }
+};
 
 // modifications
 Dependency.prototype.deleteThis = function () {

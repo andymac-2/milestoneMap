@@ -183,6 +183,9 @@ MilestoneMap.prototype.drawPrint = function () {
 
     var programmei = 0;
     var projecti = 0;
+    var pageNo = 0;
+    var depLayers = [];
+    
     // draw at least one page
     do {
         var page = Draw.svgElem ("svg", {
@@ -210,13 +213,18 @@ MilestoneMap.prototype.drawPrint = function () {
             page.appendChild(this.currReport.drawLine().cloneNode(true));
             break;
         }
-        // TODO: dependencies
+
+        var deplayer = Draw.svgElem ("g", {
+            "class": "dependencies"        
+        }, page);
+        depLayers.push(deplayer);
         
         var first = true;
         
         do {
             var programme = this.programmes[programmei];
-            var vals = programme.drawPrint (spaceLeft, projecti, first);
+            programme.yOffset = yoffset;
+            var vals = programme.drawPrint (spaceLeft, projecti, first, pageNo);
             first = false;
 
             page.appendChild(vals.elem);
@@ -237,9 +245,13 @@ MilestoneMap.prototype.drawPrint = function () {
         } while (programmei < this.programmes.length);
         
         page.appendChild(reportNode.cloneNode(true));
+        pageNo ++;
     } while (programmei < this.programmes.length);
-    
 
+    this.dependencies.forEach (elem => {
+        elem.drawPrint(depLayers);
+    });
+    
     return this.printElem;
 };
 MilestoneMap.prototype.drawDependencies = function () {

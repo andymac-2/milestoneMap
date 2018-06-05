@@ -200,10 +200,14 @@ body {
 /* dependencies */
 .dependency {
     stroke-width: 3;
-    stroke: hsl(240, 50%, 85%);
 }
+
 .dependency:hover {
     stroke-width: 6;
+}
+
+.dependencyLine, .dependencyArrow {
+    stroke: hsl(240, 50%, 85%);
 }
 .dependencyLine {
     fill: none;

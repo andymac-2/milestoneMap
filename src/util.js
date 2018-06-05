@@ -49,9 +49,19 @@ Util.refreshIndices = function (arr) {
         arr[i].index = i;
     }
 };
+
+
 Util.isStrictlySorted = function (arr, cmpFunc) {
     for (var i = 0; i < arr.length - 1; i++) {
         if (cmpFunc(arr[i], arr[i + 1]) > 0) {
+            return false;
+        }
+    }
+    return true;
+};
+Util.isSorted = function (arr, cmpFunc) {
+    for (var i = 0; i < arr.length - 1; i++) {
+        if (cmpFunc(arr[i], arr[i + 1]) >= 0) {
             return false;
         }
     }
@@ -103,8 +113,8 @@ Util.swapElements = function (array, obj1, obj2) {
 };
 
 Util.swapIndexedElements = function (array, index1, index2) {
-    assert (() => array[index1].index = index1);
-    assert (() => array[index2].index = index2);
+    assert (() => array[index1].index === index1);
+    assert (() => array[index2].index === index2);
 
     var tmp = array[index1];
     array[index1] = array[index2];

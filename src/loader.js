@@ -226,6 +226,7 @@ Loader.prototype.print = function () {
         mMap.drawPrint();
         this.parent.innerHTML = mMap.printElem.innerHTML;
         window.print();
+        return; // very temporrary debug symbol
         this.parent.innerHTML = "";
         this.parent.appendChild(this.elem);
         
@@ -233,6 +234,7 @@ Loader.prototype.print = function () {
     }
     catch (err) {
         Util.allertErr(err);
+        throw err;
     }
 };
 
