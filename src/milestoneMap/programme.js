@@ -65,7 +65,7 @@ Programme.prototype.draw = function () {
     return this.elem;
 };
 
-Programme.prototype.drawPrint = function (spaceLeft, startIndex, first) {
+Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) {
     var saveStartIndex = startIndex;
     var printable = Draw.svgElem ("g", {
         "class": "programme"
@@ -87,7 +87,9 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first) {
          startIndex++)
     {
         var project = this.projects[startIndex];
+        project.pageNo = pageNo;
         project.elem.setAttribute("transform", "translate(0, " + yOffset + ")");
+        project.yOffset = yOffset + this.yOffset;
         projects.push (project);
         yOffset += project.height;
     }

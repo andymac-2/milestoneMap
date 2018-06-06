@@ -25,6 +25,7 @@ var MsAtReport = function (obj, index, mMap) {
         "class": "milestonePointer"
     });
     this.x;
+    this.y;
     
     // used to prevent click event accumulation
     this.g;
@@ -253,7 +254,14 @@ MsAtReport.prototype.getXY = function () {
     var y = project.programme.yOffset +
         project.yOffset +
         project.height - Project.MILESTONEOFFSET;
-        
+    
+    return {x: this.x, y: y}
+};
+MsAtReport.prototype.getXYPrint = function () {
+    var project = this.milestone.project;
+    var y = project.yOffset +
+        project.height - Project.MILESTONEOFFSET;
+    
     return {x: this.x, y: y}
 };
 
@@ -326,7 +334,7 @@ MsAtReport.prototype.deleteDraw = function () {
         this.milestone.deleteThis ();
     }
     else {
-        this.milestone.draw();
+        this.milestone.draw ();
     }
 
     this.reflowUp ();

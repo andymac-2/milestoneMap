@@ -16,6 +16,7 @@ var Project = function (obj, index, mMap) {
     this.milestones = [];
     this.index = index;
     this.yOffset = 0;
+    this.pageNo = 0;
     this.restore (obj);
 };
 
@@ -209,7 +210,8 @@ Project.prototype.moveUpProgramme = function () {
 };
 
 Project.prototype.moveDownProgramme = function () {
-    assert(() => this.programme.projects.indexOf(this) === 0);
+    assert(() => this.programme.projects.indexOf(this) ===
+           this.programme.projects.length - 1);
     assert(() => Util.isSortedByIndex(this.programme.projects));
     var index = this.programme.index;
     

@@ -233,6 +233,7 @@ Loader.prototype.print = function () {
     }
     catch (err) {
         Util.allertErr(err);
+        throw err;
     }
 };
 
