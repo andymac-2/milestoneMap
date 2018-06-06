@@ -94,15 +94,48 @@ Dependency.prototype.draw = function () {
     Dependency.drawLine (start, end, this.elem);  
 };
 
+Dependency.LINESTRENGTH = 150;
 Dependency.drawLine = function (start, end, parent) {
-    Draw.sLine (start, end, 150, "dependencyLine", parent);
-    Draw.sLine (start, end, 150, "vthick transparentLine", parent);
+    Draw.sLine (start, end, Dependency.LINESTRENGTH, "dependencyLine", parent);
+    Draw.sLine (start, end, Dependency.LINESTRENGTH, "vthick transparentLine",
+                parent);
 
     Draw.svgElem ("path", {
         "class": "dependencyArrow",
         "d": "M -4 -4 L -4 4 L 0 0 Z",
         "transform": "translate("+ end.x + ", " + end.y + ")"
     }, parent);  
+};
+
+Dependency.guid = 0;
+Dependency.getGUID = function () {
+    Dependency.guid ++;
+    return Dependency.guid;
+};
+
+Dependency.spaces = "\xA0\xA0\xA0\xA0";
+Dependency.prototype.drawLineOverPage = function (start, end, elem) {
+    Dependency.drawLine (start, end, elem);
+    var line = Draw.sLine(start, end, Dependency.LINESTRENGTH,
+                           "transparentLine", elem);
+    var id = "dependency" + Dependency.getGUID();
+    line.setAttribute ("id", id);
+    
+    var startText = Draw.svgElem ("text", {
+        "class": "dependencyText"
+    }, elem);
+    Draw.svgElem ("textPath", {
+        "href": "#" + id,
+    }, startText).textContent = Dependency.spaces + this.dependent.milestone.name;
+
+    var endText = Draw.svgElem ("text", {
+        "text-anchor": "end",
+        "class": "dependencyText"
+    }, elem);
+    Draw.svgElem ("textPath", {
+        "href": "#" + id,
+        "startOffset": "100%"
+    }, endText).textContent = this.dependency.milestone.name + Dependency.spaces;
 };
 
 Dependency.prototype.drawPrint = function (depLayers) {   
@@ -142,10 +175,10 @@ Dependency.prototype.drawPrint = function (depLayers) {
         var elem2 = Draw.svgElem ("g", {
             "class": "dependency"
         }, depLayers[dependentPage]);
-        
-        Dependency.drawLine (
+
+        this.drawLineOverPage (
             start, {x: end.x, y: otherEndY}, elem1);
-        Dependency.drawLine (
+        this.drawLineOverPage (
             {x: start.x, y: otherStartY}, end, elem2);
     }
 };

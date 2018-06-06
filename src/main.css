@@ -145,7 +145,7 @@ body {
     stroke: none;
     font-size: small;
 }
-.msComment {
+.msComment, .dependencyText{
     stroke: none;
     fill: #a0a0a0;
     font-size: small;
