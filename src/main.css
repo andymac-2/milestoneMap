@@ -88,7 +88,8 @@ body {
     fill: #444;
 }
 .reportLine {
-    stroke: rgba(255, 0, 0, 0.4);
+    stroke-width: 2px;
+    stroke: rgba(255, 0, 0, 0.6);
 }
 
 
@@ -131,8 +132,14 @@ body {
 }
 
 .projectLine, .businessMsLine {
-    stroke: #b0b0b0;
-    stroke-dasharray: 3,8;
+    stroke: #909090;
+    stroke-dasharray: 6,8;
+    stroke-width: 1;
+}
+
+.businessMsLine {
+    stroke: #d0d0d0;
+    stroke-dasharray: 1,4;
     stroke-width: 1;
 }
 

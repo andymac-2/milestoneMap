@@ -15,6 +15,7 @@ var DateHeader = function (mMap, parentHeader, parentMain) {
 
     // view model
     this.mMap = mMap;
+    this.titleWidth = 0;
     this.endy;
 
     this.draw();

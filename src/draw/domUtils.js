@@ -16,7 +16,7 @@ Draw.deactivate = function (elem) {
 
 Draw.activate = function (elem) {
     elem.classList.remove("hidden");
-    elem.classList.add("active");
+    elem.classList.add("active");X
 };
 
 Draw.getElemXY = function (elem) {
@@ -69,13 +69,9 @@ Draw.fixedXElement = function (xoffset, y, elem, parentElem) {
     moveNow ();
 };
 
-Draw.getTextWidth = function (font, text) {
-    if (!Draw.getTextWidth.ctx) {
-        Draw.getTextWidth.ctx =
-            document.createElement("canvas").getContext("2d");
-    }
-    
+Draw.getTextWidth = function (font, text) {  
     var ctx = Draw.getTextWidth.ctx;
     ctx.font = font;
     return ctx.measureText(text).width;
 };
+Draw.getTextWidth.ctx = document.createElement("canvas").getContext("2d");
