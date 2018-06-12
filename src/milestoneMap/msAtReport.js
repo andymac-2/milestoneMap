@@ -1,41 +1,48 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var MsAtReport = function (obj, index, mMap) {
     // state
-    this.milestone;
-    this.report;
-    this.comment;
-    this.status;
-    this.date;
+    /** @type {Milestone} */ this.milestone;
+    /** @type {Report} */ this.report;
+    /** @type {string} */ this.comment;
+    /** @type {number} */ this.status;
+    /** @type {number} */ this.date;
 
     //view
+    /** @type {Element} */ 
     this.elem = Draw.svgElem("g", {
         "class": "msAtReport"
     });
+    /** @type {Element} */ 
     this.elemLine = Draw.svgElem ("g", {
         "class": "businessMsLine"
     });
+    /** @type {Element} */ 
     this.elemLineMain = Draw.svgElem ("g", {
         "class": "businessMsLine"
     });
+    /** @type {Element} */ 
     this.elemInfo = Draw.svgElem ("g", {
         "class": "milestoneInfo"
     });
+    /** @type {Element} */ 
     this.elemPointer = Draw.svgElem("g", {
         "class": "milestonePointer"
     });
-    this.x;
-    this.y;
+    /** @type {number} */  this.x;
+    /** @type {number} */  this.y;
     
     // used to prevent click event accumulation
-    this.g;
-    this.diamond;
+    /** @type {Element} */ this.g;
+    /** @type {Element} */ this.diamond;
 
     // view model
-    this.dependencies = [];
-    this.dependents = [];
-    this.index = index;
-    this.mMap = mMap;
+    /** @type {Array<Dependency>} */ this.dependencies = [];
+    /** @type {Array<Dependency>} */ this.dependents = [];
+    /** @type {number} */ this.index = index;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
 
     this.restore (obj);
 };
@@ -49,37 +56,37 @@ MsAtReport.PREVIOUS = 4;
 MsAtReport.DIAMONDSIZE = 7;
 
 MsAtReport.prototype.restore = function (obj) {
-    runTAssert (() => Number.isInteger(obj.milestone));
-    runTAssert (() => this.mMap.milestones[obj.milestone]);
-    runTAssert (() => Number.isInteger(obj.report));
-    runTAssert (() => this.mMap.reports[obj.report]);
-    runTAssert (() => typeof obj.comment === "string");
-    runTAssert (() => Number.isInteger(obj.date));
-    runTAssert (() => Number.isInteger(obj.status));
-    runTAssert (() => obj.status >= 0 && obj.status <= MsAtReport.PREVIOUS);
+    runTAssert (() => Number.isInteger(obj["milestone"]));
+    runTAssert (() => this.mMap.milestones[obj["milestone"]]);
+    runTAssert (() => Number.isInteger(obj["report"]));
+    runTAssert (() => this.mMap.reports[obj["report"]]);
+    runTAssert (() => typeof obj["comment"] === "string");
+    runTAssert (() => Number.isInteger(obj["date"]));
+    runTAssert (() => Number.isInteger(obj["status"]));
+    runTAssert (() => obj["status"] >= 0 && obj["status"] <= MsAtReport.PREVIOUS);
     
     if (this.milestone) {
         this.milestone.removeReport (this);
     }
     
-    this.milestone = this.mMap.milestones[obj.milestone];
+    this.milestone = this.mMap.milestones[obj["milestone"]];
     this.milestone.addReport(this);
     
-    this.report = this.mMap.reports[obj.report];
-    this.comment = obj.comment;
-    this.status = obj.status;
-    this.date = obj.date;
+    this.report = this.mMap.reports[obj["report"]];
+    this.comment = obj["comment"];
+    this.status = obj["status"];
+    this.date = obj["date"];
 };
 MsAtReport.prototype.save = function () {
     assert (() => this.mMap.reports[this.report.index] === this.report);
     assert (() => this.mMap.milestones[this.milestone.index] ===
             this.milestone);
     return {
-        milestone: this.milestone.index,
-        report: this.report.index,
-        comment: this.comment,
-        status: this.status,
-        date: this.date
+        "milestone": this.milestone.index,
+        "report": this.report.index,
+        "comment": this.comment,
+        "status": this.status,
+        "date": this.date
     };
 };
 
@@ -232,7 +239,7 @@ MsAtReport.prototype.isBusinessMs = function () {
     return this.milestone.project.index === -1;
 };
 
-MsAtReport.prototype.updateDiamond = function (cls) {
+MsAtReport.prototype.updateDiamond = function () {
     this.diamond.setAttribute("class", this.resolveStatusClass());
 };
 

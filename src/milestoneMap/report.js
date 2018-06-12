@@ -1,21 +1,26 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Report = function (obj, index, mMap) {
     // state
-    this.date;
-    this.name;
+    /** @type {number} */ this.date;
+    /** @type {string} */ this.name;
 
     //view
+    /** @type {Element} */ 
     this.lineElem = Draw.svgElem ("g", {
         "class": "reportLine"
     });
+    /** @type {Element} */ 
     this.lineElemMain = Draw.svgElem ("g", {
         "class": "reportLine"
     });
+    /** @type {Element} */ this.headerElem;
 
     //model
-    this.index = index;
-    this.mMap = mMap;
+    /** @type {number} */ this.index = index;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
 
     this.restore(obj);
 };
@@ -60,7 +65,7 @@ Report.prototype.drawHeader = function (attrs, parent) {
         this.modifyName.bind(this), {
             "transform": "translate(5, 20)",
             "class": "reportName"
-        }, g2);
+        }, g2, "Untitled");
 
     return this.headerElem;
 };

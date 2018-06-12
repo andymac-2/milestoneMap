@@ -1,5 +1,6 @@
 'use strict'
 
+/** @define {boolean} */
 var NDEBUG = false;
 
 // debug check

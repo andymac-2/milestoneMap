@@ -1,7 +1,9 @@
 'use strict'
 
+/** @constructor
+    @struct */
 Draw.svgDateInput = function (options, date) {
-    this.date;
+    /** @type {number} */ this.date;
 
     var alignment = options.alignment;
 
@@ -17,14 +19,14 @@ Draw.svgDateInput = function (options, date) {
         break;
     }
 
-    this.unclicker = options.unclicker;
-    this.onchange = options.onchange || (() => {});
-    this.parent = options.parent;
-    this.attrs = options.attrs || {};
-    this.min = options.min || null;
-    this.max = options.max || null;
+    /** @type {Unclicker} */ this.unclicker = options.unclicker;
+    /** @type {function(Event, Draw.svgDateInput)} */ this.onchange = options.onchange || (() => {});
+    /** @type {Element} */ this.parent = options.parent;
+    /** @type {Object<string>} */ this.attrs = options.attrs || {};
+    /** @type {?number} */ this.min = options.min || null;
+    /** @type {?number} */ this.max = options.max || null;
 
-    this.elem;
+    /** @type {Element} */ this.elem;
 
     this.restore (date);
     this.draw();

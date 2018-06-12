@@ -1,5 +1,6 @@
 'use strict'
 
+/** @type {function(string, Object=, Element=)} */
 Draw.elem = function (elemType, attributes, parentElem) {
     var elem = document.createElement(elemType);
     if (attributes) {

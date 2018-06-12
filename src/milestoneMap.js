@@ -1,92 +1,102 @@
 'use strict'
 
+/** @constructor
+    @struct 
+    @param {Object<number>=} pagesize */
 var MilestoneMap = function (obj, pagesize) {
     
     //state
-    this.start;
-    this.end;
-    this.programmes;
-    this.projects;
-    this.milestones;
-    this.msAtReports;
-    this.reports;
-    this.dependencies;
-    
-    this.currReport;
-    this.cmpReport;
+    /** @type {string} */ this.name;
+    /** @type {number} */ this.start;
+    /** @type {number} */ this.end;
+    /** @type {Array<Programme>} */ this.programmes;
+    /** @type {Array<Project>} */ this.projects;
+    /** @type {Array<Milestone>} */ this.milestones;
+    /** @type {Array<MsAtReport>} */ this.msAtReports;
+    /** @type {Array<Report>} */ this.reports;
+    /** @type {Array<Dependency>} */ this.dependencies;
 
-    this.businessMs;
+    /** @type {Report} */ this.currReport;
+    /** @type {Report} */ this.cmpReport;
+
+    /** @type {BusinessMs} */ this.businessMs;
+
     
     //view
+    /** @type {Element} */ 
     this.elemReportSelectors = Draw.elem ("span", {});
-    
+    /** @type {Element} */ 
     this.elemContainer = Draw.elem ("div", {
         "class": "mMapContainer"
-    }, this.elemContaine);
+    });
     this.elemContainer.addEventListener("click", this.deactivateOnUnclick.bind(this));
-
+    /** @type {Element} */ 
     this.printElem = Draw.elem("span", {
         "class": "printablePages"
     });
-    this.depLayer;
-    this.scrollbox;
-    this.elemFixed;
+    /** @type {Element} */  this.depLayer;
+    /** @type {Element} */  this.scrollbox;
+    /** @type {Element} */  this.elemFixed;
+    /** @type {Element} */  this.elemMain;
+
+
     
     //view model
-    this.width;
-    this.maxHeight;
-    this.unclicker = new Unclicker (this.elemContainer);
-    this.dateHeader;
+    /** @type {number} */ this.width;
+    /** @type {number} */ this.height;
+    /** @type {number} */ this.maxHeight;
+    /** @type {Unclicker} */ this.unclicker = new Unclicker (this.elemContainer);
+    /** @type {DateHeader} */ this.dateHeader;
 
     // {width, height}
-    this.pageSize = pagesize || Loader.A3SIZE;
+    /** @type {Object<number>} */ this.pageSize = pagesize || Loader.A3SIZE;
 
     // events
-    this.globalMode = MilestoneMap.SELECT;
+    /** @type {number} */ this.globalMode = MilestoneMap.SELECT;
     this.globalData = null;
-    this.globalModeSet = false;
+    /** @type {boolean} */ this.globalModeSet = false;
 
     this.restore (obj);
 };
-MilestoneMap.SELECT = 0;
-MilestoneMap.CREATEDEPENDENCY = 1;
+/** @const {number} */ MilestoneMap.SELECT = 0;
+/** @const {number} */ MilestoneMap.CREATEDEPENDENCY = 1;
 
 // restore here will also draw as well
 MilestoneMap.prototype.restore = function (obj) {
-    runTAssert (() => Number.isInteger(obj.start));
-    runTAssert (() => Number.isInteger(obj.end));
-    runTAssert (() => typeof obj.name === "string"); 
+    runTAssert (() => Number.isInteger(obj["start"]));
+    runTAssert (() => Number.isInteger(obj["end"]));
+    runTAssert (() => typeof obj["name"] === "string"); 
     
-    this.start = obj.start;
-    this.end = obj.end;
-    this.name = obj.name;
+    this.start = obj["start"];
+    this.end = obj["end"];
+    this.name = obj["name"];
 
     this.businessMs = new BusinessMs (this);
 
-    this.programmes = obj.programmes.map((programme, i) => {
+    this.programmes = obj["programmes"].map((programme, i) => {
         return new Programme (programme, i, this);
     });  
-    this.projects = obj.projects.map((project, i) => {
+    this.projects = obj["projects"].map((project, i) => {
         return new Project (project, i, this);
     });  
-    this.milestones = obj.milestones.map((milestone, i) => {
+    this.milestones = obj["milestones"].map((milestone, i) => {
         return new Milestone (milestone, i, this);
     });
-    this.reports = obj.reports.map ((report, i) => {
+    this.reports = obj["reports"].map ((report, i) => {
         return new Report (report, i, this);
     });
     
-    runTAssert (() => Number.isInteger(obj.currReport));
-    runTAssert (() => this.reports[obj.currReport]);
-    runTAssert (() => Number.isInteger(obj.cmpReport));
-    runTAssert (() => this.reports[obj.cmpReport]);
-    this.currReport = this.reports[obj.currReport];
-    this.cmpReport = this.reports[obj.cmpReport];
+    runTAssert (() => Number.isInteger(obj["currReport"]));
+    runTAssert (() => this.reports[obj["currReport"]]);
+    runTAssert (() => Number.isInteger(obj["cmpReport"]));
+    runTAssert (() => this.reports[obj["cmpReport"]]);
+    this.currReport = this.reports[obj["currReport"]];
+    this.cmpReport = this.reports[obj["cmpReport"]];
     
-    this.msAtReports = obj.msAtReports.map((ms, i) => {
+    this.msAtReports = obj["msAtReports"].map((ms, i) => {
         return new MsAtReport (ms, i, this);
     });
-    this.dependencies = obj.dependencies.map((dep, i) => {
+    this.dependencies = obj["dependencies"].map((dep, i) => {
         return new Dependency (dep, i, this);
     });
 };
@@ -518,7 +528,7 @@ MilestoneMap.CSVHEADING =
         "Date (YYYY-MM-DD)",
         "Health ('complete', 'on-track', 'at-risk', 'late', or 'previous)",
         "Comment"
-    ].map(JSON.stringify).join(",");
+    ].map(el => JSON.stringify(el)).join(",");
 MilestoneMap.prototype.exportCSVMilestones = function () {
     var data = this.milestones
         .filter(milestone => milestone.currentReport())

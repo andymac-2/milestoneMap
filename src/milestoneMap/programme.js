@@ -1,31 +1,34 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Programme = function (obj, index, mMap) {
     // state
-    this.name;
+    /** @type {string} */ this.name;
 
     // view
+    /** @type {Element} */ 
     this.elem = Draw.svgElem("g", {
         "class": "programme"
     });
 
     // view model
-    this.mMap = mMap;
-    this.index = index;
-    this.height = Programme.HEADERHEIGHT;
-    this.projects = [];
-    this.yOffset = 0;
+    /** @type {MilestoneMap} */  this.mMap = mMap;
+    /** @type {number} */ this.index = index;
+    /** @type {number} */ this.height = Programme.HEADERHEIGHT;
+    /** @type {Array<Project>} */ this.projects = [];
+    /** @type {number} */ this.yOffset = 0;
 
     this.restore (obj);
 };
 Programme.HEADERHEIGHT = 40;
 
 Programme.prototype.restore = function (obj) {
-    runTAssert (() => typeof obj.name === "string");
-    this.name = obj.name;
+    runTAssert (() => typeof obj["name"] === "string");
+    this.name = obj["name"];
 };
 Programme.prototype.save = function () {
-    return {name: this.name};
+    return {"name": this.name};
 };
 
 // depends on projects already being drawn correctly
@@ -41,7 +44,7 @@ Programme.prototype.draw = function () {
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
             "transform": "translate(0, 25)"
-        }, g);
+        }, g, "Untitled");
 
     Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
@@ -79,7 +82,7 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) 
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
             "transform": "translate(0, 25)"
-        }, g);
+        }, g, "Untitled");
 
     var yOffset = Programme.HEADERHEIGHT;
     for (var projects = [];

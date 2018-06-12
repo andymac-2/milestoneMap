@@ -1,21 +1,24 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Dependency = function (obj, index, mMap) {
     //state
-    this.dependency;
-    this.dependent;
-    this.report;
+    /** @type {MsAtReport} */ this.dependency;
+    /** @type {MsAtReport} */ this.dependent;
+    /** @type {Report} */ this.report;
 
     // view
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "dependency"
     });
     this.elem.addEventListener("dblclick", this.deleteDraw.bind(this));
 
     // model
-    this.selected = false;
-    this.index = index;
-    this.mMap = mMap;
+    /** @type {boolean} */ this.selected = false;
+    /** @type {number} */ this.index = index;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
 
     this.restore (obj);
 };
@@ -23,20 +26,20 @@ Dependency.HSPACE = 30;
 Dependency.VSPACE = 30;
 
 Dependency.prototype.restore = function (obj) {
-    runTAssert (() => Number.isInteger(obj.report));
-    runTAssert (() => this.mMap.reports[obj.report]);
-    runTAssert (() => Number.isInteger(obj.dependent));
-    runTAssert (() => this.mMap.milestones[obj.dependent]);
-    runTAssert (() => Number.isInteger(obj.dependency));
-    runTAssert (() => this.mMap.milestones[obj.dependency]);
+    runTAssert (() => Number.isInteger(obj["report"]));
+    runTAssert (() => this.mMap.reports[obj["report"]]);
+    runTAssert (() => Number.isInteger(obj["dependent"]));
+    runTAssert (() => this.mMap.milestones[obj["dependent"]]);
+    runTAssert (() => Number.isInteger(obj["dependency"]));
+    runTAssert (() => this.mMap.milestones[obj["dependency"]]);
     
-    this.report = this.mMap.reports[obj.report];
+    this.report = this.mMap.reports[obj["report"]];
     
     if (this.dependent) {
         this.dependent.removeDependency (this);
     }
     
-    this.dependent = this.mMap.milestones[obj.dependent].hasReport(this.report);
+    this.dependent = this.mMap.milestones[obj["dependent"]].hasReport(this.report);
     runTAssert (() => this.dependent);
     this.dependent.addDependency (this);
 
@@ -44,7 +47,7 @@ Dependency.prototype.restore = function (obj) {
         this.dependency.removeDependent (this);
     }
     
-    this.dependency = this.mMap.milestones[obj.dependency].hasReport(this.report);
+    this.dependency = this.mMap.milestones[obj["dependency"]].hasReport(this.report);
     runTAssert (() => this.dependency);
     this.dependency.addDependent (this);
 };
@@ -62,9 +65,9 @@ Dependency.prototype.save = function () {
     
 
     return {
-        dependent: this.dependent.milestone.index,
-        dependency: this.dependency.milestone.index,
-        report: this.report.index
+        "dependent": this.dependent.milestone.index,
+        "dependency": this.dependency.milestone.index,
+        "report": this.report.index
     };
 };
 

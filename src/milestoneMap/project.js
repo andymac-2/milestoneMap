@@ -1,45 +1,49 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Project = function (obj, index, mMap) {
     // state
-    this.name;
-    this.programme;
+    /** @type {string} */ this.name;
+    /** @type {Programme} */ this.programme;
 
     // view
+    /** @type {Element} */ 
     this.elem = Draw.svgElem("g", {
         "class": "project"
-    }, mMap.programmes[obj.programme].elem);
+    }, mMap.programmes[obj["programme"]].elem);
 
     // view model
-    this.mMap = mMap;
-    this.height = Project.HEIGHT;
-    this.milestones = [];
-    this.index = index;
-    this.yOffset = 0;
-    this.pageNo = 0;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
+    /** @type {number} */ this.height = Project.MINHEIGHT;
+    /** @type {Array<Milestone>} */ this.milestones = [];
+    /** @type {number} */ this.index = index;
+    /** @type {number} */ this.yOffset = 0;
+    /** @type {number} */ this.pageNo = 0;
     this.restore (obj);
 };
 
 
 Project.MINHEIGHT = 40;
 Project.MILESTONEOFFSET = 20;
+// obj is a parsed JSON string, access members using obj["membername"]
 Project.prototype.restore = function (obj) {
-    runTAssert (() => typeof obj.name === "string");
-    runTAssert (() => Number.isInteger(obj.programme));
-    runTAssert (() => this.mMap.programmes[obj.programme]);
+    runTAssert (() => typeof obj["name"] === "string");
+    runTAssert (() => Number.isInteger(obj["programme"]));
+    runTAssert (() => this.mMap.programmes[obj["programme"]]);
     
-    this.name = obj.name;
+    this.name = obj["name"];
 
     if (this.programme) {
         this.programme.removeProject(this);
     }
     
-    this.programme = this.mMap.programmes[obj.programme];
+    this.programme = this.mMap.programmes[obj["programme"]];
     this.programme.addProject (this);
 };
 Project.prototype.save = function () {
     assert (() => this.mMap.programmes[this.programme.index] === this.programme)
-    return {name: this.name, programme: this.programme.index};
+    return {"name": this.name, "programme": this.programme.index};
 };
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
@@ -70,7 +74,7 @@ Project.prototype.draw = function () {
     var name = new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
-        }, g);
+        }, g, "Untitled");
 
     var menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
@@ -245,6 +249,7 @@ Project.prototype.deleteDraw = function () {
     this.reflowUp();
 };
 
+/** @this {Project|BusinessMs} */
 Project.prototype.newMilestone = function () {
     var milestone = this.mMap.addMilestone({
         "name": "New Milestone",

@@ -3,3 +3,5 @@
 *.js#
 /sandbox/
 /node_modules/
+/dist/
+*.swp

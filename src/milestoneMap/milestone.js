@@ -1,38 +1,41 @@
 
 'use strict'
 
+/** @constructor
+    @struct */
 var Milestone = function (obj, index, mMap) {
     // state
-    this.name;
-    this.project;
+    /** @type {string} */ this.name;
+    /** @type {Project|BusinessMs} */ this.project;
 
     // view
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "milestone"
     });
 
     // view model
-    this.mMap = mMap;
-    this.index = index;
-    this.atReports = [];
+    /** @type {MilestoneMap} */ this.mMap = mMap;
+    /** @type {number} */ this.index = index;
+    /** @type {Array<MsAtReport>} */ this.atReports = [];
 
-    this.currReport;
-    this.cmpReport;
+    /** @type {MsAtReport|undefined} */ this.currReport;
+    /** @type {MsAtReport|undefined} */ this.cmpReport;
 
     this.restore (obj);
 };
 
 Milestone.prototype.restore = function (obj) {
-    runTAssert (() => Number.isInteger(obj.project));
-    runTAssert (() => this.mMap.projects[obj.project] || obj.project < 0);
-    this.name = obj.name;
+    runTAssert (() => Number.isInteger(obj["project"]));
+    runTAssert (() => this.mMap.projects[obj["project"]] || obj["project"] < 0);
+    this.name = obj["name"];
     
     if (this.project) {
         this.project.removeMilestone (this);
     }
 
-    if (obj.project >= 0) {
-        this.project = this.mMap.projects[obj.project];
+    if (obj["project"] >= 0) {
+        this.project = this.mMap.projects[obj["project"]];
     }
     else {// business milestone
         this.project = this.mMap.businessMs;
@@ -41,8 +44,8 @@ Milestone.prototype.restore = function (obj) {
 };
 Milestone.prototype.save = function () {
     return {
-        name: this.name,
-        project: this.project.index
+        "name": this.name,
+        "project": this.project.index
     };
 };
 Milestone.prototype.exportCSVRow = function () {    
@@ -58,7 +61,7 @@ Milestone.prototype.exportCSVRow = function () {
         currReport,
         msAtReport.resolveStatusClass(),
         msAtReport.comment
-    ].map(JSON.stringify).join(",");
+    ].map(el => JSON.stringify(el)).join(",");
 };
 
 Milestone.prototype.draw = function () {
@@ -99,7 +102,7 @@ Milestone.prototype.draw = function () {
 };
 
 Milestone.prototype.reflowUp = function () {
-    var project = this.milestone.project;
+    var project = this.project;
     project.draw();
     project.reflowUp();
 };

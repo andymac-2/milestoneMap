@@ -1,15 +1,16 @@
 'use strict'
 
-
+/** @constructor
+    @struct */
 var Loader = function (parent) {
     //view
+    /** @type {Element} */ 
     this.elem = Draw.htmlElem ("div", {
         "class": "milestoneMapContainer"
     }, parent);
 
-    this.map;
-    this.file;
-    this.parent = parent;
+    /** @type {MilestoneMap} */ this.map;
+    /** @type {Element} */ this.parent = parent;
 
     Util.throttleEvent (window, "resize", this.draw.bind(this), 100);
 
@@ -166,19 +167,19 @@ Loader.prototype.newFile = function () {
     var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf(); 
 
     this.map = new MilestoneMap ({
-        name: "New Map",
-        start: twoMonthsAgo,
-        end: nextYear,
-        programmes: [],
-        projects: [],
-        milestones: [],
-        msAtReports: [],
-        reports: [
-            {name: "Baseline", date:now},
+        "name": "New Map",
+        "start": twoMonthsAgo,
+        "end": nextYear,
+        "programmes": [],
+        "projects": [],
+        "milestones": [],
+        "msAtReports": [],
+        "reports": [
+            {"name": "Baseline", "date":now},
         ],
-        dependencies: [],
-        currReport: 0,
-        cmpReport: 0
+        "dependencies": [],
+        "currReport": 0,
+        "cmpReport": 0
     });
     this.draw();
 };

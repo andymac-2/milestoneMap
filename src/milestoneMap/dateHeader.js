@@ -1,22 +1,30 @@
 'use strict'
 
 // maybe better as a function rather than a class
+
+/** @constructor
+    @struct 
+    @param {Element=} parentMain*/
 var DateHeader = function (mMap, parentHeader, parentMain) { 
     // view
+
+    /** @type {Element} */ 
     this.elem = Draw.svgElem("g", {
         "class": "dateHeader"
     }, parentHeader);
+    /** @type {Element} */ 
     this.bgElem =Draw.svgElem ("g", {}, this.elem);
+    /** @type {Element} */ 
     this.fgElem = Draw.svgElem ("g", {}, this.elem);
-
+    /** @type {Element} */ 
     this.elemPageBackground = Draw.svgElem ("g", {
         "class": "dateHeader"
     }, parentMain);
 
     // view model
-    this.mMap = mMap;
-    this.titleWidth = 0;
-    this.endy;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
+    /** @type {number} */ this.titleWidth = 0;
+    /** @type {number} */ this.endy;
 
     this.draw();
 };
@@ -294,7 +302,7 @@ DateHeader.prototype.drawTitle = function () {
                 (this.mMap.width / 2) + " " +
                 DateHeader.TITLEY + ")",
             "class": "mMapTitle"
-        }, g);
+        }, g, "Untitled");
 };
 
 DateHeader.TWODAYS = 172800000;

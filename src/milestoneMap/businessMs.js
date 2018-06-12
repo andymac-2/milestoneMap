@@ -1,23 +1,27 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var BusinessMs = function (mMap) {
     // state
-    this.milestones = [];
+    /** @type {Array<Milestone>} */ this.milestones = [];
 
-    this.index = -1;
+    /** @const {number} */ this.index = -1;
     this.name = "Business Milestones"
     
     // view
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "businessMs",
     });
+    /** @type {Element} */
     this.elemLines = Draw.svgElem("g", {
         "class": "businessMs",
     });
 
     // view model
-    this.mMap = mMap;
-    this.height = BusinessMs.HEIGHT;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
+    /** @type {number} */ this.height = Project.MINHEIGHT;
 };
 
 // TODO: variable height milestone data.

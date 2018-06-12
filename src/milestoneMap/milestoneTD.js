@@ -1,22 +1,24 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var MilestoneTD = function (options, title, date, comment) {
     
     // state
-    this.title;
-    this.comment;
-    this.date;
+    /** @type {string} */ this.title;
+    /** @type {string} */ this.comment;
+    /** @type {number} */ this.date;
 
     // view model
-    this.unclicker = options.unclicker;
-    this.onChange = options.onChange || (() => {});
-    this.parent = options.parent;
-    this.attrs = options.attrs || {};
+    /** @type {Unclicker} */ this.unclicker = options.unclicker;
+    /** @type {function(MilestoneTD)} */ this.onChange = options.onChange || (() => {});
+    /** @type {Element} */ this.parent = options.parent;
+    /** @type {Object} */ this.attrs = options.attrs || {};
 
-    this.modified = false;
+    /** @type {boolean} */ this.modified = false;
 
     //view
-    this.elem;
+    /** @type {Element} */ this.elem;
 
     this.restore(title, date, comment);
     this.draw();

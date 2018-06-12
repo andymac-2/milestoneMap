@@ -1,5 +1,7 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Unclicker = function (elem) {
     this.elem = elem;
     

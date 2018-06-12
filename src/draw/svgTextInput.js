@@ -1,9 +1,11 @@
 'use strict'
 
+/** @constructor
+    @struct */
 Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, parent, defaultText) {
     // state
-    this.text;
-    this.defaultText = defaultText === undefined ? "Untitled" : defaultText;
+    /** @type {string} */ this.text;
+    /** @type {string} */ this.defaultText = defaultText === undefined ? "Untitled" : defaultText;
 
     // view model
     switch (alignment) {
@@ -17,15 +19,15 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
         assert (() => false);
         break;
     }
-    this.unclicker = unclicker;
-    this.onchange = onchange;
-    this.parent = parent;
-    this.attrs = attrs;
+    /** @type {Unclicker} */ this.unclicker = unclicker;
+    /** @type {function(Event, Draw.svgTextInput)} */ this.onchange = onchange;
+    /** @type {Element} */ this.parent = parent;
+    /** @type {Object<string>} */ this.attrs = attrs;
 
     //view
-    this.elem;
+    /** @type {Element} */ this.elem;
 
-    this.textBox;
+    /** @type {Element} */ this.textBox;
 
     this.restore(text);
     this.draw();

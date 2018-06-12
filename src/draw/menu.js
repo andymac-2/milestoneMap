@@ -100,7 +100,7 @@ Draw.dropDownSegment = function (name, onchange, entries, attrs, parent) {
     }, select).textContent = "Please choose:";
 
     for (var i = 0; i < entries.length; i++) {
-        var elem = Draw.elem ("option", {
+        Draw.elem ("option", {
             "value": i,
         }, select).textContent = entries[i];
     };

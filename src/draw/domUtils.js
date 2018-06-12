@@ -16,12 +16,12 @@ Draw.deactivate = function (elem) {
 
 Draw.activate = function (elem) {
     elem.classList.remove("hidden");
-    elem.classList.add("active");X
+    elem.classList.add("active");
 };
 
 Draw.getElemXY = function (elem) {
-    var matrix = elem.getCTM();
-    return {x: matrix.e, y: matrix.f};
+    var matrix = elem["getCTM"]();
+    return {x: matrix["e"], y: matrix["f"]};
 };
 Draw.getElemHeight = function (elem) {
     return elem.getBoundingClientRect().height;
