@@ -213,17 +213,27 @@ body {
     stroke-width: 6;
 }
 
-.dependencyLine, .dependencyArrow {
-    stroke: hsl(240, 50%, 85%);
+.dependencyLineOK, .dependencyArrowOK {
+    stroke: hsl(150, 50%, 85%);
 }
-.dependencyLine {
+.dependencyLineOK {
     fill: none;
 }
 
-.dependencyArrow {
-    fill: hsl(240, 50%, 80%);
+.dependencyArrowOK {
+    fill: hsl(150, 50%, 80%);
 }
 
+.dependencyLineLate, .dependencyArrowLate {
+    stroke: hsl(0, 60%, 70%);
+}
+.dependencyLineLate {
+    fill: none;
+}
+
+.dependencyArrowLate {
+    fill: hsl(0, 60%, 70%);
+}
 
 /* Menus */
 .menuEntry circle{

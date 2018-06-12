@@ -2,3 +2,4 @@
 *.DS_Store
 *.js#
 /sandbox/
+/node_modules/

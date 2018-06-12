@@ -96,12 +96,21 @@ Dependency.prototype.draw = function () {
 
 Dependency.LINESTRENGTH = 150;
 Dependency.drawLine = function (start, end, parent) {
-    Draw.sLine (start, end, Dependency.LINESTRENGTH, "dependencyLine", parent);
+    if (start.x <= end.x) {
+        var lineClass = "dependencyLineOK"
+        var arrowClass = "dependencyArrowOK"
+    }
+    else {
+        lineClass = "dependencyLineLate"
+        arrowClass = "dependencyArrowLate"
+    }
+    
+    Draw.sLine (start, end, Dependency.LINESTRENGTH, lineClass, parent);
     Draw.sLine (start, end, Dependency.LINESTRENGTH, "vthick transparentLine",
                 parent);
 
     Draw.svgElem ("path", {
-        "class": "dependencyArrow",
+        "class": arrowClass,
         "d": "M -4 -4 L -4 4 L 0 0 Z",
         "transform": "translate("+ end.x + ", " + end.y + ")"
     }, parent);  
