@@ -346,7 +346,7 @@ MilestoneMap.prototype.modifyCmpReport = function (index) {
     }
 };
 
-// add and removal methods
+// add and removal method
 MilestoneMap.prototype.addMsAtReport = function (obj) {
     var msAtReport = new MsAtReport (obj, this.msAtReports.length, this);
     this.msAtReports.push(msAtReport);
@@ -403,7 +403,7 @@ MilestoneMap.prototype.addReport = function (obj) {
 
     msAtReports.forEach (ms => {
         var obj = ms.save();
-        obj.report = report.index;
+        obj["report"] = report.index;
         this.addMsAtReport (obj);
     });
 
@@ -413,7 +413,7 @@ MilestoneMap.prototype.addReport = function (obj) {
 
     dependencies.forEach (dep => {
         var obj = dep.save();
-        obj.report = report.index;
+        obj["report"] = report.index;
         this.addDependency(obj);
     });
 
