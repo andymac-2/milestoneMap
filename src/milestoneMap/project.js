@@ -24,8 +24,8 @@ var Project = function (obj, index, mMap) {
 };
 
 
-Project.MINHEIGHT = 40;
-Project.MILESTONEOFFSET = 20;
+/** @const {number} */ Project.MINHEIGHT = 40;
+/** @const {number} */ Project.MILESTONEOFFSET = 20;
 // obj is a parsed JSON string, access members using obj["membername"]
 Project.prototype.restore = function (obj) {
     runTAssert (() => typeof obj["name"] === "string");

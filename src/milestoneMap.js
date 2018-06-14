@@ -175,7 +175,7 @@ MilestoneMap.prototype.draw = function () {
     this.reflow ();
 };
 
-MilestoneMap.prototype.PX_PER_MM = 5.0;
+/** @const {number} */ MilestoneMap.prototype.PX_PER_MM = 5.0;
 MilestoneMap.prototype.drawPrint = function () {
     this.printElem.innerHTML = "";
     
@@ -520,7 +520,7 @@ MilestoneMap.prototype.newProgramme = function () {
 
     this.draw();
 };
-MilestoneMap.CSVHEADING =
+/** @const {string} */ MilestoneMap.CSVHEADING =
     [
         "Programme Name",
         "Project Name",

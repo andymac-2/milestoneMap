@@ -4,4 +4,5 @@
 /sandbox/
 /node_modules/
 /dist/
+/bin/
 *.swp

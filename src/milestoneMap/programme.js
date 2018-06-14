@@ -21,7 +21,7 @@ var Programme = function (obj, index, mMap) {
 
     this.restore (obj);
 };
-Programme.HEADERHEIGHT = 40;
+/** @const {number} */ Programme.HEADERHEIGHT = 40;
 
 Programme.prototype.restore = function (obj) {
     runTAssert (() => typeof obj["name"] === "string");
