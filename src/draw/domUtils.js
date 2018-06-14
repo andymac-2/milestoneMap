@@ -33,22 +33,28 @@ Draw.getElemWidth = function (elem) {
 
 // an element drawn one way when clicked, and drawn another way when clicked elsewhere.
 Draw.activeOnClickElem = function (normal, active, unclicker, attrs, parent) {
-    var g = Draw.svgElem ("g", attrs, parent);
-    var evt;
-    
-    var onclick = function ()  {
-        active (g);
-        parent.removeEventListener ("click", onclick);
-        unclicker.onUnclickOnce (parent, onUnclick);
-    };
+    var g = Draw.svgElem ("g", attrs, parent);   
+    return Draw.activeOrDeactive (g, normal, active, unclicker, parent);
+};
 
+Draw.activeOrDeactive = function (elem, normal, active, unclicker, parent) {
+    var onclick = function ()  {
+        active (elem);
+        parent.removeEventListener ("click", onclick);
+        if (parent.contains(elem)) {
+            unclicker.onUnclickOnce (parent, onUnclick);
+        }
+    };
+    
     var onUnclick = function () {
-        normal (g);
-        parent.addEventListener ("click", onclick);
+        normal (elem);
+        if (parent.contains(elem)) {
+            parent.addEventListener ("click", onclick);
+        }
     };
 
     onUnclick ();
-    return g;
+    return elem;
 };
 
 // an element with a fixed x relative to the window

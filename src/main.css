@@ -131,6 +131,11 @@ body {
     font-size: small;
 }
 
+
+.projectHeader p {
+    margin: 0px;
+    padding: 0px;
+}
 .projectLine, .businessMsLine {
     stroke: #909090;
     stroke-dasharray: 6,8;

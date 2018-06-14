@@ -5,6 +5,7 @@
 var Project = function (obj, index, mMap) {
     // state
     /** @type {string} */ this.name;
+    /** @type {string} */ this.comment;
     /** @type {Programme} */ this.programme;
 
     // view
@@ -29,10 +30,12 @@ var Project = function (obj, index, mMap) {
 // obj is a parsed JSON string, access members using obj["membername"]
 Project.prototype.restore = function (obj) {
     runTAssert (() => typeof obj["name"] === "string");
+    runTAssert (() => !obj["comment"] || typeof obj["comment"] === "string");
     runTAssert (() => Number.isInteger(obj["programme"]));
     runTAssert (() => this.mMap.programmes[obj["programme"]]);
     
     this.name = obj["name"];
+    this.comment = obj["comment"] || "";
 
     if (this.programme) {
         this.programme.removeProject(this);
@@ -43,12 +46,30 @@ Project.prototype.restore = function (obj) {
 };
 Project.prototype.save = function () {
     assert (() => this.mMap.programmes[this.programme.index] === this.programme)
-    return {"name": this.name, "programme": this.programme.index};
+    return {
+        "name": this.name,
+        "programme": this.programme.index,
+        "comment": this.comment
+    };
 };
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
     
     this.flowMilestoneData();
+
+    // TODO: choose intellegent width.
+    var headingBox = new Draw.vertResizableForeign (300, {
+        "class": "projectHeader"
+    }, this.elem);
+
+    var heading = new Draw.editableParagraph (this.name, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "Untitled",
+        onchange: this.modifyName.bind(this)
+    }, {
+    }, headingBox.container);
+
+    headingBox.update();
     
     var milestones = Draw.svgElem("g", {
         "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
@@ -71,10 +92,10 @@ Project.prototype.draw = function () {
         "transform": "translate(20, " + (this.height - 30) + ")"
     } , this.elem);
     
-    var name = new Draw.svgTextInput (
-        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.modifyName.bind(this), {
-        }, g, "Untitled");
+    // var name = new Draw.svgTextInput (
+    //     this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
+    //     this.modifyName.bind(this), {
+    //     }, g, "Untitled");
 
     var menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
