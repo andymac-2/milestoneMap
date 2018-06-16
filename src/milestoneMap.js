@@ -281,7 +281,7 @@ MilestoneMap.prototype.deactivateOnUnclick = function () {
     }
 };
 
-MilestoneMap.SPACEFORFIRSTPROJECT = 35;
+MilestoneMap.SPACEFORFIRSTPROJECT = 30;
 MilestoneMap.prototype.reflow = function () {
     var headerHeight = Draw.verticalReflow (
         this.dateHeader.endy, [this.businessMs]);

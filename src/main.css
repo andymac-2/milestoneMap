@@ -132,21 +132,21 @@ body {
 }
 
 /* Project Headers and comment */
-.projectHeader, .projectComment {
-    margin: 3px;
-    padding: 3px;
-    border: 1px solid white; 
+.projectHeader, .programmeHeader, .headingComment {
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid rgba(0, 0, 0, 0); 
 }
 .clickedActive {
     border: 1px solid rgb(102, 204, 255);
 }
-.projectComment {
+.headingComment {
     color: #a0a0a0;
     font-size: small;
     font-style: italic;
 }
 
-.projectLine, .businessMsLine {
+.projectLine {
     stroke: #909090;
     stroke-dasharray: 6,8;
     stroke-width: 1;

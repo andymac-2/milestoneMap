@@ -1,7 +1,9 @@
-var VERSION = "1.1.0";
+var VERSION = "1.2.0";
 
 window.onload = function () {
-    runTestSuite();
+    if (!NDEBUG) {
+        runTestSuite();
+    }
     var app = document.getElementById ("app");
 
     new Loader (app);

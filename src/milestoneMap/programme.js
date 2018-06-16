@@ -5,6 +5,7 @@
 var Programme = function (obj, index, mMap) {
     // state
     /** @type {string} */ this.name;
+    /** @type {string} */ this.comment;
 
     // view
     /** @type {Element} */ 
@@ -18,17 +19,25 @@ var Programme = function (obj, index, mMap) {
     /** @type {number} */ this.height = Programme.HEADERHEIGHT;
     /** @type {Array<Project>} */ this.projects = [];
     /** @type {number} */ this.yOffset = 0;
+    
+    /** @type {vertResizableForegin} */ this.headingBox;
 
     this.restore (obj);
 };
-/** @const {number} */ Programme.HEADERHEIGHT = 40;
+/** @const {number} */ Programme.HEADERHEIGHT = 45;
 
 Programme.prototype.restore = function (obj) {
     runTAssert (() => typeof obj["name"] === "string");
+    runTAssert (() => !obj["comment"] || typeof obj["comment"] === "string");
+    
     this.name = obj["name"];
+    this.comment = obj["comment"] || "";
 };
 Programme.prototype.save = function () {
-    return {"name": this.name};
+    return {
+        "name": this.name,
+        "comment": this.comment
+    };
 };
 
 // depends on projects already being drawn correctly
@@ -37,16 +46,11 @@ Programme.prototype.draw = function () {
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
-        "class": "programmeHeader"
+        "transform": "translate(0 " + (Programme.HEADERHEIGHT - 5) + ")"
     } , this.elem);
-    
-    var textBox = new Draw.svgTextInput (
-        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.modifyName.bind(this), {
-            "transform": "translate(0, 25)"
-        }, g, "Untitled");
+    this.drawHeadingBox(g);
 
-    Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
+    Draw.menu (Draw.ALIGNRIGHT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
         "action": this.moveDown.bind(this)
     },{
@@ -59,7 +63,7 @@ Programme.prototype.draw = function () {
         "icon": "icons/plus.svg",
         "action": this.newProject.bind(this)
     }], {
-        "transform": "translate(180, 20)"
+        "transform": "translate("+ this.mMap.width + " -30)"
     }, g);
 
     this.projects.forEach(project => this.elem.appendChild (project.elem));
@@ -68,26 +72,46 @@ Programme.prototype.draw = function () {
     return this.elem;
 };
 
+Programme.MENUWIDTH = 250;
+Programme.prototype.drawHeadingBox = function (parent) {
+    // TODO: variable header height for extremely long titles or comments.
+    this.headingBox = new Draw.vertResizableForeign (
+        this.mMap.width - Programme.MENUWIDTH, Project.PARAGRAPHMARGIN, {}, parent);
+    
+    new Draw.editableParagraph (this.name, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "Untitled",
+        onchange: this.modifyName.bind(this)
+    }, {
+        "class": "programmeHeader"
+    }, this.headingBox.container);
+
+    new Draw.editableParagraph (this.comment, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "...",
+        onchange: this.modifyComment.bind(this)
+    }, {
+        "class": "headingComment"
+    }, this.headingBox.container);
+    
+    this.headingBox.update();
+};
+
 Programme.prototype.reflow = function () {
     this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
     return this.elem;
-}
+};
 
 Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) {
     var saveStartIndex = startIndex;
     var printable = Draw.svgElem ("g", {
         "class": "programme"
     });
-
+    // TODO: variable header height for extremely long titles or comments.
     var g = Draw.svgElem ("g", {
-        "class": "programmeHeader"
+        "transform": "translate(0 " + (Programme.HEADERHEIGHT - 5) + ")"
     }, printable);
-    
-    var textBox = new Draw.svgTextInput (
-        this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
-        this.modifyName.bind(this), {
-            "transform": "translate(0, 25)"
-        }, g, "Untitled");
+    this.drawHeadingBox(g);
 
     var yOffset = Programme.HEADERHEIGHT;
     for (var projects = [];
@@ -152,6 +176,9 @@ Programme.prototype.removeProject = function (project) {
 // modifications
 Programme.prototype.modifyName = function (e, input) {
     this.name = input.text;
+};
+Programme.prototype.modifyComment = function (e, input) {
+    this.comment = input.text;
 };
 Programme.prototype.deleteThis = function () {
     this.projects.forEach(project => project.deleteThis());

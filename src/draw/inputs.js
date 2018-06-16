@@ -47,8 +47,7 @@ Draw.editableParagraph = function (text, options, attrs, parent) {
     /** @type {Element} */ this.elem = Draw.elem ("p", attrs, parent);
     this.elem.addEventListener ("input", this.modifyText.bind(this, this.elem));
     this.elem.addEventListener ("input", e => this.onchange (e, this));
-    this.elem.addEventListener ("mousedown", this.onClick.bind(this));
-    this.elem.addEventListener ("click", this.onClick.bind(this));
+    this.elem.addEventListener ("focus", this.onClick.bind(this));
     
     this.restore(text);
     this.draw();

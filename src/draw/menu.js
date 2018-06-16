@@ -10,6 +10,9 @@ Draw.visibleMenu = function (alignment, entries, parent) {
     case Draw.ALIGNLEFT:
         x = Draw.MENUSPACING / -2;
         break;
+    case Draw.ALIGNRIGHT:
+        x = 0 - (entries.length + 1) * Draw.MENUSPACING;
+        break;
     }
    
     for (var i = 0; i < entries.length; i++) {

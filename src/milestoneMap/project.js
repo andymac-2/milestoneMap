@@ -63,7 +63,7 @@ Project.prototype.save = function () {
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
 
-    //set y transform to this.height - Project.MILESTONEOFFSET
+    //set y transform to this.height - Project.MILESTONEOFFSET later
     this.container = Draw.svgElem ("g", { }, this.elem);
     Draw.svgElem("line", {
         "x1": 0,
@@ -79,7 +79,6 @@ Project.prototype.draw = function () {
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
-        "class": "projectHeader",
         "transform": "translate(" +
             Project.HEADINGMARGIN + " " +
             Project.HEADINGOFFSET + ")"
@@ -178,11 +177,12 @@ Project.prototype.flowMilestoneData = function () {
     return milestoneData;
 };
 
+Project.PARAGRAPHMARGIN = 4;
 Project.prototype.drawHeadingBox = function (parent) {
-    // TODO: choose intellegent width.
     var usableWidth = this.mMap.getSideBarWidth() -
         Project.HEADINGMARGIN;
-    this.headingBox = new Draw.vertResizableForeign (usableWidth, 4, {}, parent);
+    this.headingBox = new Draw.vertResizableForeign (
+        usableWidth, Project.PARAGRAPHMARGIN, {}, parent);
     
     new Draw.editableParagraph (this.name, {
         unclicker: this.mMap.unclicker,
@@ -197,7 +197,7 @@ Project.prototype.drawHeadingBox = function (parent) {
         defaultText: "...",
         onchange: this.modifyComment.bind(this)
     }, {
-        "class": "projectComment"
+        "class": "headingComment"
     }, this.headingBox.container);
     
     this.headingBox.update();
@@ -222,8 +222,9 @@ Project.prototype.adjustHeight = function () {
     this.reflowUp();
 };
 
+Project.HEADERVERTMARGIN = 15;
 Project.prototype.getHeight = function () {
-    var a = this.headingBox.height + Project.MINHEIGHT;
+    var a = this.headingBox.height + Project.HEADERVERTMARGIN;
     var b = this.milestoneHeight;
     return this.height = Util.max(a, b);
 };
