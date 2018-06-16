@@ -24,7 +24,7 @@ var Project = function (obj, index, mMap) {
     /** @type {number} */ this.yOffset = 0;
     /** @type {number} */ this.pageNo = 0;
 
-    /** @type {vertResizableForegin} */ this.headingBox;
+    /** @type {Draw.vertResizableForeign} */ this.headingBox;
     /** @type {number} */ this.milestoneHeight = 0;
     this.restore (obj);
 };
@@ -208,17 +208,18 @@ Project.prototype.adjustHeight = function () {
     var oldHeight = this.height;
     this.getHeight();
 
+    if (this.menu) {
+        this.menu.setAttribute(
+            "transform", "translate(0 " +
+                (Project.MENUOFFSET - this.headingBox.height) + ")");
+    }
+
     if (oldHeight === this.height) {
         return;
     }
     this.container.setAttribute(
         "transform", "translate(0 " +
             (this.height - Project.MILESTONEOFFSET) + ")");
-    if (this.menu) {
-        this.menu.setAttribute(
-            "transform", "translate(0 " +
-                (Project.MENUOFFSET - this.headingBox.height) + ")");
-    }
     this.reflowUp();
 };
 

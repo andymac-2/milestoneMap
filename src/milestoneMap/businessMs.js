@@ -23,7 +23,7 @@ var BusinessMs = function (mMap) {
     /** @type {MilestoneMap} */ this.mMap = mMap;
     /** @type {number} */ this.height = Project.MINHEIGHT;
     
-    /** @type {vertResizableForegin} */ this.headingBox;
+    /** @type {Draw.vertResizableForeign} */ this.headingBox;
     /** @type {number} */ this.milestoneHeight = 0;
 };
 

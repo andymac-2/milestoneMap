@@ -28,6 +28,7 @@ npx google-closure-compiler \
     ../src/draw/lines.js\
     ../src/draw/domUtils.js\
     ../src/draw/menu.js\
+    ../src/draw/inputs.js\
     ../src/draw/elements.js\
     ../src/draw/svgTextInput.js\
     ../src/draw/svgDateInput.js\

@@ -20,7 +20,7 @@ var Programme = function (obj, index, mMap) {
     /** @type {Array<Project>} */ this.projects = [];
     /** @type {number} */ this.yOffset = 0;
     
-    /** @type {vertResizableForegin} */ this.headingBox;
+    /** @type {Draw.vertResizableForeign} */ this.headingBox;
 
     this.restore (obj);
 };

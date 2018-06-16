@@ -37,6 +37,7 @@ Draw.vertResizableForeign.prototype.update = function () {
 Draw.editableParagraph = function (text, options, attrs, parent) {
     /** @type {Unclicker} */ this.unclicker = options.unclicker;
     /** @type {string} */ this.defaultText = options.defaultText;
+    /** @type {string} */ this.text;
 
     /** @type {Element} */ this.parent = parent;
     
