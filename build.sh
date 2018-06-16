@@ -35,7 +35,13 @@ npx google-closure-compiler \
     ../src/util.js
 
 cp ../src/main.css main.css
+cp ../src/electron_package.json package.json
+cp ../src/electron_main.js main.js
 cp ../src/dist/index.html index.html
-cp -R ../src/icons icons
-      
+cp -R ../src/icons .
 
+cd ..
+
+npx electron-packager dist MilestoneMap --overwrite --all --out=bin
+
+rm dist/package.json

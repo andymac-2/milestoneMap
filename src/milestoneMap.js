@@ -175,7 +175,7 @@ MilestoneMap.prototype.draw = function () {
     this.reflow ();
 };
 
-MilestoneMap.prototype.PX_PER_MM = 5.0;
+/** @const {number} */ MilestoneMap.prototype.PX_PER_MM = 5.0;
 MilestoneMap.prototype.drawPrint = function () {
     this.printElem.innerHTML = "";
     
@@ -281,7 +281,7 @@ MilestoneMap.prototype.deactivateOnUnclick = function () {
     }
 };
 
-MilestoneMap.SPACEFORFIRSTPROJECT = 35;
+MilestoneMap.SPACEFORFIRSTPROJECT = 30;
 MilestoneMap.prototype.reflow = function () {
     var headerHeight = Draw.verticalReflow (
         this.dateHeader.endy, [this.businessMs]);
@@ -520,7 +520,7 @@ MilestoneMap.prototype.newProgramme = function () {
 
     this.draw();
 };
-MilestoneMap.CSVHEADING =
+/** @const {string} */ MilestoneMap.CSVHEADING =
     [
         "Programme Name",
         "Project Name",
