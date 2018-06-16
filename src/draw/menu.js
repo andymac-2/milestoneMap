@@ -30,13 +30,13 @@ Draw.visibleMenu = function (alignment, entries, parent) {
             "r" : "14"
         }, entryGroup);
         
-        Draw.svgElem ("image", {
-            "href": entries[i].icon,
+        var image = Draw.svgElem ("image", {
             "x": "-8",
             "y": "-8",
             "height": "16",
             "width": "16"
         }, entryGroup);
+        image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', entries[i].icon);
 
     }
     return g;

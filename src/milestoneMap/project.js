@@ -114,6 +114,8 @@ Project.prototype.draw = function () {
 
     return this.elem;
 };
+
+/** @this {Project|BusinessMs} */
 Project.prototype.flowMilestoneData = function () {
     var spaces = [];
     var layers = [];

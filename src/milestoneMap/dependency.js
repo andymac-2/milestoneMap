@@ -136,18 +136,22 @@ Dependency.prototype.drawLineOverPage = function (start, end, elem) {
     var startText = Draw.svgElem ("text", {
         "class": "dependencyText"
     }, elem);
-    Draw.svgElem ("textPath", {
-        "href": "#" + id,
-    }, startText).textContent = Dependency.spaces + this.dependent.milestone.name;
+    var text1 = Draw.svgElem ("textPath", {
+        'xlink:href': "#" + id
+    }, startText);
+    text1.textContent = Dependency.spaces + this.dependent.milestone.name;
+    //text1.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', "#" + id);
 
     var endText = Draw.svgElem ("text", {
         "text-anchor": "end",
         "class": "dependencyText"
     }, elem);
-    Draw.svgElem ("textPath", {
-        "href": "#" + id,
+    var text2 = Draw.svgElem ("textPath", {
+        'xlink:href': "#" + id,
         "startOffset": "100%"
-    }, endText).textContent = this.dependency.milestone.name + Dependency.spaces;
+    }, endText);
+    text2.textContent = this.dependency.milestone.name + Dependency.spaces;
+    //text2.setAttributeNS('http://www.w3.org/1999/xlink', 'href', "#" + id);
 };
 
 Dependency.prototype.drawPrint = function (depLayers) {   
