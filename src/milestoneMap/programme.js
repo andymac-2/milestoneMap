@@ -68,6 +68,11 @@ Programme.prototype.draw = function () {
     return this.elem;
 };
 
+Programme.prototype.reflow = function () {
+    this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
+    return this.elem;
+}
+
 Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) {
     var saveStartIndex = startIndex;
     var printable = Draw.svgElem ("g", {

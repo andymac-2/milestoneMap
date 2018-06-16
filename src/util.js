@@ -7,6 +7,10 @@ Util.allertErr = function (err) {
      alert (err.name + ": " + err.message);
 };
 
+Util.max = function(a, b) {
+    return a > b ? a : b;
+};
+
 Util.clamp = function (min, max, value) {
     value = value > max ? max : value;
     value = value < min ? min : value;

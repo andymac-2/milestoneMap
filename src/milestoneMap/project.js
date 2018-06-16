@@ -13,20 +13,28 @@ var Project = function (obj, index, mMap) {
     this.elem = Draw.svgElem("g", {
         "class": "project"
     }, mMap.programmes[obj["programme"]].elem);
+    /** @type {Element} */ this.container;
+    /** @type {Element} */ this.menu;
 
     // view model
     /** @type {MilestoneMap} */ this.mMap = mMap;
-    /** @type {number} */ this.height = Project.MINHEIGHT;
+    /** @type {number} */ this.height = 0;
     /** @type {Array<Milestone>} */ this.milestones = [];
     /** @type {number} */ this.index = index;
     /** @type {number} */ this.yOffset = 0;
     /** @type {number} */ this.pageNo = 0;
+
+    /** @type {vertResizableForegin} */ this.headingBox;
+    /** @type {number} */ this.milestoneHeight = 0;
     this.restore (obj);
 };
 
 
 /** @const {number} */ Project.MINHEIGHT = 40;
 /** @const {number} */ Project.MILESTONEOFFSET = 20;
+/** @const {number} */ Project.HEADINGOFFSET = 0;
+/** @const {number} */ Project.HEADINGMARGIN = 20;
+/** @const {number} */ Project.MENUOFFSET = -20;
 // obj is a parsed JSON string, access members using obj["membername"]
 Project.prototype.restore = function (obj) {
     runTAssert (() => typeof obj["name"] === "string");
@@ -54,50 +62,42 @@ Project.prototype.save = function () {
 };
 Project.prototype.draw = function () {
     this.elem.innerHTML = "";
-    
-    this.flowMilestoneData();
 
-    // TODO: choose intellegent width.
-    var headingBox = new Draw.vertResizableForeign (300, {
-        "class": "projectHeader"
-    }, this.elem);
-
-    var heading = new Draw.editableParagraph (this.name, {
-        unclicker: this.mMap.unclicker,
-        defaultText: "Untitled",
-        onchange: this.modifyName.bind(this)
-    }, {
-    }, headingBox.container);
-
-    headingBox.update();
-    
-    var milestones = Draw.svgElem("g", {
-        "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
-    });
-    this.elem.insertBefore(milestones, this.elem.firstChild);
-    this.milestones.forEach(milestone => milestones.appendChild(milestone.elem));
-
-    var line = Draw.svgElem("line", {
+    //set y transform to this.height - Project.MILESTONEOFFSET
+    this.container = Draw.svgElem ("g", { }, this.elem);
+    Draw.svgElem("line", {
         "x1": 0,
-        "y1": (this.height - Project.MILESTONEOFFSET),
+        "y1": 0,
         "x2": this.mMap.width,
-        "y2": (this.height - Project.MILESTONEOFFSET),
+        "y2": 0,
         "class": "projectLine"
-    });
-    this.elem.insertBefore(line, this.elem.firstChild);
+    }, this.container);
+    
+    var milestoneData = this.flowMilestoneData();
+    this.milestones.forEach(milestone => this.container.appendChild(milestone.elem));
+    this.container.appendChild(milestoneData);
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
         "class": "projectHeader",
-        "transform": "translate(20, " + (this.height - 30) + ")"
-    } , this.elem);
+        "transform": "translate(" +
+            Project.HEADINGMARGIN + " " +
+            Project.HEADINGOFFSET + ")"
+    }, this.container);
+    this.drawHeadingBox(g);
+    
+    this.getHeight();
+
+    this.container.setAttribute(
+        "transform", "translate(0 " +
+            (this.height - Project.MILESTONEOFFSET) + ")");
     
     // var name = new Draw.svgTextInput (
     //     this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
     //     this.modifyName.bind(this), {
     //     }, g, "Untitled");
 
-    var menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
+    this.menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
         "icon": "icons/move-down.svg",
         "action": this.moveDown.bind(this)
     },{
@@ -110,7 +110,7 @@ Project.prototype.draw = function () {
         "icon": "icons/plus.svg",
         "action": this.newMilestone.bind(this)
     }], {
-        "transform": "translate(180, -7)"              
+        "transform": "translate(0 " + (Project.MENUOFFSET - this.headingBox.height) + ")"
     }, g);
 
     return this.elem;
@@ -161,26 +161,76 @@ Project.prototype.flowMilestoneData = function () {
     });
 
     // height dependent on how many layers.
-    this.height = layers.length * MilestoneTD.HEIGHT / 2;
+    this.milestoneHeight = layers.length * MilestoneTD.HEIGHT / 2;
 
     // add layers from top to bottom.
     var milestoneData = Draw.svgElem ("g", {
-        "transform": "translate(0, " + this.height + ")"
-    }, this.elem);
+        "transform": "translate(0 " + (-Project.MILESTONEOFFSET) + ")"
+    });
     for (var i = layers.length - 1; i >= 0; i--) {
         if (layers[i]) {
             milestoneData.appendChild(layers[i]);
         }
     }
 
-    this.height += Project.MINHEIGHT;
+    this.milestoneHeight += Project.MINHEIGHT;
 
     return milestoneData;
 };
 
+Project.prototype.drawHeadingBox = function (parent) {
+    // TODO: choose intellegent width.
+    var usableWidth = this.mMap.getSideBarWidth() -
+        Project.HEADINGMARGIN;
+    this.headingBox = new Draw.vertResizableForeign (usableWidth, 4, {}, parent);
+    
+    new Draw.editableParagraph (this.name, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "Untitled",
+        onchange: this.modifyName.bind(this)
+    }, {
+        "class": "projectHeader"
+    }, this.headingBox.container);
+
+    new Draw.editableParagraph (this.comment, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "...",
+        onchange: this.modifyComment.bind(this)
+    }, {
+        "class": "projectComment"
+    }, this.headingBox.container);
+    
+    this.headingBox.update();
+    this.headingBox.elem.addEventListener ("verticalResize", this.adjustHeight.bind(this));
+};
+
+Project.prototype.adjustHeight = function () {
+    var oldHeight = this.height;
+    this.getHeight();
+
+    if (oldHeight === this.height) {
+        return;
+    }
+    this.container.setAttribute(
+        "transform", "translate(0 " +
+            (this.height - Project.MILESTONEOFFSET) + ")");
+    if (this.menu) {
+        this.menu.setAttribute(
+            "transform", "translate(0 " +
+                (Project.MENUOFFSET - this.headingBox.height) + ")");
+    }
+    this.reflowUp();
+};
+
+Project.prototype.getHeight = function () {
+    var a = this.headingBox.height + Project.MINHEIGHT;
+    var b = this.milestoneHeight;
+    return this.height = Util.max(a, b);
+};
+
 // call this if the height changes.
 Project.prototype.reflowUp = function () {
-    this.programme.draw();
+    this.programme.reflow();
     this.mMap.reflow();
 };
 
@@ -199,6 +249,10 @@ Project.prototype.removeMilestone = function (milestone) {
 Project.prototype.modifyName = function (e, input) {
     this.name = input.text;
 };
+Project.prototype.modifyComment = function (e, input) {
+    this.comment = input.text;
+};
+
 Project.prototype.deleteThis = function () {
     this.programme.removeProject (this);
     this.milestones.forEach (milestone => milestone.deleteThis());

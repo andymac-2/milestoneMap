@@ -2,9 +2,10 @@
 
 /** @constructor
     @struct */
-Draw.vertResizableForeign = function (width, attrs, parent) {
+Draw.vertResizableForeign = function (width, margin, attrs, parent) {
     /** @type {number} */ this.width = width;
     /** @type {number} */ this.height = 0;
+    /** @type {number} */ this.margin = margin;
 
     /** @type {Element} */
     this.elem = Draw.svgElem ("g", attrs, parent);
@@ -14,14 +15,21 @@ Draw.vertResizableForeign = function (width, attrs, parent) {
     }, this.elem);
     /** @type {Element} */
     this.container = Draw.elem ("div", {
-        "style": "width:" + this.width + "px;"
+        "style": "width:" + this.width + "px;max-width:" + this.width + "px;"
     }, this.foreign);
+    this.container.addEventListener("input", this.update.bind(this));
 
 };
 
 Draw.vertResizableForeign.prototype.update = function () {
-    this.height = Draw.getElemHeight (this.container);
-    this.foreign.setAttribute("height", this.height);
+    var height = Draw.forceGetElementHeight(this.container) + this.margin * 2;
+    if (this.height !== height) {
+        this.height = height;
+        this.foreign.setAttribute("height", this.height);
+        this.foreign.setAttribute("y", -this.height);
+        var e = new CustomEvent("verticalResize", {detail: this});
+        this.elem.dispatchEvent(e);
+    }
 };
 
 /** @constructor
@@ -37,26 +45,39 @@ Draw.editableParagraph = function (text, options, attrs, parent) {
 
     attrs["contenteditable"] = "true";
     /** @type {Element} */ this.elem = Draw.elem ("p", attrs, parent);
-    this.elem.addEventListener ("change", e => this.onchange (e, this));
-
+    this.elem.addEventListener ("input", this.modifyText.bind(this, this.elem));
+    this.elem.addEventListener ("input", e => this.onchange (e, this));
+    this.elem.addEventListener ("mousedown", this.onClick.bind(this));
+    this.elem.addEventListener ("click", this.onClick.bind(this));
+    
     this.restore(text);
     this.draw();
 };
 
 Draw.editableParagraph.prototype.restore = function (text) {
-    this.text = text === "" ? this.defaultText: this.text;
+    this.text = !text ? this.defaultText: text;
 };
 
 Draw.editableParagraph.prototype.draw = function () {
     Draw.activeOrDeactive (
-        this.elem, this.onUnClick.bind (this), this.onClick (this),
+        this.elem, this.onUnClick.bind (this), this.activate.bind (this),
         this.unclicker, this.parent);
 };
 
 Draw.editableParagraph.prototype.onUnClick = function () {
     this.elem.textContent = this.text || this.defaultText;
+    this.elem.classList.remove("clickedActive");
+};
+
+Draw.editableParagraph.prototype.activate = function () {
+    this.elem.textContent = this.text;
+    this.elem.classList.add("clickedActive");
 };
 
 Draw.editableParagraph.prototype.onClick = function () {
-    this.elem.textContent = this.text;
+    Draw.selectElementContents (this.elem);
+};
+
+Draw.editableParagraph.prototype.modifyText = function (elem) {
+    this.restore(elem.textContent);
 };

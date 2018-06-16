@@ -22,6 +22,9 @@ var BusinessMs = function (mMap) {
     // view model
     /** @type {MilestoneMap} */ this.mMap = mMap;
     /** @type {number} */ this.height = Project.MINHEIGHT;
+    
+    /** @type {vertResizableForegin} */ this.headingBox;
+    /** @type {number} */ this.milestoneHeight = 0;
 };
 
 // TODO: variable height milestone data.
@@ -29,19 +32,19 @@ BusinessMs.prototype.draw = function () {
     this.elem.innerHTML = "";
     this.elemLines.innerHTML = "";
 
-    this.flowMilestoneData();
-    
+    var milestoneData = this.flowMilestoneData();
+    this.height = this.milestoneHeight;
+    var container = Draw.svgElem ("g", {
+        "transform": "translate(0 " + (this.height - Project.MILESTONEOFFSET) + ")"
+    }, this.elem);
     Draw.svgElem("line", {
         "x1": 0,
-        "y1": (this.height - Project.MILESTONEOFFSET),
+        "y1": 0,
         "x2": this.mMap.width,
-        "y2": (this.height - Project.MILESTONEOFFSET),
+        "y2": 0,
         "class": "projectLine"
-    }, this.elem);
-
-    var milestones = Draw.svgElem("g", {
-        "transform": "translate(0, " + (this.height - Project.MILESTONEOFFSET) + ")"
-    }, this.elem);
+    }, container);
+    
     this.milestones
         .filter (milestone => milestone.currentReport())
         .forEach(milestone => {
@@ -49,15 +52,16 @@ BusinessMs.prototype.draw = function () {
             assert (() => msAtReport);
             
             msAtReport.drawLine();
-            milestones.appendChild (milestone.elem);
+            container.appendChild (milestone.elem);
             this.elemLines.appendChild (msAtReport.elemLineMain);
         });
+    container.appendChild(milestoneData);
 
     // this group stops multiple click events on the parent elem occuring
     var g = Draw.svgElem ("g", {
         "class": "businessMsHeader",
-        "transform": "translate(0, " + (this.height - 30) + ")"
-    } , this.elem);
+        "transform": "translate(0, -10)"
+    }, container);
     
     var name = Draw.svgElem ("text", {}, g).textContent = "Business Milestones";
     

@@ -131,11 +131,21 @@ body {
     font-size: small;
 }
 
-
-.projectHeader p {
-    margin: 0px;
-    padding: 0px;
+/* Project Headers and comment */
+.projectHeader, .projectComment {
+    margin: 3px;
+    padding: 3px;
+    border: 1px solid white; 
 }
+.clickedActive {
+    border: 1px solid rgb(102, 204, 255);
+}
+.projectComment {
+    color: #a0a0a0;
+    font-size: small;
+    font-style: italic;
+}
+
 .projectLine, .businessMsLine {
     stroke: #909090;
     stroke-dasharray: 6,8;

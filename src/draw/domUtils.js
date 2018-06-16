@@ -30,6 +30,22 @@ Draw.getElemWidth = function (elem) {
     return elem.getBoundingClientRect().width;
 };
 
+Draw.dummyElem = undefined;
+Draw.forceGetElementHeight = function (elem) {
+    if (document.contains(elem)) {
+        return elem.offsetHeight;
+    }
+    if (!Draw.dummyElem) {
+        Draw.dummyElem = Draw.elem("div", {
+            "style": "position:absolute;visibility:hidden;"
+        }, document.body);
+    }
+    var clone = elem.cloneNode(true);
+    Draw.dummyElem.appendChild(clone);
+    var height = clone.offsetHeight;
+    Draw.dummyElem.innerHTML = "";
+    return height;
+};
 
 // an element drawn one way when clicked, and drawn another way when clicked elsewhere.
 Draw.activeOnClickElem = function (normal, active, unclicker, attrs, parent) {
@@ -81,3 +97,11 @@ Draw.getTextWidth = function (font, text) {
     return ctx.measureText(text).width;
 };
 Draw.getTextWidth.ctx = document.createElement("canvas").getContext("2d");
+
+Draw.selectElementContents = function (el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+};
