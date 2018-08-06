@@ -234,7 +234,7 @@ Project.prototype.getHeight = function () {
 
 // call this if the height changes.
 Project.prototype.reflowUp = function () {
-    this.programme.reflow();
+    this.programme.draw();
     this.mMap.reflow();
 };
 
