@@ -503,6 +503,11 @@ MilestoneMap.prototype.addCSVRow = function (row) {
 MilestoneMap.prototype.addReportFromCSV = function (arr) {
     this.validateReportFromCSV(arr);
 
+    var milestones = this.msAtReports.filter (
+        ms => ms.report === this.currReport);
+    
+    milestones.forEach(ms => ms.deleteThis());
+
     for (var i = 1; i < arr.length; i++) {
         this.addCSVRow(arr[i]);
     }
