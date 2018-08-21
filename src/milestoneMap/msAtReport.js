@@ -307,6 +307,21 @@ MsAtReport.prototype.diamondOnClick = function () {
         });
         dep.draw();
     };
+
+    if (this.isComparison() && !this.milestone.currentReport()) {
+        var obj = {
+            "milestone": this.milestone.index,
+            "report": this.mMap.currReport.index,
+            "comment": this.comment,
+            "status": this.status,
+            "date": this.date
+        };
+        var msAtReport = this.mMap.addMsAtReport(obj);
+        
+        msAtReport.draw();
+        this.milestone.draw();
+        this.reflowUp();
+    }
 };
 
 // modifications
