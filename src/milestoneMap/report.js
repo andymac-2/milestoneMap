@@ -1,13 +1,26 @@
 'use strict'
 
+/** @constructor
+    @struct */
 var Report = function (obj, index, mMap) {
     // state
-    this.date;
-    this.name;
+    /** @type {number} */ this.date;
+    /** @type {string} */ this.name;
+
+    //view
+    /** @type {Element} */ 
+    this.lineElem = Draw.svgElem ("g", {
+        "class": "reportLine"
+    });
+    /** @type {Element} */ 
+    this.lineElemMain = Draw.svgElem ("g", {
+        "class": "reportLine"
+    });
+    /** @type {Element} */ this.headerElem;
 
     //model
-    this.index = index;
-    this.mMap = mMap;
+    /** @type {number} */ this.index = index;
+    /** @type {MilestoneMap} */ this.mMap = mMap;
 
     this.restore(obj);
 };
@@ -21,39 +34,65 @@ Report.prototype.save = function () {
     return {"date": this.date, "name": this.name};
 };
 
-Report.prototype.drawMenu = function (parent) {
-    var elem = Draw.elem ("option", {
-        "value": this.index,
-    }, parent);
-    elem.textContent = this.name + ": "  + Util.getISODateOnly(this.date);
-    return elem;
+Report.prototype.getMenuText = function () {
+    return this.name + ": "  + Util.getISODateOnly(this.date);
 };
 
-Report.prototype.drawHeader = function (text, attrs, parent) {
-    var g = Draw.svgElem ("g", attrs, parent);
+Report.prototype.drawHeader = function (attrs, parent) {
+    this.headerElem = Draw.svgElem ("g", attrs, parent);
+    var text = this === this.mMap.currReport ? "Current:": "Baseline:"
+    
     Draw.svgElem ("text", {
         "class": "reportHeader",
         "text-anchor": "end"
-    }, g).textContent = text;
+    }, this.headerElem).textContent = text;
     
-    var g2 = Draw.svgElem ("g", {}, g);
-    new Draw.svgDateInput (
-        this.date, Draw.ALIGNRIGHT, this.mMap.unclicker,
-        this.modifyDate.bind(this), {
+    var g2 = Draw.svgElem ("g", {}, this.headerElem);
+    new Draw.svgDateInput ({
+        unclicker: this.mMap.unclicker,
+        onchange: this.modifyDate.bind(this),
+        parent: g2,
+        alignment: Draw.ALIGNRIGHT,
+        attrs: {
             "transform": "translate(0, 20)",
             "class": "reportDate"
-        }, g2);
+        }
+    }, this.date);
 
-    g2 = Draw.svgElem ("g", {}, g);
+    g2 = Draw.svgElem ("g", {}, this.headerElem);
     new Draw.svgTextInput (
         this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
         this.modifyName.bind(this), {
             "transform": "translate(5, 20)",
             "class": "reportName"
-        }, g2);
+        }, g2, "Untitled");
 
-    return g;
+    return this.headerElem;
 };
+
+Report.prototype.drawLine = function () {
+    this.lineElem.innerHTML = "";
+    this.lineElemMain.innerHTML = "";
+
+    if (!this.mMap.isInInterval(this.date)) {
+        return this.lineElem;
+    }
+
+    var x = this.mMap.getXCoord(this.date);
+
+    Draw.svgElem("line", {
+        "x1": x, "y1": DateHeader.ROWY,
+        "x2": x, "y2":"100%"
+    }, this.lineElem);
+
+    Draw.svgElem("line", {
+        "x1": x, "y1": 0,
+        "x2": x, "y2":"100%"
+    }, this.lineElemMain);
+
+    return this.lineElem;
+};
+
 Report.prototype.deleteThis = function () {
     var milestones = this.mMap.msAtReports.filter (ms => ms.report === this);
     milestones.forEach(ms => ms.deleteThis());
@@ -66,12 +105,12 @@ Report.prototype.deleteThis = function () {
 // user events
 Report.prototype.modifyDate = function (e, input) {
     this.date = input.date;
-    // TODO: draw line
+    this.mMap.reportSelectors();
+    this.drawLine();
 };
 
 Report.prototype.modifyName = function (e, input) {
     this.name = input.text;
-    // TODO: redraw dropdown lists
-    // TODO: redraw other report display.
+    this.mMap.reportSelectors();
 };
 

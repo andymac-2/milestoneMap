@@ -1,8 +1,11 @@
 'use strict'
 
-Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, parent) {
+/** @constructor
+    @struct */
+Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, parent, defaultText) {
     // state
-    this.text;
+    /** @type {string} */ this.text;
+    /** @type {string} */ this.defaultText = defaultText === undefined ? "Untitled" : defaultText;
 
     // view model
     switch (alignment) {
@@ -16,13 +19,15 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
         assert (() => false);
         break;
     }
-    this.unclicker = unclicker;
-    this.onchange = onchange;
-    this.parent = parent;
-    this.attrs = attrs;
+    /** @type {Unclicker} */ this.unclicker = unclicker;
+    /** @type {function(Event, Draw.svgTextInput)} */ this.onchange = onchange;
+    /** @type {Element} */ this.parent = parent;
+    /** @type {Object<string>} */ this.attrs = attrs;
 
     //view
-    this.elem;
+    /** @type {Element} */ this.elem;
+
+    /** @type {Element} */ this.textBox;
 
     this.restore(text);
     this.draw();
@@ -30,9 +35,10 @@ Draw.svgTextInput = function (text, alignment, unclicker, onchange, attrs, paren
 
 Draw.svgTextInput.HEIGHTWIDTHRATIO = 10;
 Draw.svgTextInput.TEXTTOTEXTBOXRATIO = 1.4;
+Draw.svgTextInput.MAXTEXTLENGTH = 40;
 Draw.svgTextInput.prototype.restore = function (text) {
     this.text = text;
-    this.text = this.text === "" ? "Untitled": this.text;
+    this.text = this.text === "" ? this.defaultText: this.text;
 };
 
 Draw.svgTextInput.prototype.draw = function () {
@@ -47,18 +53,23 @@ Draw.svgTextInput.prototype.onclick = function (parent) {
     
     var width = height * Draw.svgTextInput.HEIGHTWIDTHRATIO;
     var x = this.anchor === "middle" ? width / -2 : 0;
+
+    var offset = Draw.getElemXY (parent);
+    var unx = -offset.x;
+    var uny = -offset.y
     
     var foreign = Draw.svgElem("foreignObject", {
         "width": width,
         "height": (height * Draw.svgTextInput.TEXTTOTEXTBOXRATIO),
-        "x": x,
-        "y": (0 - height)
+        "transform": "translate(" + unx + ", " + uny + ")",
+        "x": x - unx,
+        "y": (0 - height) - uny
     }, parent);
     
-    var textBox = Draw.htmlElem ("input", {
+    var textBox = Draw.elem ("input", {
         "class": "svgTextBox",
-        "value": this.text,
-        "type": "text"
+        "type": "text",
+        "value": this.text
     }, foreign);
     textBox.focus();
     textBox.select();
@@ -72,7 +83,8 @@ Draw.svgTextInput.prototype.onunclick = function (parent) {
     var normalText = Draw.svgElem ("text", {
         "text-anchor": this.anchor
     }, parent);
-    normalText.textContent = this.text;
+    normalText.textContent = Util.truncate(
+        this.text, Draw.svgTextInput.MAXTEXTLENGTH);
 };
 
 // user events

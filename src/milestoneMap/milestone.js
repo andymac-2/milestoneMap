@@ -1,72 +1,110 @@
 
 'use strict'
 
+/** @constructor
+    @struct */
 var Milestone = function (obj, index, mMap) {
     // state
-    this.name;
-    this.project;
+    /** @type {string} */ this.name;
+    /** @type {Project|BusinessMs} */ this.project;
 
     // view
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "milestone"
     });
 
     // view model
-    this.mMap = mMap;
-    this.index = index;
-    this.cmpX;
-    this.currX;
-    this.atReports = [];   
+    /** @type {MilestoneMap} */ this.mMap = mMap;
+    /** @type {number} */ this.index = index;
+    /** @type {Array<MsAtReport>} */ this.atReports = [];
+
+    /** @type {MsAtReport|undefined} */ this.currReport;
+    /** @type {MsAtReport|undefined} */ this.cmpReport;
 
     this.restore (obj);
 };
 
 Milestone.prototype.restore = function (obj) {
-    this.name = obj.name;
+    runTAssert (() => Number.isInteger(obj["project"]));
+    runTAssert (() => this.mMap.projects[obj["project"]] || obj["project"] < 0);
+    this.name = obj["name"];
     
     if (this.project) {
         this.project.removeMilestone (this);
     }
-    
-    this.project = this.mMap.projects[obj.project];
+
+    if (obj["project"] >= 0) {
+        this.project = this.mMap.projects[obj["project"]];
+    }
+    else {// business milestone
+        this.project = this.mMap.businessMs;
+    }
     this.project.addMilestone (this);
 };
 Milestone.prototype.save = function () {
     return {
-        name: this.name,
-        project: this.project.index
+        "name": this.name,
+        "project": this.project.index
     };
 };
+Milestone.prototype.exportCSVRow = function () {    
+    var msAtReport = this.currentReport();
+    var currReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
+
+    var programmeName = this.project.index === -1 ?
+        this.project.name : this.project.programme.name;
+    return [
+        programmeName,
+        this.project.name,
+        this.name,
+        currReport,
+        msAtReport.resolveStatusClass(),
+        msAtReport.comment
+    ].map(el => JSON.stringify(el)).join(",");
+};
+
 Milestone.prototype.draw = function () {
     this.elem.innerHTML = "";
 
-    if (this.currentReport() && this.cmpReport() &&
+    var current = this.currentReport();
+    var comparison = this.comparisonReport();
+
+    if (current && comparison &&
         (this.mMap.currReport !== this.mMap.cmpReport)) {
-        Draw.svgElem ("line", {
-            "class": "compareLine",
-            "x1": this.cmpX, "y1": "0",
-            "x2": this.currX, "y2": "0"
-        }, this.elem);
+        Draw.bowedLine ({x: comparison.x, y: 0}, {x: current.x, y: 0},
+                        "thick evenDashed brightPink noFill", this.elem);
         
-        if (this.cmpX < this.currX) {
-            Draw.svgElem ("path", {
-                "class": "compareArrow",
-                "d": "M -6 -6 L -6 6 L 0 0 Z",
-                "transform": "translate("+
-                    (this.currX - MsAtReport.DIAMONDSIZE) + ", 0)"
-            }, this.elem);
-        }
-        else if (this.cmpX > this.currX) {
-            Draw.svgElem ("path", {
-                "class": "compareArrow",
-                "d": "M 6 -6 L 6 6 L 0 0 Z",
-                "transform": "translate("+
-                    (this.currX + MsAtReport.DIAMONDSIZE) + ", 0)"
-            }, this.elem);
-        }
+        // if (comparison.x < current.x) {
+        //     Draw.svgElem ("path", {
+        //         "class": "compareArrow",
+        //         "d": "M -6 -6 L -6 6 L 0 0 Z",
+        //         "transform": "translate("+
+        //             (current.x - MsAtReport.DIAMONDSIZE) + ", 0)"
+        //     }, this.elem);
+        // }
+        // else if (comparison.x > current.x) {
+        //     Draw.svgElem ("path", {
+        //         "class": "compareArrow",
+        //         "d": "M 6 -6 L 6 6 L 0 0 Z",
+        //         "transform": "translate("+
+        //             (current.x + MsAtReport.DIAMONDSIZE) + ", 0)"
+        //     }, this.elem);
+        // }
     };
 
-    this.atReports.forEach(atReport => this.elem.appendChild (atReport.elem));
+    if (comparison) {
+        this.elem.appendChild (comparison.elem);
+    }
+    if (current) {
+        this.elem.appendChild (current.elem);
+    }
+};
+
+Milestone.prototype.reflowUp = function () {
+    var project = this.project;
+    project.draw();
+    project.reflowUp();
 };
 
 
@@ -76,6 +114,12 @@ Milestone.prototype.addReport = function (report) {
     this.atReports.push(report);
 };
 Milestone.prototype.removeReport = function (msAtReport) {
+    if (msAtReport.report === this.mMap.currReport) {
+        this.currReport = null;
+    }
+    if (msAtReport.report === this.mMap.cmpReport) {
+        this.cmpReport = null;
+    }
     this.atReports = this.atReports.filter(elem => elem !== msAtReport);
 };
 
@@ -86,24 +130,24 @@ Milestone.prototype.deleteThis = function () {
     this.mMap.removeMilestone (this);
 };
 
-// user modifications
-Milestone.prototype.modifyName = function (elem) {
-    this.name = elem.value;
-};
-Milestone.prototype.deleteDraw = function () {
-    this.deleteThis ();
-    this.project.draw ();
-};
-
-
 
 // other methods
 Milestone.prototype.hasReport = function (report) {
     return this.atReports.find(msAtReport => msAtReport.report === report);
 };
 Milestone.prototype.currentReport = function () {
-    return this.hasReport (this.mMap.currReport);
+    if (this.currReport &&
+        this.currReport.report === this.mMap.currReport)
+    {
+        return this.currReport;
+    }
+    return this.currReport = this.hasReport (this.mMap.currReport);
 };
-Milestone.prototype.cmpReport = function () {
-    return this.hasReport (this.mMap.cmpReport);
+Milestone.prototype.comparisonReport = function () {
+    if (this.cmpReport &&
+        this.cmpReport.report === this.mMap.cmpReport)
+    {
+        return this.cmpReport;
+    }
+    return this.cmpReport = this.hasReport (this.mMap.cmpReport);
 };

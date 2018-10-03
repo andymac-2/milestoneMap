@@ -3,6 +3,13 @@
 // miscellaneous functions.
 
 var Util = {};
+Util.allertErr = function (err) {
+     alert (err.name + ": " + err.message);
+};
+
+Util.max = function(a, b) {
+    return a > b ? a : b;
+};
 
 Util.clamp = function (min, max, value) {
     value = value > max ? max : value;
@@ -13,6 +20,14 @@ Util.clamp = function (min, max, value) {
 Util.removeAtIndex = function (array, index) {
     array[index] = array[array.length - 1];
     array.pop();   
+};
+
+Util.insertInSortedArray = function (arr, cmpFunc, elem) {
+    for (var i = arr.length; i > 0 && cmpFunc(arr[i - 1], elem) > 0; i--) {
+        arr[i] = arr[i - 1];
+    }
+    arr[i] = elem;
+    return arr;
 };
 
 Util.removeFromArray = function (array, obj) {
@@ -33,12 +48,59 @@ Util.safeRemoveFromArray = function (array, obj) {
     array.pop();
 };
 
+Util.refreshIndices = function (arr) {
+    for (var i = 0; i < arr.length; i++) {
+        arr[i].index = i;
+    }
+};
+
+
+Util.isStrictlySorted = function (arr, cmpFunc) {
+    for (var i = 0; i < arr.length - 1; i++) {
+        if (cmpFunc(arr[i], arr[i + 1]) > 0) {
+            return false;
+        }
+    }
+    return true;
+};
+Util.isSorted = function (arr, cmpFunc) {
+    for (var i = 0; i < arr.length - 1; i++) {
+        if (cmpFunc(arr[i], arr[i + 1]) >= 0) {
+            return false;
+        }
+    }
+    return true;
+};
+Util.isSortedByIndex = function (arr) {
+    return Util.isSorted (arr, (a, b) => a.index - b.index);
+};
+Util.addToIndexedArray = function (arr, obj, index) {
+    assert (() => index <= arr.length);
+    assert (() => index >= 0);
+    for (var i = arr.length; i > index; i--) {
+        arr[i] = arr[i - 1];
+        arr[i].index = i;
+    }
+
+    arr[index] = obj;
+    obj.index = index;
+
+    return arr;
+};
+Util.addToIndexedArrayEnd = function (arr, obj) {
+    obj.index = arr.length;
+    arr.push (obj);
+
+    return arr;
+};
 Util.removeFromIndexedArray = function (array, obj) {
-    assert (() => array[obj.index] = obj);
+    assert (() => array[obj.index] === obj);
     var index = obj.index;
 
-    array[index] = array[array.length - 1];
-    array[index].index = index;
+    for (var i = index; i < array.length - 1; i++){
+        array[i] = array[i + 1];
+        array[i].index = i;
+    }
     array.pop();
 };
 
@@ -55,8 +117,8 @@ Util.swapElements = function (array, obj1, obj2) {
 };
 
 Util.swapIndexedElements = function (array, index1, index2) {
-    assert (() => array[index1].index = index1);
-    assert (() => array[index2].index = index2);
+    assert (() => array[index1].index === index1);
+    assert (() => array[index2].index === index2);
 
     var tmp = array[index1];
     array[index1] = array[index2];
@@ -70,6 +132,9 @@ Util.swapIndexedElements = function (array, index1, index2) {
 // date functions
 Util.getISODateOnly = function (date) {
     return new Date(date).toISOString().slice(0, 10);
+};
+Util.fromISODateOnly = function (string) {
+    return new Date(string + "T01:00:00.000Z").valueOf();
 };
 Util.getDateValueFromInputElem = function (elem) {
     return new Date(elem.value + "T01:00:00.000Z").valueOf();
@@ -86,11 +151,15 @@ Util.download = function (filename, string, type, parent) {
     parent.removeChild(a);
 };
 
-Util.upload = function (parent, callback) {
-    var input = Draw.elem ("input", {
+Util.upload = function (parent, callback, type) {
+    var attrs = {
         "type": "file",
         "style": "display:none;"
-    }, parent);
+    };
+    if (type) {
+        attrs["accept"] = type;
+    }
+    var input = Draw.elem ("input", attrs, parent);
 
     var reader = new FileReader();
     reader.onload = () => {
@@ -107,4 +176,70 @@ Util.upload = function (parent, callback) {
     
     input.addEventListener("change", handleFiles);
     input.click();
+};
+
+
+// string functions
+Util.truncate = function (string, length) {
+    if (string.length > length - 3) {
+        return string.slice(0, length - 3) + "...";
+    }
+    return string;
+};
+
+// this functio9n lacks compatibility TODO: create alternative.
+Util.getCSS = function () {
+    var css= [];
+
+    for (var sheeti = 0; sheeti < document.styleSheets.length; sheeti++) {
+        var sheet = document.styleSheets[sheeti];
+        var rules = ('cssRules' in sheet)? sheet.cssRules : sheet.rules;
+        for (var rulei= 0; rulei<rules.length; rulei++) {
+            var rule= rules[rulei];
+            if ('cssText' in rule)
+                css.push(rule.cssText);
+            else
+                css.push(rule.selectorText+' {\n'+rule.style.cssText+'\n}\n');
+        }
+    }
+
+    return css.join('\n');
+};
+
+Util.throttleEvent = function (elem, eventName, callback, time) {
+    time = time || 100;
+    var timer;
+    var throttle = function () {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+        timer = setTimeout(callback, time);
+    };
+    elem.addEventListener(eventName, throttle);
+}
+
+Util.parseCSV = function (str) {
+    var arr = [];
+    var quote = false;  // true means we're inside a quoted field
+    var c, col, row;
+
+    // iterate over each character, keep track of current row and column (of the returned array)
+    for (row = col = c = 0; c < str.length; c++) {
+        var cc = str[c], nc = str[c+1];      
+        arr[row] = arr[row] || [];
+        arr[row][col] = arr[row][col] || '';  
+
+        if (cc == '"' && quote && nc == '"') { arr[row][col] += cc; ++c; continue; }  
+        if (cc == '"') { quote = !quote; continue; }
+        if (cc == ',' && !quote) { ++col; continue; }
+        if (cc == '\r' && nc == '\n' && !quote) { ++row; col = 0; ++c; continue; }
+        if (cc == '\n' && !quote) { ++row; col = 0; continue; }
+        if (cc == '\r' && !quote) { ++row; col = 0; continue; }
+
+        arr[row][col] += cc;
+    }
+    if (arr[arr.length - 1].length === 0) {
+        arr.pop();
+    }
+    return arr;
 };

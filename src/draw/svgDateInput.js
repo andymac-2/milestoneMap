@@ -1,7 +1,11 @@
 'use strict'
 
-Draw.svgDateInput = function (date, alignment, unclicker, onchange, attrs, parent) {
-    this.date;
+/** @constructor
+    @struct */
+Draw.svgDateInput = function (options, date) {
+    /** @type {number} */ this.date;
+
+    var alignment = options.alignment;
 
     switch (alignment) {
     case Draw.ALIGNLEFT:
@@ -15,18 +19,20 @@ Draw.svgDateInput = function (date, alignment, unclicker, onchange, attrs, paren
         break;
     }
 
-    this.unclicker = unclicker;
-    this.onchange = onchange;
-    this.parent = parent;
-    this.attrs = attrs;
+    /** @type {Unclicker} */ this.unclicker = options.unclicker;
+    /** @type {function(Event, Draw.svgDateInput)} */ this.onchange = options.onchange || (() => {});
+    /** @type {Element} */ this.parent = options.parent;
+    /** @type {Object<string>} */ this.attrs = options.attrs || {};
+    /** @type {?number} */ this.min = options.min || null;
+    /** @type {?number} */ this.max = options.max || null;
 
-    this.elem;
+    /** @type {Element} */ this.elem;
 
     this.restore (date);
     this.draw();
 };
 Draw.svgDateInput.HEIGHTWIDTHRATIO = 10;
-Draw.svgDateInput.TEXTTOTEXTBOXRATIO = 1.4
+Draw.svgDateInput.TEXTTOTEXTBOXRATIO = 1.5;
 
 Draw.svgDateInput.prototype.restore = function (date) {
     this.date = date;
@@ -51,17 +57,25 @@ Draw.svgDateInput.prototype.onclick = function (parent) {
         "x": x,
         "y": 0 - height
     }, parent);
-    
-    var dateBox = Draw.htmlElem ("input", {
+
+    var attrs = {
         "class": "svgDateBox",
         "value": Util.getISODateOnly (this.date),
         "type": "date",
         "required": ""
-    }, foreign);
+    };
+    if (this.min) {
+        attrs["min"] = Util.getISODateOnly (this.min);
+    }
+    if (this.max) {
+        attrs["max"] = Util.getISODateOnly (this.max);
+    }
+    
+    var dateBox = Draw.htmlElem ("input", attrs, foreign);
     dateBox.focus();
     dateBox.select();
-    dateBox.addEventListener("change", this.modifyDate.bind(this, dateBox));
-    dateBox.addEventListener("change", e => this.onchange(e, this));
+    dateBox.addEventListener("blur", this.modifyDate.bind(this, dateBox));
+    dateBox.addEventListener("blur", e => this.onchange(e, this));
 };
 
 Draw.svgDateInput.prototype.onunclick = function (parent) {
