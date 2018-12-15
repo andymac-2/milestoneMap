@@ -1,0 +1,336 @@
+body {
+    font-family: sans-serif;
+    overflow: hidden;
+}
+/* overall */
+/* .milestoneMapPage { */
+/*     page-break-after: always; */
+/* } */
+
+/* menu bar */
+.menubar {
+    padding: 0px;
+    
+    display: flex;
+    flex-wrap: wrap;
+}
+.menuBarSegment {
+    border: 1px solid #888;
+    background-color: #f4f4f4;
+    border-radius: 3px;
+    margin: 2px;
+    padding: 2px;
+    
+    height: 55px;
+    overflow: hidden;
+    display: inline-block;
+}
+.menuBarHeader {
+    color: #444;
+    font-size: small;    
+}
+.menuBarContent {
+    text-align: center;
+    color: #444;
+    font-size: small;
+}
+.menuBarContent span {
+    display: inline-block;
+    height: 45px;
+    overflow: hidden;
+}
+.reportSelector {
+    width: 140px;
+    display: inline-block;
+}
+.dropdownSegmentHeading {
+    width: 140px;
+}
+.dropdownSegmentDropdown {
+    width: 90%;
+    display: inline;
+}
+
+/* milestone map total */
+.mMapScrollBox {
+    overflow: auto;
+}
+.milestoneMap {
+    width: 100%;
+    display: block;
+}
+.mMapFixed {
+    width: 100%;
+    display: block;
+}
+
+/* pages */
+.milestoneMapPage { 
+    width: 100%;
+    height: auto;
+}
+
+/* title bar */
+.mMapTitle {
+    font-size: 2em;
+    font-weight: bold;
+}
+.mMapEdgeDate {
+    font-weight: bold;
+}
+.whiteBackground {
+    fill: #FFFFFF
+}
+
+/* reports */
+.reportHeader {
+    font-size: small;
+    fill: #444;
+}
+.reportLine {
+    stroke-width: 2px;
+    stroke: rgba(255, 0, 0, 0.6);
+}
+
+
+/* text input fields */
+.milestoneMap input {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+}
+.svgTextBox, .svgDateBox{
+    margin: 0px;
+    width: 90%;
+    overflow: hidden;
+}
+.milestoneData .svgTextBox, .milestoneData .svgDateBox{
+    width: auto;
+}
+.svgCommentBox {
+    display: block;
+}
+
+/* general */
+.transparent {
+    stroke: none;
+    fill: rgba(0, 0, 0, 1);
+}
+
+/* date headers */
+.even {
+    fill: #fbfbfb;
+}
+.odd {
+    fill: none;
+}
+.dateHeaderSeparator {
+    stroke: black;
+}
+.minorRowText, .majorRowText {
+    font-size: small;
+}
+
+/* Project Headers and comment */
+.projectHeader, .programmeHeader, .headingComment {
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid rgba(0, 0, 0, 0); 
+}
+.clickedActive {
+    border: 1px solid rgb(102, 204, 255);
+}
+.headingComment {
+    color: #a0a0a0;
+    font-size: small;
+    font-style: italic;
+}
+
+.projectLine {
+    stroke: #909090;
+    stroke-dasharray: 6,8;
+    stroke-width: 1;
+}
+
+.businessMsLine {
+    stroke: #d0d0d0;
+    stroke-dasharray: 1,4;
+    stroke-width: 1;
+}
+
+/* milestones */
+.milestone {
+    stroke-width: 1;
+    stroke: #505050;
+}
+.milestoneData {
+    stroke: none;
+    font-size: small;
+}
+.msComment, .dependencyText{
+    stroke: none;
+    fill: #a0a0a0;
+    font-size: small;
+    font-style: italic;
+}
+.milestonePointer {
+    stroke-width: 1;
+    stroke: #C0C0C0;
+}
+
+.milestone .complete {
+    fill: #b0b0b0;
+}
+.milestone .on-track {
+    fill: #33cc33;
+}
+.milestone .at-risk {
+    fill: yellow;
+}
+.milestone .late {
+    fill: red;
+}
+.milestone .previous {
+    fill: white;
+    stroke: gray;
+    /* stroke-dasharray: 2,2; */
+}
+
+.businessMs .milestone {
+    stroke-width: 3;
+    stroke: #0099ff;
+}
+
+.businessMs .milestone .previous {
+    stroke-width: 1;
+    stroke: #505050;
+}
+
+.milestone .compareArrow {
+    fill: rgba(255, 102, 255, 0.5);
+    stroke: none;
+}
+.msAtReport .wide, .project .wide {
+    min-width: 100%;
+    max-width: 100%;
+}
+/* headers  */
+.programmeHeader, .businessMsHeader{
+    font-weight: bold;
+}
+
+/* dependencies */
+.dependency {
+    stroke-width: 3;
+}
+
+.dependency:hover {
+    stroke-width: 6;
+}
+
+.dependencyLineOK, .dependencyArrowOK {
+    stroke: hsl(150, 50%, 85%);
+}
+.dependencyLineOK {
+    fill: none;
+}
+
+.dependencyArrowOK {
+    fill: hsl(150, 50%, 80%);
+}
+
+.dependencyLineLate, .dependencyArrowLate {
+    stroke: hsl(0, 60%, 70%);
+}
+.dependencyLineLate {
+    fill: none;
+}
+
+.dependencyArrowLate {
+    fill: hsl(0, 60%, 70%);
+}
+
+/* Menus */
+.menuEntry circle{
+    fill: hsl(180, 30%, 90%);
+    stroke: none;
+}
+
+
+
+/* priority level pallette */
+/* default */
+.priorityLine{
+    stroke: #4D4D4D;
+    fill: #4D4D4D;
+    stroke-width: 2;
+}
+
+.priorityLine.priority-0 {
+    stroke: #F15854;
+    fill: #F15854;
+}
+.priorityLine.priority-1 {
+    stroke: #5DA5DA;
+    fill: #5DA5DA;
+}
+.priorityLine.priority-2 {
+    stroke: #FAA43A;
+    fill: #FAA43A;
+}
+.priorityLine.priority-3 {
+    stroke: #60BD68;
+    fill: #60BD68;
+}
+.priorityLine.priority-4 {
+    stroke: #F17CB0;
+    fill: #F17CB0;
+}
+.priorityLine.priority-5 {
+    stroke: #B2912F;
+    fill: #B2912F;
+}
+.priorityLine.priority-6 {
+    stroke: #B276B2;
+    fill: #B276B2;
+}
+.priorityLine.priority-7 {
+    stroke: #DECF3F;
+    fill: #DECF3F;
+}
+.priorityLine.slack {
+    stroke: #b0b0b0;
+    stroke-dasharray: 5,5;
+    stroke-width: 1;
+}
+
+.hidden {
+    display: none;
+}
+
+
+
+/* style types */
+.transparentLine {
+    fill: none;
+    stroke: rgba(0, 0, 0, 0%);
+}
+
+.vthick {
+    stroke-width: 8px;
+}
+.thick {
+    stroke-width: 3px;
+}
+
+.evenDashed {
+    stroke-dasharray: 5, 5;
+}
+
+.brightPink {
+    stroke: rgba(255, 102, 255, 0.5);
+}
+
+.noFill {
+    fill: none;
+}
