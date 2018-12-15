@@ -9,7 +9,7 @@ npx google-closure-compiler \
     --create_source_map bundle.js.map\
     --output_wrapper '%output% //# sourceMappingURL=bundle.js.map'\
     -W VERBOSE\
-    -D NDEBUG=false\
+    -D NDEBUG=true\
     ../src/main.js\
     ../src/tests.js\
     ../src/assert.js\
