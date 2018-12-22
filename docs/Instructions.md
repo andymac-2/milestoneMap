@@ -1,5 +1,5 @@
 # Overview
-## What was the problem we were trying to solve?
+## What problem are we were trying to solve?
 For a Programme Manager working in the IT delivery space what we want to monitor (and communicate consitently) at the high level is:
 1. What the projects and programmes are delivering and when (Milestones)?
 2. How confident are we that we will meet that delivery (Health)?
