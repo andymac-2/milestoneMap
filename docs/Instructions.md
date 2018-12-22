@@ -1,4 +1,14 @@
 # Overview
+## What was the problem we were trying to solve?
+For a Programme Manager working in the IT delivery space what we want to monitor (and communicate consitently) at the high level is:
+1. What the projects and programmes are delivering and when (Milestones)?
+2. How confident are we that we will meet that delivery (Health)?
+3. Is the delivery reliant on anything else (Dependency)?
+4. What has changed (Compare)?
+
+What we don't want to do is constantly have to draw up slides to reflect this to our stakeholders.
+
+milestoneMap was developed to capture and report on this information and do comparisons between the status at 2 different dates.
 
 # User Guide
 ## Set Up
