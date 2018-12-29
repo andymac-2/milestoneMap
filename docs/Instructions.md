@@ -12,9 +12,18 @@ milestoneMap was developed to capture and report on this information and do comp
 
 # User Guide
 ## Set Up
+milestoneMap can be installed locally or run from GitHub (recommended).
+
+To run from GitHub use the following URL [https://andymac-2.github.io/milestoneMap/](https://andymac-2.github.io/milestoneMap/)
 
 ## Basics
 ### Creating a milestoneMap
+Creating a milestone Map is as simple as saving the file. 
+
+1. Change the title by selecting the "New Map" text at the top of the page. This will be the name of the .JSON file that is created when you select the "Save" option.
+
+2. Select "Save".
+
 ### Create/Update a Programme
 ### Create/Update a Project
 ### Create/Update a Milestone
@@ -47,7 +56,6 @@ How to write [links](google.com)
 ```
 this is how you write preformetted text
 great for code
-
 hello
 ```
 
