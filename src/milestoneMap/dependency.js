@@ -84,7 +84,6 @@ Dependency.prototype.draw = function () {
     var start = this.dependency.getXY();
     //start.x +=  MsAtReport.DIAMONDSIZE;
     var end = this.dependent.getXY();
-    end.x -=  MsAtReport.DIAMONDSIZE;
 
     // Draw.quadrupleAngledLine (
     //     start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
@@ -107,6 +106,8 @@ Dependency.drawLine = function (start, end, parent) {
         lineClass = "dependencyLineLate"
         arrowClass = "dependencyArrowLate"
     }
+
+    end.x -=  MsAtReport.DIAMONDSIZE;
     
     Draw.sLine (start, end, Dependency.LINESTRENGTH, lineClass, parent);
     Draw.sLine (start, end, Dependency.LINESTRENGTH, "vthick transparentLine",
