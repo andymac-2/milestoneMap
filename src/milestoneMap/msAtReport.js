@@ -76,6 +76,8 @@ MsAtReport.prototype.restore = function (obj) {
     this.comment = obj["comment"];
     this.status = obj["status"];
     this.date = obj["date"];
+    // fix #63: backwards compatibility.
+    this.date -= (this.date % (24 * 60 * 60 * 1000)) - 1
 };
 MsAtReport.prototype.save = function () {
     assert (() => this.mMap.reports[this.report.index] === this.report);
