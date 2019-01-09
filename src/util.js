@@ -134,10 +134,10 @@ Util.getISODateOnly = function (date) {
     return new Date(date).toISOString().slice(0, 10);
 };
 Util.fromISODateOnly = function (string) {
-    return new Date(string + "T01:00:00.000Z").valueOf();
+    return new Date(string + "T00:00:00.000Z").valueOf() + 1;
 };
 Util.getDateValueFromInputElem = function (elem) {
-    return new Date(elem.value + "T01:00:00.000Z").valueOf();
+    return new Date(elem.value + "T00:00:00.000Z").valueOf() + 1;
 };
 
 
