@@ -18,11 +18,14 @@ To run from GitHub use the following URL [https://andymac-2.github.io/milestoneM
 
 ## Basics
 ### Basic screen controls
+#### File and print management
+
 At the top of the screen are the controls for file management, snapshot management and printing.
 
 ![Main controls](./helpfiles/Controls1.png)
 
 **File Controls**
+
 Lets you manage the file the data for milestone map is contained in.
 
 1. Create new map. Creates a *.JSON file.
@@ -32,9 +35,11 @@ Lets you manage the file the data for milestone map is contained in.
 5. Import data from a *.csv file.
 
 **Programme Control**
+
 6. Create a programme heading.
 
 **Comparison Controls**
+
 Comparisons allow you to show the differences (and movements) of milestones between 2 point sin time (snapshots). E.g.compare "last month" to "now" or compare "last month" to "6 months ago".
 
 7. Take a snapshot of the current status.
@@ -43,14 +48,31 @@ Comparisons allow you to show the differences (and movements) of milestones betw
 10. Baseline snapshot. The snapshot you want to compare to.
 
 **Print Controls**
+
 Print the map. There are various pre-defined layouts.
 
 11. Print the milestone map
 12. Pre-defined outputs for the milestone map
 
+![Main controls](./helpfiles/PrintLayouts.png)
+
 **About**
+
 13. Version details, help and logging issues for defects or enhancements.
 
+#### Programme/Project Controls
+Both the programme and project entries have the same common controls
+
+![Main controls](./helpfiles/Controls2.png)
+
+1. Shift programme/project down one.
+	Shifting a programme moves all of the projects in side as well.
+	Shifting a project also allows you to move across to a different programme group.	
+2. Shift programme/project up one.
+3. Delete programme/project.
+4. Add project/milestone.
+	If this is selected for a Programme it will create a "project line.
+	If this is selected for a Project it will create a Milestone as at today's date.
 
 ### Creating a milestoneMap
 Creating a milestone Map is as simple as saving the file. 
