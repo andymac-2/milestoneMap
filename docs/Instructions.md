@@ -34,8 +34,14 @@ Creating a milestone Map is as simple as saving the file.
 
 	e.g. Chrome has settings to prompt for the overwriting or not.
 
-
 ### Create/Update a Programme
+To create a programme:
+
+1. Select the "+" icon which will append a programme group to the canvas.
+
+![Create programme grouping.](./helpfiles/Create_PgM1.png)
+
+
 ### Create/Update a Project
 ### Create/Update a Milestone
 ### Create a Dependency
