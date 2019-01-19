@@ -139,6 +139,12 @@ Util.fromISODateOnly = function (string) {
 Util.getDateValueFromInputElem = function (elem) {
     return new Date(elem.value + "T00:00:00.000Z").valueOf() + 1;
 };
+// a date "standard". To compare the same date with different times, we set
+// it to 1ms into the day.
+Util.standardDate = function (date) {
+    date -= date % (24 * 60 * 60 * 1000)
+    return date + 1
+};
 
 
 //save and restore string
