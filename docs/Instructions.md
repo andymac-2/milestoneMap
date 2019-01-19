@@ -20,9 +20,20 @@ To run from GitHub use the following URL [https://andymac-2.github.io/milestoneM
 ### Creating a milestoneMap
 Creating a milestone Map is as simple as saving the file. 
 
+![Open milestonMap and then 2 steps ...](./helpfiles/SetUP_1.png)
+
 1. Change the title by selecting the "New Map" text at the top of the page. This will be the name of the .JSON file that is created when you select the "Save" option.
 
+![... change the title ...](./helpfiles/Setup_2.png)
+
 2. Select "Save".
+
+![...and select save.](./helpfiles/Setup_3.png)
+
+*Note! Depending on your browser settings you may have different ways presented to you to save the JSON file. Consider if you want to save copies as you progress or maintain a single file that you overwrite each time.*
+
+	e.g. Chrome has settings to prompt for the overwriting or not.
+
 
 ### Create/Update a Programme
 ### Create/Update a Project
