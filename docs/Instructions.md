@@ -17,6 +17,41 @@ milestoneMap can be installed locally or run from GitHub (recommended).
 To run from GitHub use the following URL [https://andymac-2.github.io/milestoneMap/](https://andymac-2.github.io/milestoneMap/)
 
 ## Basics
+### Basic screen controls
+At the top of the screen are the controls for file management, snapshot management and printing.
+
+![Main controls](./helpfiles/Controls1.png)
+
+**File Controls**
+Lets you manage the file the data for milestone map is contained in.
+
+1. Create new map. Creates a *.JSON file.
+2. Open existing map.
+3. Save open file.
+4. Export base data to *.csv file
+5. Import data from a *.csv file.
+
+**Programme Control**
+6. Create a programme heading.
+
+**Comparison Controls**
+Comparisons allow you to show the differences (and movements) of milestones between 2 point sin time (snapshots). E.g.compare "last month" to "now" or compare "last month" to "6 months ago".
+
+7. Take a snapshot of the current status.
+8. Delete a snapshot.
+9. Current snapshot selection (defaults to the current view).
+10. Baseline snapshot. The snapshot you want to compare to.
+
+**Print Controls**
+Print the map. There are various pre-defined layouts.
+
+11. Print the milestone map
+12. Pre-defined outputs for the milestone map
+
+**About**
+13. Version details, help and logging issues for defects or enhancements.
+
+
 ### Creating a milestoneMap
 Creating a milestone Map is as simple as saving the file. 
 
@@ -35,11 +70,15 @@ Creating a milestone Map is as simple as saving the file.
 	e.g. Chrome has settings to prompt for the overwriting or not.
 
 ### Create/Update a Programme
+The concept of "programme" in MilestoneMap is merely a collection of projects. It does not need to reflect an actual programme. It can reflect parts of a programme. The primary advantage is that the contents of the "programme" can me moved up and down as a group (see "Moving projects and programmes"
+
 To create a programme:
 
 1. Select the "+" icon which will append a programme group to the canvas.
 
 ![Create programme grouping.](./helpfiles/Create_PgM1.png)
+
+2. Enter a name for the programme grouping.
 
 
 ### Create/Update a Project
@@ -47,6 +86,7 @@ To create a programme:
 ### Create a Dependency
 ### Printing
 ### Change the date span
+### Moving projects and programmes.
 
 ## Beyond Basics
 ### Import and Export Data
