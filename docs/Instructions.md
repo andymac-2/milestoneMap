@@ -11,6 +11,11 @@ What we don't want to do is constantly have to draw up slides to reflect this to
 milestoneMap was developed to capture and report on this information and do comparisons between the status at 2 different dates.
 
 # User Guide
+## Defects and Enhancements
+If you find a defect or want to request an enhancement send an email to the following address:
+
+  milestonemap@fire.fundersclub.com
+
 ## Set Up
 milestoneMap can be installed locally or run from GitHub (recommended).
 
@@ -79,7 +84,7 @@ Both the programme and project entries have the same common controls
 2. Shift programme/project up one.
 3. Delete programme/project.
 4. Add project/milestone.
-	If this is selected for a Programme it will create a "project line.
+	If this is selected for a Programme it will create a "project" line.
 	If this is selected for a Project it will create a Milestone as at today's date.
 
 #### Milestone Controls
@@ -177,35 +182,10 @@ Projects can be moved up or down using the "Shift Up" and "Shift Down" controls
 ![Shift project up](./helpfiles/MoveUp.png)
 
 ..results in ...
-![Change date](./helpfiles/MoveUp2.png)
+![..after the shift.](./helpfiles/MoveUp2.png)
 *Note! In the above example the project entry was moved up 2 slots.*
 
-## Beyond Basics
-### Import and Export Data
-### Working with a Team
-### Snapshots and Comparisons
-
-# Troubleshooting
-## Known issues
 ## Requesting Support
+If you find a defect or want to request an enhancement send an email to the following address:
 
-# help file
-
-1. this is a list
-2. this is the second item
-
-## subheading
-
-add headers to make smaller headings.
-
-How to make *italics* and **bold** text
-
-How to write [links](google.com)
-
-```
-this is how you write preformetted text
-great for code
-hello
-```
-
-
+  milestonemap@fire.fundersclub.com
