@@ -143,10 +143,17 @@ To create a dependency:
 
 1. Select the milestone that is "supplying". I.e. Delivering something another project needs.
 2. Select the dependency icon.
+
+![Create dependency](./helpfiles/Dependency.png)
+
 3. Click on the milestone that "needs". I.e. It needs the supply milestone.
+
 
 If the "supply" milestone is on the same date or before of the "need" milestone it will show as green (OK). 
 If the "supply" milestone is after the "need" milestone it will show as red (late).
+
+
+![Create dependency](./helpfiles/Dependency2.png)
 
 ### Printing
 To print:
