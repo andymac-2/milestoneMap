@@ -17,6 +17,13 @@ milestoneMap can be installed locally or run from GitHub (recommended).
 To run from GitHub use the following URL [https://andymac-2.github.io/milestoneMap/](https://andymac-2.github.io/milestoneMap/)
 
 ## Basics
+MilstoneMap displays a canvas where business/customer and project milestones can be represented. The period being displayed can be as large or small as required. You are not restricted to entering to just the display view. 
+
+This allows for long term and short terms views to be generated.
+
+The image below provides a summary of the key components of a MilestonMap.
+
+![Main controls](./helpfiles/Overview.png)
 
 ### Basic screen controls
 #### File and print management
