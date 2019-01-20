@@ -23,14 +23,14 @@ This allows for long term and short terms views to be generated.
 
 The image below provides a summary of the key components of a MilestonMap.
 
-![Main controls](./helpfiles/Overview.png)
+![Overview](./helpfiles/Overview.png)
 
 ### Basic screen controls
 #### File and print management
 
 At the top of the screen are the controls for file management, snapshot management and printing.
 
-![Main controls](./helpfiles/Controls1.png)
+![File and print controls](./helpfiles/Controls1.png)
 
 **File Controls**
 
@@ -62,7 +62,7 @@ Print the map. There are various pre-defined layouts.
 11. Print the milestone map
 12. Pre-defined outputs for the milestone map
 
-![Main controls](./helpfiles/PrintLayouts.png)
+![Print layouts](./helpfiles/PrintLayouts.png)
 
 **About**
 
@@ -71,7 +71,7 @@ Print the map. There are various pre-defined layouts.
 #### Programme/Project Controls
 Both the programme and project entries have the same common controls
 
-![Main controls](./helpfiles/Controls2.png)
+![Pgm/Prj controls](./helpfiles/Controls2.png)
 
 1. Shift programme/project down one.
 	Shifting a programme moves all of the projects in side as well.
@@ -84,7 +84,7 @@ Both the programme and project entries have the same common controls
 
 #### Milestone Controls
 
-![Main controls](./helpfiles/MilestoneControls.png)
+![Milestone controls](./helpfiles/MilestoneControls.png)
 
 1. Milestone health. This cycles through Green (on-track), yellow (at-risk), red (late) and grey (complete).
 2. Deletes the milestone.
@@ -121,7 +121,19 @@ To create a programme:
 
 
 ### Create/Update a Project
+To create a project entry:
+1. Select the Programme grouping. This will display the Programme controls.
+2. Select the "+" icon. This will append a new project line to the list of projects in the programme.
+
+![Create programme grouping.](./helpfiles/CreateAPrj.png)
+
 ### Create/Update a Milestone
+To create a Milestone entry:
+1. Select the Project. This will display the project controls.
+2. Select the "+" icon. This will add a new milestone line to the project with default date of today.
+
+![Create programme grouping.](./helpfiles/CreateAMilestone.png)
+
 ### Create a Dependency
 ### Printing
 ### Change the date span
