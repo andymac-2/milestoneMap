@@ -84,6 +84,9 @@ Loader.prototype.draw = function () {
     Draw.iconBar ([{
         icon: "icons/info.svg",
         action: () => alert(Loader.aboutText)
+    }, {
+        icon: "icons/question.svg",
+        action: () => window.open("https://andymac-2.github.io/milestoneMap/instructions")
     }], {}, aboutSegment.body);
 
     this.map.maxHeight = window.innerHeight - Draw.getElemHeight(menubar) - 5;
@@ -240,6 +243,12 @@ Loader.prototype.print = function () {
 
 
 /** @const {string} */ Loader.aboutText = `Milestone Map, Version: ` + VERSION + `
+
+For help and support, please visit:
+
+https://andymac-2.github.io/milestoneMap/instructions
+
+
 
 Copyright 2018 Andrew Pritchard
 
