@@ -86,7 +86,11 @@ Both the programme and project entries have the same common controls
 
 ![Milestone controls](./helpfiles/MilestoneControls.png)
 
-1. Milestone health. This cycles through Green (on-track), yellow (at-risk), red (late) and grey (complete).
+1. Milestone health. This cycles through:
+	1.1 Green (on-track), 
+	1.2 Yellow (at-risk), 
+	1.3 Red (late) and 
+	1.4 Grey (complete).
 2. Deletes the milestone.
 3. Add dependency. Adds a dependency line to another milestone that is dependent (needs) the current milestone to have been met.
 4. Date of milestone. 
@@ -135,9 +139,39 @@ To create a Milestone entry:
 ![Create programme grouping.](./helpfiles/CreateAMilestone.png)
 
 ### Create a Dependency
+To create a dependency:
+
+1. Select the milestone that is "supplying". I.e. Delivering something another project needs.
+2. Select the dependency icon.
+3. Click on the milestone that "needs". I.e. It needs the supply milestone.
+
+If the "supply" milestone is on the same date or before of the "need" milestone it will show as green (OK). 
+If the "supply" milestone is after the "need" milestone it will show as red (late).
+
 ### Printing
+To print:
+
+1. Select the output format.
+2. Click on the print icon.
+
+![Print layouts](./helpfiles/PrintLayouts.png)
+
 ### Change the date span
+Changing the date range displayed is done by changing the "Display Range" vaults on either side of the screen.
+
+![Change date](./helpfiles/DateRange1.png)
+
+..results in ...
+![Change date](./helpfiles/DateRange2.png)
+
 ### Moving projects and programmes.
+Projects can be moved up or down using the "Shift Up" and "Shift Down" controls
+
+![Shift project up](./helpfiles/MoveUp.png)
+
+..results in ...
+![Change date](./helpfiles/MoveUp2.png)
+*Note! In the above example the project entry was moved up 2 slots.*
 
 ## Beyond Basics
 ### Import and Export Data
