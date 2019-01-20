@@ -1,6 +1,6 @@
 # Overview
 ## What problem are we were trying to solve?
-For a Programme Manager working in the IT delivery space what we want to monitor (and communicate consitently) at the high level is:
+For a Programme Manager working in the IT delivery space what we want to monitor (and communicate consistently) at the high level is:
 1. What the projects and programmes are delivering and when (Milestones)?
 2. How confident are we that we will meet that delivery (Health)?
 3. Is the delivery reliant on anything else (Dependency)?
@@ -17,6 +17,7 @@ milestoneMap can be installed locally or run from GitHub (recommended).
 To run from GitHub use the following URL [https://andymac-2.github.io/milestoneMap/](https://andymac-2.github.io/milestoneMap/)
 
 ## Basics
+
 ### Basic screen controls
 #### File and print management
 
@@ -40,7 +41,7 @@ Lets you manage the file the data for milestone map is contained in.
 
 **Comparison Controls**
 
-Comparisons allow you to show the differences (and movements) of milestones between 2 point sin time (snapshots). E.g.compare "last month" to "now" or compare "last month" to "6 months ago".
+Comparisons allow you to show the differences (and movements) of milestones between 2 points in time (snapshots). E.g.compare "last month" to "now" or compare "last month" to "6 months ago".
 
 7. Take a snapshot of the current status.
 8. Delete a snapshot.
@@ -73,6 +74,15 @@ Both the programme and project entries have the same common controls
 4. Add project/milestone.
 	If this is selected for a Programme it will create a "project line.
 	If this is selected for a Project it will create a Milestone as at today's date.
+
+#### Milestone Controls
+
+![Main controls](./helpfiles/MilestoneControls.png)
+
+1. Milestone health. This cycles through Green (on-track), yellow (at-risk), red (late) and grey (complete).
+2. Deletes the milestone.
+3. Add dependency. Adds a dependency line to another milestone that is dependent (needs) the current milestone to have been met.
+4. Date of milestone. 
 
 ### Creating a milestoneMap
 Creating a milestone Map is as simple as saving the file. 
