@@ -158,6 +158,10 @@ Loader.prototype.newReport = function () {
     this.draw();
 };
 Loader.prototype.deleteCurrReport = function () {
+    if (this.map.reports.length <= 1) {
+        return;
+    }
+
     this.map.currReport.deleteThis();
     this.draw();
 };
