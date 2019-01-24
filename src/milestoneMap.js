@@ -551,13 +551,17 @@ MilestoneMap.prototype.modifyName = function (e, input) {
 
 // called by svgDateInput change of date will require complete redraw.
 MilestoneMap.prototype.modifyStartDate = function (e, input) {
-    this.start = input.date;
+    if (input.date <= this.end) {
+        this.start = input.date;
+    }
     this.draw();
 };
 
 // called by svgDateInput change of date will require complete redraw.
 MilestoneMap.prototype.modifyEndDate = function (e, input) {
-    this.end = input.date;
+    if (input.date >= this.start) {
+        this.end = input.date;
+    }
     this.draw();
 };
 
