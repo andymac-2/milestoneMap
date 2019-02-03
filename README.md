@@ -12,7 +12,7 @@ For help using the actual tool itself, visit [the help file](docs/instructions.m
 
 Key features: Able to show the health of individual milestones.
 
-## Bssic usage
+## Basic usage
 
 Clone this repository. Open `src/index.html` for a debug build. The latest stable release pre built will be available at `docs/index.html`. 
 
