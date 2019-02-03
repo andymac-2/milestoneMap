@@ -8,4 +8,23 @@ It allows programme and delivery managers to get an view of the overall status o
 
 This is not a project management tool, rather a programme reporting tool.
 
+For help using the actual tool itself, visit [the help file](docs/instructions.md)
+
 Key features: Able to show the health of individual milestones.
+
+## Bssic usage
+
+Clone this repository. Open `src/index.html` for a debug build. The latest stable release pre built will be available at `docs/index.html`. 
+
+## Build from source
+
+You will need to install `npm` to build milestoneMap from source. MilestoneMap will work without compilation if you open `src/index.html`.
+
+After you have installed npm navigage to the source directory and run
+
+```
+npm init
+make
+```
+
+A build of the source will appear in the `dist` directory. To build again, simply run `make`
