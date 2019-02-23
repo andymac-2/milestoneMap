@@ -233,7 +233,14 @@ Project.prototype.getHeight = function () {
 };
 
 // call this if the height changes.
+// This will not deselect the project name on each line
 Project.prototype.reflowUp = function () {
+    this.programme.reflow();
+    this.mMap.reflow();
+};
+// call this if the project might move to a different programme
+// this will deselect the project name/comment if you create a new line.
+Project.prototype.reflowMove = function () {
     this.programme.draw();
     this.mMap.reflow();
 };
@@ -359,7 +366,7 @@ Project.prototype.moveUp = function () {
         var programme = this.programme;
         this.moveUpProgramme();
         programme.draw();
-        this.reflowUp();
+        this.reflowMove();
         return;
     }
 
@@ -380,7 +387,7 @@ Project.prototype.moveDown = function () {
         var programme = this.programme;
         this.moveDownProgramme();
         programme.draw();
-        this.reflowUp();
+        this.reflowMove();
         return;
     }
 
