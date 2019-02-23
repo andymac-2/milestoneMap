@@ -74,8 +74,7 @@ Draw.svgDateInput.prototype.onclick = function (parent) {
     var dateBox = Draw.htmlElem ("input", attrs, foreign);
     dateBox.focus();
     dateBox.select();
-    dateBox.addEventListener("blur", this.modifyDate.bind(this, dateBox));
-    dateBox.addEventListener("blur", e => this.onchange(e, this));
+    dateBox.addEventListener("blur", e => this.modifyDate(dateBox, e));
 };
 
 Draw.svgDateInput.prototype.onunclick = function (parent) {
@@ -87,6 +86,9 @@ Draw.svgDateInput.prototype.onunclick = function (parent) {
     normalText.textContent = Util.getISODateOnly (this.date);
 };
 
-Draw.svgDateInput.prototype.modifyDate = function (elem) {
-    this.date = Util.getDateValueFromInputElem (elem);
+Draw.svgDateInput.prototype.modifyDate = function (elem, evt) {
+    if (elem.value !== "") {
+        this.date = Util.getDateValueFromInputElem (elem);
+    }
+    this.onchange (evt, this);
 };
