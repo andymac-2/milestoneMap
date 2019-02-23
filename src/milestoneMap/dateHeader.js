@@ -169,7 +169,6 @@ DateHeader.prototype.draw = function () {
         y += DateHeader.ROWHEIGHT;
     }
 
-    // TODO all calls to Draw.getElemHEight replaced with something printer friendly
     if (rows.length > 1) {
         this.drawRow(y, "100%", rows[rows.length - 2],
                      this.drawHighlightedBox.bind(this));

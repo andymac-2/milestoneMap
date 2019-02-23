@@ -1,4 +1,4 @@
-var VERSION = "1.2.3\u03B2";
+var VERSION = "1.2.4\u03B2";
 
 window.onload = function () {
     if (!NDEBUG) {
@@ -8,6 +8,3 @@ window.onload = function () {
 
     new Loader (app);
 }
-
-
-
