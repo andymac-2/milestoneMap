@@ -74,6 +74,8 @@ body {
 .mMapTitle {
     font-size: 2em;
     font-weight: bold;
+    margin: 4px;
+    text-align: center;
 }
 .mMapEdgeDate {
     font-weight: bold;
@@ -140,6 +142,10 @@ body {
 .clickedActive {
     border: 1px solid rgb(102, 204, 255);
 }
+.notClickedActive {
+    border: 1px solid rgba(0, 0, 0, 0);
+}
+
 .headingComment {
     color: #a0a0a0;
     font-size: small;

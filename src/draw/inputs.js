@@ -67,11 +67,13 @@ Draw.editableParagraph.prototype.draw = function () {
 Draw.editableParagraph.prototype.onUnClick = function () {
     this.elem.textContent = this.text || this.defaultText;
     this.elem.classList.remove("clickedActive");
+    this.elem.classList.add("notClickedActive");
 };
 
 Draw.editableParagraph.prototype.activate = function () {
     this.elem.textContent = this.text;
     this.elem.classList.add("clickedActive");
+    this.elem.classList.remove("notClickedActive");
 };
 
 Draw.editableParagraph.prototype.onClick = function () {

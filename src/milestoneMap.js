@@ -188,7 +188,6 @@ MilestoneMap.prototype.drawPrint = function () {
 
     this.programmes.forEach(programme => programme.draw());
 
-    var reportNode = this.currReport.drawLine();
     var businessMsNode = this.businessMs.draw();
 
     var programmei = 0;
@@ -204,8 +203,9 @@ MilestoneMap.prototype.drawPrint = function () {
                 (this.pageSize.width * MilestoneMap.prototype.PX_PER_MM) + " " +
                 (this.pageSize.height * MilestoneMap.prototype.PX_PER_MM),
         }, this.printElem);
-
-        var yoffset = new DateHeader (this, page).endy;
+        
+        this.dateHeader = new DateHeader (this, page);
+        var yoffset = this.dateHeader.endy;
         
         var clone = businessMsNode.cloneNode(true);
         clone.setAttribute("transform", "translate(0, " + yoffset + ")");
@@ -254,6 +254,7 @@ MilestoneMap.prototype.drawPrint = function () {
             }
         } while (programmei < this.programmes.length);
         
+        var reportNode = this.currReport.drawLine();
         page.appendChild(reportNode.cloneNode(true));
         pageNo ++;
     } while (programmei < this.programmes.length);
@@ -300,6 +301,8 @@ MilestoneMap.prototype.reflow = function () {
         MilestoneMap.SPACEFORFIRSTPROJECT, this.programmes);
     mainHeight = mainHeight < bodyHeight ? bodyHeight : mainHeight;
     this.elemMain.setAttribute("height", mainHeight);
+
+    this.currReport.drawLine();
     
     this.drawDependencies();
 };

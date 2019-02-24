@@ -21,10 +21,16 @@ var DateHeader = function (mMap, parentHeader, parentMain) {
         "class": "dateHeader"
     }, parentMain);
 
+    /** @type {Element} */ this.headingBox;
+    /** @type {Element} */ this.nonTitle;
+
+
     // view model
     /** @type {MilestoneMap} */ this.mMap = mMap;
     /** @type {number} */ this.titleWidth = 0;
     /** @type {number} */ this.endy;
+    /** @type {number} */ this.rowHeight;
+
 
     this.draw();
 };
@@ -115,8 +121,8 @@ DateHeader.getDecade = function (date) {
     return ("" + decade + "'s");
 };
 
-DateHeader.TITLEY = 30;
-DateHeader.ROWY = 50;
+DateHeader.DATEYOFFSET = -5;
+DateHeader.ROWMARGIN = 20;
 DateHeader.ROWHEIGHT = 20;
 DateHeader.TEXTOFFSET = 15;
 DateHeader.BUFFERHEIGHT = 10;
@@ -137,6 +143,11 @@ DateHeader.prototype.draw = function () {
     
     // drawing the header
     this.drawTitle();
+    this.fgElem.setAttribute(
+        "transform", "translate(0 " + this.headingBox.height + ")");
+    this.bgElem.setAttribute(
+        "transform", "translate(0 " + this.headingBox.height + ")");
+    
     this.drawEndDates();
     this.drawReports();
     
@@ -162,7 +173,7 @@ DateHeader.prototype.draw = function () {
         rows.push(DateHeader.DAYS);
     }
 
-    var y = DateHeader.ROWY;
+    var y = DateHeader.ROWMARGIN;
     for (var i = 0; i < rows.length - 2; i++) {
         this.drawRow(y, DateHeader.ROWHEIGHT, rows[i],
                      this.drawHighlightedBox.bind(this));
@@ -187,8 +198,8 @@ DateHeader.prototype.draw = function () {
                      this.drawBGBox.bind(this));
         this.endy = y + DateHeader.ROWHEIGHT;
     }
-
-    this.endy += DateHeader.BUFFERHEIGHT;
+    this.rowHeight = this.endy;
+    this.endy += DateHeader.BUFFERHEIGHT + this.headingBox.height;
     
     Draw.svgElem ("rect", {
         "x" : 0, "y": 0,
@@ -292,17 +303,54 @@ DateHeader.prototype.drawRow = function (y1, height, interval, drawfunc) {
     };
 };
 
+DateHeader.TITLEMARGIN = 60;
+DateHeader.PARAGRAPHMARGIN = 4;
 DateHeader.prototype.drawTitle = function () {
-    var g = Draw.svgElem ("g", {}, this.fgElem);
-    new Draw.svgTextInput (
-        this.mMap.name, Draw.ALIGNCENTER, this.mMap.unclicker,
-        this.mMap.modifyName.bind(this.mMap), {
-            "transform": "translate(" +
-                (this.mMap.width / 2) + " " +
-                DateHeader.TITLEY + ")",
-            "class": "mMapTitle"
-        }, g, "Untitled");
+    var x = DateHeader.REPORTMARGIN + DateHeader.TITLEMARGIN;
+    var g = Draw.svgElem ("g", {
+        "transform": "translate(" + x + " 0)",
+    }, this.fgElem);
+
+    var usableWidth = this.mMap.width - 
+        2 * DateHeader.REPORTMARGIN - 2 * DateHeader.TITLEMARGIN;
+    this.headingBox = new Draw.vertResizableForeign (
+        usableWidth, DateHeader.PARAGRAPHMARGIN, {}, g);
+    
+    new Draw.editableParagraph (this.mMap.name, {
+        unclicker: this.mMap.unclicker,
+        defaultText: "Untitled",
+        onchange: this.mMap.modifyName.bind(this.mMap)
+    }, {
+        "class": "mMapTitle"
+    }, this.headingBox.container);
+    
+    this.headingBox.update();
+    this.fgElem.setAttribute(
+        "transform", "translate(0 " + this.headingBox.height + ")");
+    this.headingBox.elem.addEventListener (
+        "verticalResize", this.adjustHeight.bind(this));
+
+    return this.headingBox.height;
 };
+DateHeader.prototype.adjustHeight = function () {
+    var oldHeight = this.endy;
+   //   this.headingBox.elem.setAttribute(
+   //     "transform", "translate(0 " + this.headingBox.height + ")");
+
+    this.fgElem.setAttribute(
+        "transform", "translate(0 " + this.headingBox.height + ")");
+    this.bgElem.setAttribute(
+        "transform", "translate(0 " + this.headingBox.height + ")");
+    this.endy = this.getHeight();
+    this.reflowUp();
+};
+DateHeader.prototype.getHeight = function () {
+    return this.rowHeight + DateHeader.BUFFERHEIGHT + this.headingBox.height;
+};
+DateHeader.prototype.getReportLineStartY = function () {
+    return this.headingBox.height + DateHeader.ROWMARGIN;
+};
+
 
 DateHeader.TWODAYS = 172800000;
 DateHeader.prototype.drawEndDates = function () {
@@ -314,7 +362,7 @@ DateHeader.prototype.drawEndDates = function () {
         max: this.mMap.end - DateHeader.TWODAYS,
         alignment: Draw.ALIGNLEFT,
         attrs: {
-            "transform": "translate(10 " + DateHeader.TITLEY + ")",
+            "transform": "translate(10 " + DateHeader.DATEYOFFSET + ")",
             "class":  "mMapEdgeDate"
         }
     }, this.mMap.start);
@@ -329,21 +377,27 @@ DateHeader.prototype.drawEndDates = function () {
         attrs: {
             "transform": "translate(" + 
                 (this.mMap.width - 10) + " " +
-                DateHeader.TITLEY + ")",
+                DateHeader.DATEYOFFSET  + ")",
             "class": "mMapEdgeDate"
         }
     }, this.mMap.end);
 };
 
+DateHeader.REPORTMARGIN = 250
 DateHeader.prototype.drawReports = function () {
-    var x = this.mMap.width - 250;
+    var x = this.mMap.width - DateHeader.REPORTMARGIN;
     this.mMap.currReport.drawHeader ({
-        "transform": "translate(" + x + ", 25)"
+        "transform": "translate(" + x + ", " + DateHeader.DATEYOFFSET  + ")"
     }, this.fgElem);
 
     if (this.mMap.currReport !== this.mMap.cmpReport) {
         this.mMap.cmpReport.drawHeader ({
-            "transform": "translate(250, 25)"
+            "transform": "translate(" + DateHeader.REPORTMARGIN + 
+                ", " + DateHeader.DATEYOFFSET  + ")"
         }, this.fgElem);
     }   
 };
+
+DateHeader.prototype.reflowUp = function () {
+    this.mMap.reflow();
+}

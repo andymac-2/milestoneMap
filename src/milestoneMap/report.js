@@ -80,8 +80,9 @@ Report.prototype.drawLine = function () {
 
     var x = this.mMap.getXCoord(this.date);
 
+    var startY = this.mMap.dateHeader.getReportLineStartY();
     Draw.svgElem("line", {
-        "x1": x, "y1": DateHeader.ROWY,
+        "x1": x, "y1": startY,
         "x2": x, "y2":"100%"
     }, this.lineElem);
 
