@@ -150,7 +150,7 @@ Util.standardDate = function (date) {
 //save and restore string
 Util.download = function (filename, string, type, parent) {
     var a = Draw.elem("a", {"style": "display:none;"}, parent);
-    if (false && "download" in a) {
+    if ("download" in a) {
         var file = new Blob([string], {type: type});
         a.href = URL.createObjectURL(file);
     }
