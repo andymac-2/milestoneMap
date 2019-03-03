@@ -150,8 +150,13 @@ Util.standardDate = function (date) {
 //save and restore string
 Util.download = function (filename, string, type, parent) {
     var a = Draw.elem("a", {"style": "display:none;"}, parent);
-    var file = new Blob([string], {type: type});
-    a.href = URL.createObjectURL(file);
+    if (false && "download" in a) {
+        var file = new Blob([string], {type: type});
+        a.href = URL.createObjectURL(file);
+    }
+    else {
+        a.href = "data:application/octet-stream," + encodeURIComponent(string);
+    }
     a.download = filename;
     a.click();
     parent.removeChild(a);

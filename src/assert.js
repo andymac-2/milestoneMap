@@ -1,23 +1,21 @@
 'use strict'
-
 /** @define {boolean} */
-var NDEBUG = false;
+const NDEBUG = false;
+
+class AssertionError extends Error {
+    constructor (msg) {
+        super ("Assertion failed : " + msg);
+        this.name = "AssertionError"
+    }
+}
 
 // runtime check, check for user errors.
-var runTAssert = function (test) {
+let runTAssert = function (test) {
     if (test()) {
         return;
     }
-    console.assert (false, test.toString());
-    console.trace();
-    throw Error (test.toString());
+    throw new AssertionError (test.toString());
 };
 
 // debug check
-var assert = NDEBUG === true ? () => {} : test => {
-    if (test()) {
-        return;
-    }
-    console.assert (false, test.toString());
-    console.trace();
-};
+var assert = NDEBUG === true ? () => {} : runTAssert;
