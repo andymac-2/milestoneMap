@@ -1,10 +1,3 @@
-.PHONY : webapp electron
-webapp : dist/bundle.js dist/main.css dist/index.html icons
-electron : webapp dist/package.json dist/main.js
-	npx electron-packager dist MilestoneMap --overwrite --all --out=bin
-	rm dist/package.json
-
-
 files = src/main.js\
     src/tests.js\
     src/assert.js\
@@ -30,26 +23,47 @@ files = src/main.js\
     src/onUnclick.js\
     src/util.js
 
+.PHONY : webapp debug release
+webapp : dist/bundle.js dist/main.css dist/index.html dist/icons
+# debug will force a compilation
+debug : dist/main.css dist/index.html dist/icons
+	npx google-closure-compiler\
+		-O ADVANCED\
+		--js_output_file dist/bundle.js\
+		--create_source_map dist/bundle.js.map\
+		--output_wrapper '%output% //# sourceMappingURL=bundle.js.map'\
+		-W VERBOSE\
+		--debug\
+		--use_types_for_optimization\
+		$(files)
+release : docs/main.css docs/index.html docs/bundle.js docs/icons
 
-dist/bundle.js : $(files)
+dist :
+	mkdir dist
+dist/bundle.js : $(files) dist
 	npx google-closure-compiler \
 		-O ADVANCED\
-    	--js_output_file dist/bundle.js\
-    	--create_source_map dist/bundle.js.map\
-    	--output_wrapper '%output% //# sourceMappingURL=bundle.js.map'\
-    	-W VERBOSE\
-    	-D NDEBUG=true\
+		--js_output_file dist/bundle.js\
+		--isolation_mode IIFE\
+		--assume_function_wrapper\
+		-W VERBOSE\
+		-D NDEBUG=true\
+		--use_types_for_optimization\
 		$(files)
-dist/main.css : src/main.css
+dist/main.css : src/main.css dist
 	cp src/main.css dist/main.css
-dist/index.html : src/dist/index.html
+dist/index.html : src/dist/index.html dist
 	cp src/dist/index.html dist/index.html
-.PHONY : icons
-icons : 
+dist/icons : dist
 	cp -R src/icons dist
 
-
-dist/package.json : src/electron_package.json
-	cp src/electron_package.json dist/package.json
-dist/main.js : src/main.js
-	cp src/electron_main.js dist/main.js
+docs :
+	mkdir docs
+docs/main.css : dist/main.css docs
+	cp dist/main.css docs/main.css
+docs/index.html : dist/index.html docs
+	cp dist/index.html docs/index.html
+docs/bundle.js : dist/bundle.js docs
+	cp dist/bundle.js docs/bundle.js
+docs/icons : docs
+	cp -R src/icons docs

@@ -296,8 +296,9 @@ MsAtReport.prototype.removeDependent = function (dependent) {
 
 // events
 MsAtReport.prototype.diamondOnClick = function () {
-    if (this.mMap.globalMode === MilestoneMap.CREATEDEPENDENCY) {
-        if (this.isBusinessMs()) {
+    if (this.mMap.globalMode === MilestoneMap.CREATEDEPENDENCY) 
+    {
+        if (this.isBusinessMs() || this.isComparison()) {
             return;
         };
         var dep = this.mMap.addDependency ({
@@ -306,9 +307,8 @@ MsAtReport.prototype.diamondOnClick = function () {
             "dependent": this.milestone.index
         });
         dep.draw();
-    };
-
-    if (this.isComparison() && !this.milestone.currentReport()) {
+    }
+    else if (this.isComparison() && !this.milestone.currentReport()) {
         var obj = {
             "milestone": this.milestone.index,
             "report": this.mMap.currReport.index,

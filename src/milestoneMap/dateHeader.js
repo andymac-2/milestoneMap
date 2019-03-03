@@ -21,7 +21,7 @@ var DateHeader = function (mMap, parentHeader, parentMain) {
         "class": "dateHeader"
     }, parentMain);
 
-    /** @type {Element} */ this.headingBox;
+    /** @type {Draw.vertResizableForeign} */ this.headingBox;
     /** @type {Element} */ this.nonTitle;
 
 
