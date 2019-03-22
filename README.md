@@ -4,7 +4,7 @@
 
 Milestone Map is a programme reporting tool that shows the progress of multiple programmes and projects based on key milestones.
 
-It allows programme and delivery managers view the overall status of programmes and projects within the context of associated "organisational milestones".
+It allows programme and delivery managers to view the overall status of programmes and projects within the context of associated "organisational milestones".
 
 Please note that this is not a project management tool but rather a programme reporting tool.
 
