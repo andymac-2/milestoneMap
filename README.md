@@ -4,7 +4,7 @@
 
 Milestone Map is a programme reporting tool to show the progress of multiple programmes and projects based on the key milestones.
 
-It allows programme and delivery managers to get an view of the overall status of programmes and projects and in the context of associated "organisational milestones".
+It allows programme and delivery managers to get a view of the overall status of programmes and projects and in the context of associated "organisational milestones".
 
 This is not a project management tool, rather a programme reporting tool.
 
@@ -20,7 +20,7 @@ Clone this repository. Open `src/index.html` for a debug build. The latest stabl
 
 You will need to install `npm` to build milestoneMap from source. MilestoneMap will work without compilation if you open `src/index.html`.
 
-After you have installed npm navigage to the source directory and run
+After you have installed npm navigate to the source directory and run
 
 ```
 npm init
