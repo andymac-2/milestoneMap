@@ -233,33 +233,36 @@ body {
 .dependency:hover {
     stroke-width: 6;
 }
+
 .dependencyLineOK, .dependencyArrowOK {
     stroke: hsl(150, 50%, 85%);
 }
 .dependencyLineOK {
     fill: none;
 }
+
 .dependencyArrowOK {
     fill: hsl(150, 50%, 80%);
 }
+
 .dependencyLineLate, .dependencyArrowLate {
     stroke: hsl(0, 60%, 70%);
 }
 .dependencyLineLate {
     fill: none;
 }
+
 .dependencyArrowLate {
     fill: hsl(0, 60%, 70%);
 }
 
 /* Menus */
-.menuEntry {
-    cursor: pointer;
-}
 .menuEntry circle{
     fill: hsl(180, 30%, 90%);
     stroke: none;
 }
+
+
 
 /* priority level pallette */
 /* default */
@@ -268,6 +271,7 @@ body {
     fill: #4D4D4D;
     stroke-width: 2;
 }
+
 .priorityLine.priority-0 {
     stroke: #F15854;
     fill: #F15854;
@@ -305,9 +309,12 @@ body {
     stroke-dasharray: 5,5;
     stroke-width: 1;
 }
+
 .hidden {
     display: none;
 }
+
+
 
 /* style types */
 .transparentLine {

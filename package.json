@@ -28,6 +28,8 @@
   },
   "homepage": "https://github.com/andymac-2/milestoneMap#readme",
   "devDependencies": {
+    "electron": "^2.0.8",
+    "electron-packager": "^12.1.0",
     "google-closure-compiler": "^20180506.0.0"
   }
 }
