@@ -2,30 +2,31 @@
 
 (C) Andrew Pritchard 2018
 
-Milestone Map is a programme reporting tool that shows the progress of multiple programmes and projects based on key milestones.
+Milestone Map is a programme reporting tool that displays the progress of multiple programmes and projects based on key milestones.
 
-It allows programme and delivery managers to view the overall status of programmes and projects within the context of associated "organisational milestones".
+Milestone Map allows programme and delivery managers to view the overall status of programmes and projects within the context of associated "organisational milestones".
 
-Please note that this is not a project management tool but rather a programme reporting tool.
+# Note
+Milestone Map is not a project management tool but a programme reporting tool.
 
-For help on using the tool itself, please visit [the help file](docs/instructions.md).
+For help on using the tool, please visit [the help file](docs/instructions.md).
 
-Key features: 
+Key feature: 
 - Able to show the health of individual milestones
 
 ## Installation
 
-Clone this repository. Open `src/index.html` for a debug build. A prebuilt copy of the latest stable release will be available at `docs/index.html`. 
+Clone repository using command `git clone https://github.com/andymac-2/milestoneMap.git`. Open `src/index.html` for a debug build. A prebuilt copy of the latest stable release will be available at `docs/index.html`. 
 
 ## Build from source
 
 You will need to install `npm` to build milestoneMap from source. Alternatively, MilestoneMap works without compilation if you open `src/index.html`.
 
-After you have installed npm, navigate to the source directory and run: 
+After npm installation, navigate to the source directory and run: 
 
 ```
 npm init
 make
 ```
 
-A build of the source will appear in the `dist` directory. To build again, simply run `make`.
+A build of the source will appear in the `dist` directory. To build again, run `make`.
