@@ -2,12 +2,12 @@
 
 (C) Andrew Pritchard 2018
 
-Milestone Map is a program reporting tool that displays the progress of multiple programmes and projects based on key milestones.
+Milestone Map is a programme reporting tool that displays the progress of multiple programmes and projects based on key milestones.
 
-Milestone Map allows program and delivery managers to view the overall status of programs and projects within the context of associated "organisational milestones".
+Milestone Map allows programme and delivery managers to view the overall status of programmes and projects within the context of associated "organisational milestones".
 
 # Note
-Milestone Map is not a project management tool but a program reporting tool.
+Milestone Map is not a project management tool but a programme reporting tool.
 
 For help on using the tool, please visit [the help file](docs/instructions.md).
 
