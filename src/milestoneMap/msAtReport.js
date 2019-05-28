@@ -204,7 +204,7 @@ MsAtReport.prototype.resolveStatusClass = function () {
                 return "late";
         }
     }
-    else if (this.mMap.cmpReport === this.report) {
+    else if (this.isComparison()) {
         return "previous";
     }
     assert(() => false);
@@ -296,7 +296,7 @@ MsAtReport.prototype.removeDependent = function (dependent) {
 // events
 MsAtReport.prototype.diamondOnClick = function () {
     if (this.mMap.globalMode === MilestoneMap.CREATEDEPENDENCY) {
-        if (this.isBusinessMs() || this.isComparison()) {
+        if (this.isBusinessMs() || !this.isCurrent()) {
             return;
         };
         var dep = this.mMap.addDependency({
