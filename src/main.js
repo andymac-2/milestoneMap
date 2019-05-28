@@ -1,4 +1,4 @@
-var VERSION = "1.2.6\u03B2";
+var VERSION = "1.2.7\u03B2";
 
 window.onload = function () {
     if (!NDEBUG) {

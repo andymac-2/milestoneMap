@@ -47,7 +47,6 @@ dist/bundle.js : $(files) dist
 		--isolation_mode IIFE\
 		--assume_function_wrapper\
 		-W VERBOSE\
-		-D NDEBUG=true\
 		--use_types_for_optimization\
 		$(files)
 dist/main.css : src/main.css dist
