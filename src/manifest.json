@@ -1,0 +1,14 @@
+{
+    "name": "MilestoneMap",
+    "description": "Milestone Reporting Tool",
+    "version": "1.2.7",
+    "manifest_version": 2,
+    "app": {
+        "background": {
+            "scripts": [
+                "chrome_app.js"
+            ]
+        }
+    },
+    "icons": {}
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Google Picker Example</title>
+
+    <script type="text/javascript">
+        function onApiLoad() {
+            let sl = new SaveLoad();
+            document.getElementById("auth")
+                .addEventListener("click", () => sl.open());
+        }
+
+    </script>
+</head>
+
+<body>
+    <button type="button" id="auth">Authenticate</button>
+
+    <div id="result"></div>
+
+    <script src="assert.js"></script>
+    <script src="saveLoad.js"></script>
+    <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=onApiLoad"></script>
+</body>
+
+</html>
