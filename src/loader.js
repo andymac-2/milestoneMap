@@ -4,39 +4,40 @@
     @struct */
 var Loader = function (parent) {
     //view
-    /** @type {Element} */ 
-    this.elem = Draw.htmlElem ("div", {
+    /** @type {Element} */
+    this.elem = Draw.htmlElem("div", {
         "class": "milestoneMapContainer"
     }, parent);
 
     /** @type {MilestoneMap} */ this.map;
     /** @type {Element} */ this.parent = parent;
+    /** @type {SaveLoad} */ this.saveLoad = new SaveLoad();
 
-    Util.throttleEvent (window, "resize", this.draw.bind(this), 100);
+    Util.throttleEvent(window, "resize", this.draw.bind(this), 100);
 
     this.newFile();
 };
 
 Loader.prototype.save = function () {
     var string = JSON.stringify(this.map.save(), null, "\t");
-    Util.download (this.map.name + ".json", string, "application/json",
-                   this.elem);
+    this.saveLoad.save(() => { }, this.map.name, string);
+    // Util.download (this.map.name + ".json", string, "application/json",
+    //                this.elem);
 };
 
-Loader.prototype.restore = function (string) {
-    var obj = JSON.parse(string);
+Loader.prototype.restore = function (obj) {
     this.map = new MilestoneMap(obj);
 };
 
 Loader.prototype.draw = function () {
     this.elem.innerHTML = "";
-    
-    var menubar = Draw.htmlElem ("div", {
+
+    var menubar = Draw.htmlElem("div", {
         "class": "menubar"
     }, this.elem);
 
     var fileSegment = Draw.menuBarSegment("File", menubar);
-    Draw.iconBar ([{
+    Draw.iconBar([{
         icon: "icons/new.svg",
         action: this.newFile.bind(this)
     }, {
@@ -45,7 +46,7 @@ Loader.prototype.draw = function () {
     }, {
         icon: "icons/save.svg",
         action: this.save.bind(this)
-    },  {
+    }, {
         icon: "icons/exportCSV.svg",
         action: this.exportCSV.bind(this)
     }, {
@@ -60,7 +61,7 @@ Loader.prototype.draw = function () {
     }], {}, programmeSegment.body);
 
     var reportSegment = Draw.menuBarSegment("Comparison", menubar);
-    Draw.iconBar ([{
+    Draw.iconBar([{
         icon: "icons/camera.svg",
         action: this.newReport.bind(this)
     }, {
@@ -71,17 +72,17 @@ Loader.prototype.draw = function () {
     this.map.reportSelectors();
     reportSegment.body.appendChild(this.map.elemReportSelectors);
 
-    var printSegment = Draw.menuBarSegment ("Print", menubar);
-    Draw.iconBar ([{
+    var printSegment = Draw.menuBarSegment("Print", menubar);
+    Draw.iconBar([{
         icon: "icons/print.svg",
         action: this.print.bind(this)
     }], {}, printSegment.body);
-    this.printSizeSelector ({
+    this.printSizeSelector({
         "class": "pageSizeSelector"
     }, printSegment.body);
 
-    var aboutSegment = Draw.menuBarSegment ("About", menubar);
-    Draw.iconBar ([{
+    var aboutSegment = Draw.menuBarSegment("About", menubar);
+    Draw.iconBar([{
         icon: "icons/info.svg",
         action: () => alert(Loader.aboutText)
     }, {
@@ -98,20 +99,20 @@ Loader.prototype.draw = function () {
 // correspond to Loader.PAGESIZENAMES
 /** @const {number} */ Loader.PAGEMARGIN = 35;
 /** @const {Array<Object<number>>}*/ Loader.PAGESIZES = [
-    {height: 1682, width: 2378},
-    {height: 1189, width: 1682},
-    {height: 841, width: 1189},
-    {height: 594, width: 841},
-    {height: 420, width: 594},
-    {height: 297, width: 420},
-    {height: 210, width: 297},
-    {width: 1682, height: 2378},
-    {width: 1189, height: 1682},
-    {width: 841, height: 1189},
-    {width: 594, height: 841},
-    {width: 420, height: 594},
-    {width: 297, height: 420},
-    {width: 210, height: 297},
+    { height: 1682, width: 2378 },
+    { height: 1189, width: 1682 },
+    { height: 841, width: 1189 },
+    { height: 594, width: 841 },
+    { height: 420, width: 594 },
+    { height: 297, width: 420 },
+    { height: 210, width: 297 },
+    { width: 1682, height: 2378 },
+    { width: 1189, height: 1682 },
+    { width: 841, height: 1189 },
+    { width: 594, height: 841 },
+    { width: 420, height: 594 },
+    { width: 297, height: 420 },
+    { width: 210, height: 297 },
 ].map(elem => {
     if (elem.width > elem.height) {
         return {
@@ -145,7 +146,7 @@ Loader.prototype.printSizeSelector = function (attrs, parent) {
     var onchange = (evt) => {
         this.map.pageSize = Loader.PAGESIZES[evt.currentTarget.value];
     }
-    Draw.dropDownSegment (
+    Draw.dropDownSegment(
         "Page Size:", onchange, Loader.PAGESIZENAMES, attrs, parent);
 };
 
@@ -154,7 +155,7 @@ Loader.prototype.printSizeSelector = function (attrs, parent) {
 
 // user events
 Loader.prototype.newReport = function () {
-    this.map.addReport ({"name": "New Report", "date": this.map.defaultDate()});
+    this.map.addReport({ "name": "New Report", "date": this.map.defaultDate() });
     this.draw();
 };
 Loader.prototype.deleteCurrReport = function () {
@@ -171,9 +172,9 @@ Loader.prototype.newFile = function () {
     var twoMonths = 60 * 24 * 60 * 60 * 1000;
     var twoMonthsAgo = now - twoMonths;
     var date = new Date(twoMonthsAgo);
-    var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf(); 
+    var nextYear = date.setUTCFullYear(date.getUTCFullYear() + 1).valueOf();
 
-    this.map = new MilestoneMap ({
+    this.map = new MilestoneMap({
         "name": "New Map",
         "start": twoMonthsAgo,
         "end": nextYear,
@@ -182,7 +183,7 @@ Loader.prototype.newFile = function () {
         "milestones": [],
         "msAtReports": [],
         "reports": [
-            {"name": "Baseline", "date":now},
+            { "name": "Baseline", "date": now },
         ],
         "dependencies": [],
         "currReport": 0,
@@ -192,24 +193,25 @@ Loader.prototype.newFile = function () {
 };
 
 Loader.prototype.loadFile = function () {
-    var restoreDraw = (string) => {
+    var restoreDraw = (obj) => {
         try {
-            this.restore(string);
+            this.restore(obj);
             this.draw();
         }
         catch (e) {
-            alert ("Error: Invalid file.");
+            alert("Error: Invalid file.");
             throw e;
         }
     };
-    
-    Util.upload (this.elem, restoreDraw, ".json");
+
+    this.saveLoad.open(restoreDraw);
+    // Util.upload(this.elem, restoreDraw, ".json");
 };
 Loader.prototype.importCSVReport = function () {
     var restoreDraw = (string) => {
         try {
-            var arr = Util.parseCSV (string);
-            this.map.addReportFromCSV (arr);
+            var arr = Util.parseCSV(string);
+            this.map.addReportFromCSV(arr);
             this.draw();
         }
         catch (err) {
@@ -217,26 +219,26 @@ Loader.prototype.importCSVReport = function () {
             throw err;
         }
     };
-    
-    Util.upload (this.elem, restoreDraw, ".csv");
+
+    Util.upload(this.elem, restoreDraw, ".csv");
 };
 
 Loader.prototype.exportCSV = function () {
     var string = this.map.exportCSVMilestones();
-    Util.download (this.map.name + ".csv", string, "text/csv",
-                   this.elem);
+    Util.download(this.map.name + ".csv", string, "text/csv",
+        this.elem);
 };
 
 Loader.prototype.print = function () {
-    var mMap = new MilestoneMap (this.map.save(), this.map.pageSize);
-    
+    var mMap = new MilestoneMap(this.map.save(), this.map.pageSize);
+
     try {
         mMap.drawPrint();
         this.parent.innerHTML = mMap.printElem.innerHTML;
         window.print();
         this.parent.innerHTML = "";
         this.parent.appendChild(this.elem);
-        
+
         //newWindow.close();
     }
     catch (err) {
