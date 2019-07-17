@@ -11,6 +11,7 @@ var Loader = function (parent) {
 
     /** @type {MilestoneMap} */ this.map;
     /** @type {Element} */ this.parent = parent;
+    /** @type {Element} */ this.console;
     /** @type {SaveLoad} */ this.saveLoad = new SaveLoad();
 
     Util.throttleEvent(window, "resize", this.draw.bind(this), 100);
@@ -20,9 +21,19 @@ var Loader = function (parent) {
 
 Loader.prototype.save = function () {
     var string = JSON.stringify(this.map.save(), null, "\t");
-    this.saveLoad.save(() => { }, this.map.name, string);
+    this.console.textContent = "Saving..."
+    this.saveLoad.save((fileResource) => {
+        if (fileResource) {
+            this.console.textContent = ""
+        }
+    }, this.map.name, string);
     // Util.download (this.map.name + ".json", string, "application/json",
     //                this.elem);
+};
+Loader.prototype.download = function () {
+    var string = JSON.stringify(this.map.save(), null, "\t");
+    Util.download(this.map.name + ".json", string, "application/json",
+        this.elem);
 };
 
 Loader.prototype.restore = function (obj) {
@@ -31,6 +42,10 @@ Loader.prototype.restore = function (obj) {
 
 Loader.prototype.draw = function () {
     this.elem.innerHTML = "";
+
+    this.console = Draw.htmlElem("div", {
+        "class": "console"
+    }, this.elem);
 
     var menubar = Draw.htmlElem("div", {
         "class": "menubar"
@@ -46,6 +61,12 @@ Loader.prototype.draw = function () {
     }, {
         icon: "icons/save.svg",
         action: this.save.bind(this)
+    }, {
+        icon: "icons/download.svg",
+        action: this.download.bind(this)
+    }, {
+        icon: "icons/upload.svg",
+        action: this.uploadFile.bind(this)
     }, {
         icon: "icons/exportCSV.svg",
         action: this.exportCSV.bind(this)
@@ -203,9 +224,20 @@ Loader.prototype.loadFile = function () {
             throw e;
         }
     };
-
     this.saveLoad.open(restoreDraw);
-    // Util.upload(this.elem, restoreDraw, ".json");
+};
+Loader.prototype.uploadFile = function () {
+    var restoreDraw = (string) => {
+        try {
+            this.restore(JSON.parse(string));
+            this.draw();
+        }
+        catch (e) {
+            alert("Error: Invalid file.");
+            throw e;
+        }
+    };
+    Util.upload(this.elem, restoreDraw, ".json");
 };
 Loader.prototype.importCSVReport = function () {
     var restoreDraw = (string) => {

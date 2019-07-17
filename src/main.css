@@ -8,6 +8,9 @@ body {
 /* } */
 
 /* menu bar */
+.console {
+    float: right;
+}
 .menubar {
     padding: 0px;
     
