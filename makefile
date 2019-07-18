@@ -21,7 +21,8 @@ files = src/main.js\
     src/draw/svgTextInput.js\
     src/draw/svgDateInput.js\
     src/onUnclick.js\
-    src/util.js
+    src/util.js\
+    src/saveLoad.js\
 
 .PHONY : webapp debug release
 webapp : dist/bundle.js dist/main.css dist/index.html dist/icons
