@@ -130,6 +130,7 @@ MilestoneMap.prototype.reportSelectors = function () {
         "Snapshot 2 (Baseline)", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
 };
 
+MilestoneMap.MINIMUMWIDTH = 1024;
 MilestoneMap.prototype.draw = function () {
     this.elemContainer.innerHTML = "";
 
@@ -282,6 +283,7 @@ MilestoneMap.prototype.deactivateOnUnclick = function () {
     }
 };
 
+MilestoneMap.MINIMUMBODYHEIGHT = 250;
 MilestoneMap.SPACEFORFIRSTPROJECT = 30;
 MilestoneMap.prototype.reflow = function () {
     var headerHeight = Draw.verticalReflow(
@@ -289,17 +291,20 @@ MilestoneMap.prototype.reflow = function () {
     this.elemFixed.setAttribute("height", headerHeight);
 
     var bodyHeight = this.maxHeight - headerHeight;
-    this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
 
-    // I've forgotten what this line is for. the number 4 is
-    // apparently the difference between the height of the containing
-    // scroll box, and the height if the inner content. maybe to stop
-    // the scroll bar appearing when the height is small?
-    bodyHeight -= 4;
+    if (bodyHeight > MilestoneMap.MINIMUMBODYHEIGHT) {
+        this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
+
+        // I've forgotten what this line is for. the number 4 is
+        // apparently the difference between the height of the containing
+        // scroll box, and the height if the inner content. maybe to stop
+        // the scroll bar appearing when the height is small?
+        bodyHeight -= 4;
+    }
 
     var mainHeight = Draw.verticalReflow(
         MilestoneMap.SPACEFORFIRSTPROJECT, this.programmes);
-    mainHeight = mainHeight < bodyHeight ? bodyHeight : mainHeight;
+    mainHeight = Math.max(mainHeight, bodyHeight);
     this.elemMain.setAttribute("height", mainHeight);
 
     this.currReport.drawLine();

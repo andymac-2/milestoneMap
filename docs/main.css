@@ -1,6 +1,6 @@
 body {
     font-family: sans-serif;
-    overflow: hidden;
+    overflow: auto;
 }
 /* overall */
 /* .milestoneMapPage { */
@@ -9,13 +9,25 @@ body {
 
 /* menu bar */
 .console {
+    position: fixed;
     float: right;
+    bottom: 0;
+    right: 0;
+
+    border: 1px solid #888;
+    background-color: rgba(244, 244, 244, 0.8);
+    border-radius: 3px;
+    padding: 2px;
+    margin: 2px;
+
+    color: #444;
+    font-size: small;   
 }
 .menubar {
     padding: 0px;
-    
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
 }
 .menuBarSegment {
     border: 1px solid #888;
@@ -25,6 +37,7 @@ body {
     padding: 2px;
     
     height: 55px;
+    flex: 1 0 auto;
     overflow: hidden;
     display: inline-block;
 }
@@ -56,13 +69,13 @@ body {
 
 /* milestone map total */
 .mMapScrollBox {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: none;
 }
-.milestoneMap {
-    width: 100%;
-    display: block;
+.mMapFixed, .milestoneMap, .menubar, .mMapScrollBox {
+    min-width: 1023px;
 }
-.mMapFixed {
+.mMapFixed, .milestoneMap{
     width: 100%;
     display: block;
 }
