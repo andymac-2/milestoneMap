@@ -3,6 +3,7 @@
 /** @constructor
     @struct */
 var Loader = function (parent) {
+    parent.innerHTML = "";
     //view
     /** @type {Element} */
     this.elem = Draw.htmlElem("div", {
@@ -24,7 +25,10 @@ Loader.prototype.save = function () {
     this.console.textContent = "Saving..."
     this.saveLoad.save((fileResource) => {
         if (fileResource) {
-            this.console.textContent = ""
+            this.console.textContent = "Saved as: " + fileResource["name"];
+        }
+        else {
+            this.console.textContent = "Error saving file"
         }
     }, this.map.name, string);
     // Util.download (this.map.name + ".json", string, "application/json",
@@ -54,40 +58,50 @@ Loader.prototype.draw = function () {
     var fileSegment = Draw.menuBarSegment("File", menubar);
     Draw.iconBar([{
         icon: "icons/new.svg",
-        action: this.newFile.bind(this)
+        action: this.newFile.bind(this),
+        mouseover: () => this.console.textContent = "New file"
     }, {
         icon: "icons/open.svg",
-        action: this.loadFile.bind(this)
+        action: this.loadFile.bind(this),
+        mouseover: () => this.console.textContent = "Open file from Google Drive"
     }, {
         icon: "icons/save.svg",
-        action: this.save.bind(this)
+        action: this.save.bind(this),
+        mouseover: () => this.console.textContent = "Save file to google drive"
     }, {
         icon: "icons/download.svg",
-        action: this.download.bind(this)
+        action: this.download.bind(this),
+        mouseover: () => this.console.textContent = "Download file"
     }, {
         icon: "icons/upload.svg",
-        action: this.uploadFile.bind(this)
+        action: this.uploadFile.bind(this),
+        mouseover: () => this.console.textContent = "Upload file"
     }, {
         icon: "icons/exportCSV.svg",
-        action: this.exportCSV.bind(this)
+        action: this.exportCSV.bind(this),
+        mouseover: () => this.console.textContent = "Download snapshot as CSV"
     }, {
         icon: "icons/import.svg",
-        action: this.importCSVReport.bind(this)
+        action: this.importCSVReport.bind(this),
+        mouseover: () => this.console.textContent = "Import CSV snapshot"
     }], {}, fileSegment.body);
 
     var programmeSegment = Draw.menuBarSegment("Programme", menubar);
     Draw.iconBar([{
         icon: "icons/plus.svg",
-        action: this.map.newProgramme.bind(this.map)
+        action: this.map.newProgramme.bind(this.map),
+        mouseover: () => this.console.textContent = "New programme"
     }], {}, programmeSegment.body);
 
     var reportSegment = Draw.menuBarSegment("Comparison", menubar);
     Draw.iconBar([{
         icon: "icons/camera.svg",
-        action: this.newReport.bind(this)
+        action: this.newReport.bind(this),
+        mouseover: () => this.console.textContent = "New snapshot"
     }, {
         icon: "icons/delete.svg",
-        action: this.deleteCurrReport.bind(this)
+        action: this.deleteCurrReport.bind(this),
+        mouseover: () => this.console.textContent = "Delete snapshot"
     }], {}, reportSegment.body);
 
     this.map.reportSelectors();
@@ -96,7 +110,8 @@ Loader.prototype.draw = function () {
     var printSegment = Draw.menuBarSegment("Print", menubar);
     Draw.iconBar([{
         icon: "icons/print.svg",
-        action: this.print.bind(this)
+        action: this.print.bind(this),
+        mouseover: () => this.console.textContent = "Print"
     }], {}, printSegment.body);
     this.printSizeSelector({
         "class": "pageSizeSelector"
@@ -105,10 +120,12 @@ Loader.prototype.draw = function () {
     var aboutSegment = Draw.menuBarSegment("About", menubar);
     Draw.iconBar([{
         icon: "icons/info.svg",
-        action: () => alert(Loader.aboutText)
+        action: () => alert(Loader.aboutText),
+        mouseover: () => this.console.textContent = "About"
     }, {
         icon: "icons/question.svg",
-        action: () => window.open("https://andymac-2.github.io/milestoneMap/instructions")
+        action: () => window.open("https://andymac-2.github.io/milestoneMap/instructions"),
+        mouseover: () => this.console.textContent = "Help"
     }], {}, aboutSegment.body);
 
     this.map.maxHeight = window.innerHeight - Draw.getElemHeight(menubar) - 5;
@@ -189,6 +206,7 @@ Loader.prototype.deleteCurrReport = function () {
 };
 
 Loader.prototype.newFile = function () {
+    this.saveLoad.reset();
     var now = MilestoneMap.prototype.defaultDate();
     var twoMonths = 60 * 24 * 60 * 60 * 1000;
     var twoMonthsAgo = now - twoMonths;

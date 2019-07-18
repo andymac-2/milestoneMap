@@ -18,20 +18,65 @@ var SaveLoad = function () {
     /** @type {Array<string>} */ this.discoveryDocs = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"];
 
     /** @type {boolean} */ this.clientLoaded = false;
-    /** @type {string} */ this.fileId = null;
+    /** @type {?string} */ this.fileId = null;
 
-    gapi.load('client:auth2:picker', () => this.initClient());
+    window["gapi"]["load"]('client:auth2:picker', () => this.initClient());
 };
 SaveLoad.prototype.initClient = function () {
-    gapi.client.init({
-        apiKey: this.developerKey,
-        clientId: this.clientId,
-        discoveryDocs: this.discoveryDocs,
-        scope: this.scope,
+    window["gapi"]["client"]["init"]({
+        "apiKey": this.developerKey,
+        "clientId": this.clientId,
+        "discoveryDocs": this.discoveryDocs,
+        "scope": this.scope,
     }).then(() => {
         this.clientLoaded = true;
     })
-}
+};
+SaveLoad.prototype.isSignedIn = function () {
+    return window["gapi"]["auth2"]["getAuthInstance"]()["isSignedIn"]["get"]();
+};
+SaveLoad.prototype.getToken = function () {
+    let authInstance = window["gapi"]["auth2"]["getAuthInstance"]();
+    let currentUser = authInstance["currentUser"]["get"]();
+    let authResponse = currentUser["getAuthResponse"]();
+    return authResponse["access_token"];
+};
+
+SaveLoad.prototype.reset = function () {
+    this.fileId = null;
+};
+SaveLoad.prototype.saveAs = function (callback, title, data) {
+    if (!this.clientLoaded) {
+        return;
+    }
+
+    if (this.isSignedIn()) {
+        this.newFileWithTitle(callback, title, data);
+    }
+    else {
+        cps(
+            (proceed) => this.doAuth(proceed),
+            (proceed) => this.newFileWithTitle(proceed, title, data)
+        )(callback);
+    }
+};
+SaveLoad.prototype.save = function (callback, title, data) {
+    if (!this.clientLoaded) {
+        return;
+    }
+    if (this.fileId === null) {
+        this.saveAs(callback, title, data);
+    }
+    else if (this.isSignedIn()) {
+        this.saveFile(callback, data);
+    }
+    else {
+        cps(
+            (proceed) => this.doAuth(proceed),
+            (proceed) => this.saveFile(proceed, data),
+        )(callback)
+    }
+};
 SaveLoad.prototype.open = function (callback) {
     if (!this.clientLoaded) {
         return;
@@ -42,7 +87,7 @@ SaveLoad.prototype.open = function (callback) {
             this.openFileWithPickerResponse(proceed, pickerResponse),
     );
 
-    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
+    if (this.isSignedIn()) {
         openFileDialog(callback);
     }
     else {
@@ -51,77 +96,62 @@ SaveLoad.prototype.open = function (callback) {
             (proceed) => openFileDialog(proceed),
         )(callback);
     }
-}
+};
 
 SaveLoad.prototype.createPicker = function (callback) {
     assert(() => this.clientLoaded === true);
-    assert(() => gapi.auth2.getAuthInstance().isSignedIn.get());
-    let token = gapi.auth2.getAuthInstance()
-        .currentUser.get()
-        .getAuthResponse()
-        .access_token;
+    assert(() => this.isSignedIn());
 
-    var picker = new google.picker.PickerBuilder().
-        addView(google.picker.ViewId.DOCS).
-        setOAuthToken(token).
-        setDeveloperKey(this.developerKey).
-        setCallback(callback).
-        build();
-    picker.setVisible(true);
+    const DOCS = window["google"]["picker"]["ViewId"]["DOCS"];
+
+    var picker = new window["google"]["picker"]["PickerBuilder"]()
+    ["addView"](DOCS)
+    ["setOAuthToken"](this.getToken())
+    ["setDeveloperKey"](this.developerKey)
+    ["setCallback"](callback)
+    ["build"]();
+
+    picker["setVisible"](true);
 }
 SaveLoad.prototype.doAuth = function (callback) {
+    assert(() => this.clientLoaded === true);
     callback = callback || function () { };
-    let googleAuth = gapi.auth2.getAuthInstance()
-    googleAuth.signIn({ scope: this.scope }).then(googleUser => {
-        let response = googleUser.getAuthResponse();
-        if (response && !response.error) {
-            this.oauthToken = response.access_token;
+    let googleAuth = window["gapi"]["auth2"]["getAuthInstance"]()
+    googleAuth["signIn"]({ "scope": this.scope }).then(googleUser => {
+        let response = googleUser["getAuthResponse"]();
+        if (response && !response["error"]) {
             callback();
         }
     }).catch((error) => {
         console.error(error);
     });
 }
+
 SaveLoad.prototype.openFileWithPickerResponse = function (callback, pickerResponse) {
     assert(() => this.clientLoaded === true);
-    assert(() => gapi.auth2.getAuthInstance().isSignedIn.get());
-    if (pickerResponse[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
-        let doc = pickerResponse[google.picker.Response.DOCUMENTS][0];
-        let fileId = doc[google.picker.Document.ID];
+    assert(() => this.isSignedIn());
 
-        gapi.client.drive.files.get({
-            fileId: fileId,
-            alt: 'media'
-        }).execute((file) => {
+    const RESPONSE_ACTION = window["google"]["picker"]["Response"]["ACTION"];
+    const RESPONSE_DOCUMENTS = window["google"]["picker"]["Response"]["DOCUMENTS"];
+    const ACTION_PICKED = window["google"]["picker"]["Action"]["PICKED"];
+    const DOCUMENT_ID = window["google"]["picker"]["Document"]["ID"];
+
+    if (pickerResponse[RESPONSE_ACTION] == ACTION_PICKED) {
+        let doc = pickerResponse[RESPONSE_DOCUMENTS][0];
+        let fileId = doc[DOCUMENT_ID];
+
+        window["gapi"]["client"]["drive"]["files"]["get"]({
+            'fileId': fileId,
+            'alt': 'media'
+        })["execute"]((file) => {
             this.fileId = fileId;
             callback(file);
         });
     }
 }
-
-SaveLoad.prototype.gotFile = function (file) {
-    console.log(file);
-}
-
-SaveLoad.prototype.saveAs = function (callback, title, data) {
-    if (!this.clientLoaded) {
-        return;
-    }
-
-    if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        this.newFileWithTitle(callback, title, data);
-    }
-    else {
-        cps(
-            (proceed) => this.doAuth(proceed),
-            (proceed) => this.newFileWithTitle(proceed, title, data)
-        )(callback);
-    }
-};
-
 SaveLoad.prototype.newFileWithTitle = function (callback, title, data) {
     assert(() => this.clientLoaded === true);
-    assert(() => gapi.auth2.getAuthInstance().isSignedIn.get());
+    assert(() => this.isSignedIn());
 
     const boundary = '-------10897387501935781034';
     const newline = "\r\n";
@@ -146,7 +176,7 @@ SaveLoad.prototype.newFileWithTitle = function (callback, title, data) {
 
         close_delim;
 
-    var request = gapi.client.request({
+    var request = window["gapi"]["client"]["request"]({
         'path': '/upload/drive/v3/files',
         'method': 'POST',
         'params': { 'uploadType': 'multipart' },
@@ -156,35 +186,16 @@ SaveLoad.prototype.newFileWithTitle = function (callback, title, data) {
         'body': multipartRequestBody
     });
 
-    request.execute(callback);
+    request["execute"](callback);
 }
-
-SaveLoad.prototype.save = function (callback, title, data) {
-    if (!this.clientLoaded) {
-        return;
-    }
-    if (this.fileId === null) {
-        this.saveAs(callback, title, data);
-    }
-    else if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-        this.saveFile(callback, data);
-    }
-    else {
-        cps(
-            (proceed) => this.doAuth(proceed),
-            (proceed) => this.saveFile(proceed, data),
-        )(callback)
-    }
-};
-
 SaveLoad.prototype.saveFile = function (callback, data) {
     assert(() => this.clientLoaded === true);
     assert(() => this.fileId !== null);
-    assert(() => gapi.auth2.getAuthInstance().isSignedIn.get());
+    assert(() => this.isSignedIn());
 
     console.log(this.fileId);
 
-    var request = gapi.client.request({
+    var request = window["gapi"]["client"]["request"]({
         'path': '/upload/drive/v3/files/' + this.fileId,
         'method': 'PATCH',
         'params': {
@@ -193,5 +204,5 @@ SaveLoad.prototype.saveFile = function (callback, data) {
         'body': data
     });
 
-    request.execute(callback);
+    request["execute"](callback);
 }
