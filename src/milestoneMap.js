@@ -56,15 +56,7 @@ var MilestoneMap = function (obj, pagesize) {
     this.globalData = null;
     /** @type {boolean} */ this.globalModeSet = false;
 
-    Util.throttleEvent(window, "resize", () => {
-        let elem = document.activeElement;
-        if (elem.tagName === "input" || elem.getAttribute("contenteditable") === "true") {
-            this.unclicker.onUnclickOnce(elem, () => this.draw());
-        }
-        else {
-            this.draw();
-        }
-    }, 200);
+    Util.throttleEvent(window, "resize", () => this.redrawOnceNotEditing(), 200);
 
     this.restore(obj);
 };
@@ -294,6 +286,15 @@ MilestoneMap.prototype.deactivateOnUnclick = function () {
     else {
         this.globalMode = MilestoneMap.SELECT;
         this.globalData = null;
+    }
+};
+MilestoneMap.prototype.redrawOnceNotEditing = function () {
+    let elem = document.activeElement;
+    if (elem.tagName === "INPUT" || elem.getAttribute("contenteditable") === "true") {
+        this.unclicker.onUnclickOnce(elem, () => this.redrawOnceNotEditing());
+    }
+    else {
+        this.draw();
     }
 };
 
