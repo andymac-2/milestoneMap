@@ -1,5 +1,12 @@
 'use strict'
 
+class FileError extends Error {
+    constructor(msg) {
+        super("Error saving/loading file: " + msg);
+        this.name = "NotYetLoadedError"
+    }
+}
+
 let cps = function (...array) {
     return array.reduce(bindCPS)
 }
@@ -11,7 +18,7 @@ let bindCPS = function (func1, func2) {
 
 /** @constructor
     @struct */
-var SaveLoad = function () {
+var SaveLoadGoogle = function () {
     /** @type {string} */ this.developerKey = 'AIzaSyCYeIi5ThOCg1tPdy52ALudL_W-E_aipzo';
     /** @type {string} */ this.clientId = '899992407737-pdogm033l5v7tb2j8n2g5n4hpo3r4ftd.apps.googleusercontent.com';
     /** @type {string} */ this.scope = 'https://www.googleapis.com/auth/drive.file';
@@ -22,7 +29,66 @@ var SaveLoad = function () {
 
     window["gapi"]["load"]('client:auth2:picker', () => this.initClient());
 };
-SaveLoad.prototype.initClient = function () {
+SaveLoadGoogle.prototype.isFileOpen = function () {
+    return this.fileId !== null;
+};
+SaveLoadGoogle.prototype.reset = function () {
+    this.fileId = null;
+};
+SaveLoadGoogle.prototype.saveAs = function (callback, fail, title, data) {
+    if (!this.clientLoaded) {
+        onFail(new FileError("Could not save file"));
+    }
+
+    if (this.isSignedIn()) {
+        this.newFileWithTitle(callback, fail, title, data);
+    }
+    else {
+        cps(
+            (proceed) => this.doAuth(proceed, fail),
+            (proceed) => this.newFileWithTitle(proceed, fail, title, data)
+        )(callback);
+    }
+};
+SaveLoadGoogle.prototype.save = function (callback, fail, data) {
+    assert(() => this.isFileOpen());
+    if (!this.clientLoaded) {
+        onFail(new FileError("Could not save file"));
+    }
+    if (this.isSignedIn()) {
+        this.saveFile(callback, data);
+    }
+    else {
+        cps(
+            (proceed) => this.doAuth(proceed, fail),
+            (proceed) => this.saveFile(proceed, data),
+        )(callback)
+    }
+};
+SaveLoadGoogle.prototype.open = function (callback, fail) {
+    if (!this.clientLoaded) {
+        return;
+    }
+    let openFileDialog = cps(
+        (proceed) => this.createPicker(proceed),
+        (proceed, pickerResponse) =>
+            this.openFileWithPickerResponse(proceed, fail, pickerResponse),
+    );
+
+    if (this.isSignedIn()) {
+        openFileDialog(callback);
+    }
+    else {
+        cps(
+            (proceed) => this.doAuth(proceed, fail),
+            (proceed) => openFileDialog(proceed),
+        )(callback);
+    }
+};
+
+
+
+SaveLoadGoogle.prototype.initClient = function () {
     window["gapi"]["client"]["init"]({
         "apiKey": this.developerKey,
         "clientId": this.clientId,
@@ -32,73 +98,16 @@ SaveLoad.prototype.initClient = function () {
         this.clientLoaded = true;
     })
 };
-SaveLoad.prototype.isSignedIn = function () {
+SaveLoadGoogle.prototype.isSignedIn = function () {
     return window["gapi"]["auth2"]["getAuthInstance"]()["isSignedIn"]["get"]();
 };
-SaveLoad.prototype.getToken = function () {
+SaveLoadGoogle.prototype.getToken = function () {
     let authInstance = window["gapi"]["auth2"]["getAuthInstance"]();
     let currentUser = authInstance["currentUser"]["get"]();
     let authResponse = currentUser["getAuthResponse"]();
     return authResponse["access_token"];
 };
-
-SaveLoad.prototype.reset = function () {
-    this.fileId = null;
-};
-SaveLoad.prototype.saveAs = function (callback, title, data) {
-    if (!this.clientLoaded) {
-        return;
-    }
-
-    if (this.isSignedIn()) {
-        this.newFileWithTitle(callback, title, data);
-    }
-    else {
-        cps(
-            (proceed) => this.doAuth(proceed),
-            (proceed) => this.newFileWithTitle(proceed, title, data)
-        )(callback);
-    }
-};
-SaveLoad.prototype.save = function (callback, title, data) {
-    if (!this.clientLoaded) {
-        return;
-    }
-    if (this.fileId === null) {
-        this.saveAs(callback, title, data);
-    }
-    else if (this.isSignedIn()) {
-        this.saveFile(callback, data);
-    }
-    else {
-        cps(
-            (proceed) => this.doAuth(proceed),
-            (proceed) => this.saveFile(proceed, data),
-        )(callback)
-    }
-};
-SaveLoad.prototype.open = function (callback) {
-    if (!this.clientLoaded) {
-        return;
-    }
-    let openFileDialog = cps(
-        (proceed) => this.createPicker(proceed),
-        (proceed, pickerResponse) =>
-            this.openFileWithPickerResponse(proceed, pickerResponse),
-    );
-
-    if (this.isSignedIn()) {
-        openFileDialog(callback);
-    }
-    else {
-        cps(
-            (proceed) => this.doAuth(proceed),
-            (proceed) => openFileDialog(proceed),
-        )(callback);
-    }
-};
-
-SaveLoad.prototype.createPicker = function (callback) {
+SaveLoadGoogle.prototype.createPicker = function (callback) {
     assert(() => this.clientLoaded === true);
     assert(() => this.isSignedIn());
 
@@ -113,7 +122,7 @@ SaveLoad.prototype.createPicker = function (callback) {
 
     picker["setVisible"](true);
 }
-SaveLoad.prototype.doAuth = function (callback) {
+SaveLoadGoogle.prototype.doAuth = function (callback, onFail) {
     assert(() => this.clientLoaded === true);
     callback = callback || function () { };
     let googleAuth = window["gapi"]["auth2"]["getAuthInstance"]()
@@ -122,12 +131,14 @@ SaveLoad.prototype.doAuth = function (callback) {
         if (response && !response["error"]) {
             callback();
         }
+        else {
+            onFail(response);
+        }
     }).catch((error) => {
-        console.error(error);
+        onFail(error)
     });
 }
-
-SaveLoad.prototype.openFileWithPickerResponse = function (callback, pickerResponse) {
+SaveLoadGoogle.prototype.openFileWithPickerResponse = function (callback, fail, pickerResponse) {
     assert(() => this.clientLoaded === true);
     assert(() => this.isSignedIn());
 
@@ -143,17 +154,25 @@ SaveLoad.prototype.openFileWithPickerResponse = function (callback, pickerRespon
         window["gapi"]["client"]["drive"]["files"]["get"]({
             'fileId': fileId,
             'alt': 'media'
-        })["execute"]((file) => {
-            this.fileId = fileId;
-            callback(file);
+        })["execute"](file => {
+            if (file["id"]) {
+                this.fileId = file["id"];
+                callback(file);
+            }
+            else {
+                fail();
+            }
         });
     }
+    else {
+        fail();
+    }
 }
-SaveLoad.prototype.newFileWithTitle = function (callback, title, data) {
+SaveLoadGoogle.prototype.newFileWithTitle = function (callback, fail, title, data) {
     assert(() => this.clientLoaded === true);
     assert(() => this.isSignedIn());
 
-    const boundary = '-------10897387501935781034';
+    const boundary = '-------1089738750193135781034';
     const newline = "\r\n";
     const delimiter = newline + "--" + boundary + newline;
     const close_delim = newline + "--" + boundary + "--";
@@ -186,9 +205,16 @@ SaveLoad.prototype.newFileWithTitle = function (callback, title, data) {
         'body': multipartRequestBody
     });
 
-    request["execute"](callback);
+    request["execute"](fileResource => {
+        if (fileResource["name"] === undefined) {
+            fail();
+        }
+        else {
+            callback(fileResource["name"]);
+        }
+    });
 }
-SaveLoad.prototype.saveFile = function (callback, data) {
+SaveLoadGoogle.prototype.saveFile = function (callback, fail, data) {
     assert(() => this.clientLoaded === true);
     assert(() => this.fileId !== null);
     assert(() => this.isSignedIn());
@@ -204,5 +230,17 @@ SaveLoad.prototype.saveFile = function (callback, data) {
         'body': data
     });
 
-    request["execute"](callback);
+    request["execute"](fileResource => {
+        if (fileResource["name"] === undefined) {
+            fail();
+        }
+        else {
+            callback(fileResource["name"]);
+        }
+    });
 }
+
+var SaveLoadOnedrive = function () {
+
+}
+SaveLoadOneDrive

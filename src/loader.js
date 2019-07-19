@@ -21,14 +21,10 @@ var Loader = function (parent) {
 Loader.prototype.save = function () {
     var string = JSON.stringify(this.map.save(), null, "\t");
     this.console.textContent = "Saving..."
-    this.saveLoad.save((fileResource) => {
-        if (fileResource) {
-            this.console.textContent = "Saved as: " + fileResource["name"];
-        }
-        else {
-            this.console.textContent = "Error saving file"
-        }
-    }, this.map.name, string);
+    this.saveLoad.save(
+        name => this.console.textContent = "Saved as: " + name,
+        () => this.console.textContent = "Error saving file",
+        string);
     // Util.download (this.map.name + ".json", string, "application/json",
     //                this.elem);
 };
