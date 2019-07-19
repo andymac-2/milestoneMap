@@ -56,6 +56,16 @@ var MilestoneMap = function (obj, pagesize) {
     this.globalData = null;
     /** @type {boolean} */ this.globalModeSet = false;
 
+    Util.throttleEvent(window, "resize", () => {
+        let elem = document.activeElement;
+        if (elem.tagName === "input" || elem.getAttribute("contenteditable") === "true") {
+            this.unclicker.onUnclickOnce(elem, () => this.draw());
+        }
+        else {
+            this.draw();
+        }
+    }, 200);
+
     this.restore(obj);
 };
 /** @const {number} */ MilestoneMap.SELECT = 0;
@@ -129,10 +139,14 @@ MilestoneMap.prototype.reportSelectors = function () {
     Draw.dropDownSegment(
         "Snapshot 2 (Baseline)", this.modifyCmpReportEvt.bind(this), entries, attrs, parent);
 };
-
-MilestoneMap.MINIMUMWIDTH = 1024;
+MilestoneMap.MENUBARHEIGHT = 60;
+MilestoneMap.MINIMUMWIDTH = 1023;
 MilestoneMap.prototype.draw = function () {
     this.elemContainer.innerHTML = "";
+
+    // 18 pixels is sufficient buffer to stop the vertical scroll bar from
+    // appearing.
+    this.maxHeight = window.innerHeight - MilestoneMap.MENUBARHEIGHT - 18;
 
     this.elemFixed = Draw.svgElem("svg", {
         "class": "mMapFixed"
@@ -158,7 +172,7 @@ MilestoneMap.prototype.draw = function () {
         "class": "fg"
     }, this.elemMain);
 
-    this.width = Draw.getElemWidth(this.elemMain);
+    this.width = Math.max(MilestoneMap.MINIMUMWIDTH, Draw.getElemWidth(this.elemMain));
 
     // maybe this would be better as a series of functions rather than a class.
     this.dateHeader = new DateHeader(this, this.elemFixed, bg);
@@ -294,12 +308,6 @@ MilestoneMap.prototype.reflow = function () {
 
     if (bodyHeight > MilestoneMap.MINIMUMBODYHEIGHT) {
         this.scrollbox.setAttribute("style", "max-height:" + bodyHeight + "px;");
-
-        // I've forgotten what this line is for. the number 4 is
-        // apparently the difference between the height of the containing
-        // scroll box, and the height if the inner content. maybe to stop
-        // the scroll bar appearing when the height is small?
-        bodyHeight -= 4;
     }
 
     var mainHeight = Draw.verticalReflow(

@@ -15,8 +15,6 @@ var Loader = function (parent) {
     /** @type {Element} */ this.console;
     /** @type {SaveLoad} */ this.saveLoad = new SaveLoad();
 
-    Util.throttleEvent(window, "resize", this.draw.bind(this), 100);
-
     this.newFile();
 };
 
@@ -128,7 +126,10 @@ Loader.prototype.draw = function () {
         mouseover: () => this.console.textContent = "Help"
     }], {}, aboutSegment.body);
 
-    this.map.maxHeight = window.innerHeight - Draw.getElemHeight(menubar) - 5;
+    Draw.elem("div", {
+        "class": "menuBarPlaceholder"
+    }, this.elem);
+
     this.elem.appendChild(this.map.elemContainer);
     this.map.draw();
 };
@@ -303,8 +304,6 @@ Loader.prototype.print = function () {
 For help and support, please visit:
 
 https://andymac-2.github.io/milestoneMap/instructions
-
-
 
 Copyright 2018 Andrew Pritchard
 
