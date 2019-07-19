@@ -24,10 +24,21 @@ body {
     font-size: small;   
 }
 .menubar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+
     padding: 0px;
     display: flex;
     flex-wrap: nowrap;
     overflow-x: scroll;
+}
+/* if you change the placeholder height, make sure to change the height in
+milestoneMap.js draw function. */
+.menuBarPlaceholder {
+    height: 60px;
 }
 .menuBarSegment {
     border: 1px solid #888;
@@ -70,9 +81,11 @@ body {
 /* milestone map total */
 .mMapScrollBox {
     overflow-y: auto;
-    overflow-x: none;
+    overflow-x: hidden;
 }
-.mMapFixed, .milestoneMap, .menubar, .mMapScrollBox {
+/* If you change this min-width value, change the corresponding MINIMUMWIDTH
+value in milestomeMap.js */
+.mMapFixed, .milestoneMap, .mMapScrollBox, .mMapContainer{
     min-width: 1023px;
 }
 .mMapFixed, .milestoneMap{
@@ -80,7 +93,7 @@ body {
     display: block;
 }
 
-/* pages */
+/* pages */ 
 .milestoneMapPage { 
     width: 100%;
     height: auto;

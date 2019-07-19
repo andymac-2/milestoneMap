@@ -19,7 +19,43 @@
   <!--[if lte IE 9]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
-  <div id="app"></div>
+  <div id="app">
+    <div text-align="center">
+      <svg height="600" width="100%" viewBox="100 100 300 300" xmlns="http://www.w3.org/2000/svg">
+        <style>
+          .splashTitle {
+            font-size: 2em;
+            font-weight: bold;
+          }
+
+          .splashLine {
+            stroke: #909090;
+            stroke-dasharray: 6, 8;
+            stroke-width: 1;
+          }
+
+          .splashDot {
+            stroke-width: 1.5;
+            stroke: #C0C0C0;
+          }
+
+          .splashMilestone {
+            stroke-width: 1.5;
+            stroke: #505050;
+            fill: #33cc33;
+          }
+        </style>
+        <text x="145" y="190" text-anchor="start" class="splashTitle">MilestoneMap</text>
+        <line x1="-2000" y1="210" x2="2000" y2="210" class="splashLine"></line>
+        <g transform="translate(130 210)">
+
+          <line class="splashDot" x1="0" y1="-30" x2="0" y2="0"></line>
+          <circle class="splashDot" cx="0" cy="-30" r="4"></circle>
+          <path class="splashMilestone" d="M -10 0L 0 10L 10 0L 0 -10 Z"></path>
+        </g>
+      </svg>
+    </div>
+  </div>
 
   <script type="text/javascript" src="https://apis.google.com/js/api.js"></script>
 
