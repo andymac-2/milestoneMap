@@ -13,7 +13,7 @@ var Loader = function (parent) {
     /** @type {MilestoneMap} */ this.map;
     /** @type {Element} */ this.parent = parent;
     /** @type {Element} */ this.console;
-    /** @type {SaveLoad} */ this.saveLoad = new SaveLoad();
+    /** @type {SaveLoad} */ this.saveLoad = new SaveLoadOnedrive();
 
     this.newFile();
 };
@@ -21,12 +21,21 @@ var Loader = function (parent) {
 Loader.prototype.save = function () {
     var string = JSON.stringify(this.map.save(), null, "\t");
     this.console.textContent = "Saving..."
-    this.saveLoad.save(
+
+    this.saveLoad.saveAs(
         name => this.console.textContent = "Saved as: " + name,
-        () => this.console.textContent = "Error saving file",
-        string);
-    // Util.download (this.map.name + ".json", string, "application/json",
-    //                this.elem);
+        error => {
+            this.console.textContent = "Error saving file"
+            console.error(error);
+        },
+        this.map.name,
+        string,
+    );
+
+    // this.saveLoad.save(
+    //     name => this.console.textContent = "Saved as: " + name,
+    //     () => this.console.textContent = "Error saving file",
+    //     string);
 };
 Loader.prototype.download = function () {
     var string = JSON.stringify(this.map.save(), null, "\t");
@@ -231,6 +240,7 @@ Loader.prototype.newFile = function () {
 Loader.prototype.loadFile = function () {
     var restoreDraw = (obj) => {
         try {
+            console.log(obj);
             this.restore(obj);
             this.draw();
         }
@@ -239,7 +249,9 @@ Loader.prototype.loadFile = function () {
             throw e;
         }
     };
-    this.saveLoad.open(restoreDraw);
+    this.saveLoad.open(restoreDraw, (err) => {
+        alert("Error: Could not open file.");
+    });
 };
 Loader.prototype.uploadFile = function () {
     var restoreDraw = (string) => {

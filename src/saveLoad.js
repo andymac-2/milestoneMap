@@ -8,7 +8,7 @@ class FileError extends Error {
 }
 
 let cps = function (...array) {
-    return array.reduce(bindCPS)
+    return array.reduceRight((func2, func1) => bindCPS(func1, func2))
 }
 let bindCPS = function (func1, func2) {
     return (proceed, ...args) => {
@@ -37,7 +37,8 @@ SaveLoadGoogle.prototype.reset = function () {
 };
 SaveLoadGoogle.prototype.saveAs = function (callback, fail, title, data) {
     if (!this.clientLoaded) {
-        onFail(new FileError("Could not save file"));
+        fail();
+        return;
     }
 
     if (this.isSignedIn()) {
@@ -53,15 +54,16 @@ SaveLoadGoogle.prototype.saveAs = function (callback, fail, title, data) {
 SaveLoadGoogle.prototype.save = function (callback, fail, data) {
     assert(() => this.isFileOpen());
     if (!this.clientLoaded) {
-        onFail(new FileError("Could not save file"));
+        fail();
+        return;
     }
     if (this.isSignedIn()) {
-        this.saveFile(callback, data);
+        this.saveFile(callback, fail, data);
     }
     else {
         cps(
             (proceed) => this.doAuth(proceed, fail),
-            (proceed) => this.saveFile(proceed, data),
+            (proceed) => this.saveFile(proceed, fail, data),
         )(callback)
     }
 };
@@ -86,8 +88,6 @@ SaveLoadGoogle.prototype.open = function (callback, fail) {
     }
 };
 
-
-
 SaveLoadGoogle.prototype.initClient = function () {
     window["gapi"]["client"]["init"]({
         "apiKey": this.developerKey,
@@ -99,9 +99,11 @@ SaveLoadGoogle.prototype.initClient = function () {
     })
 };
 SaveLoadGoogle.prototype.isSignedIn = function () {
-    return window["gapi"]["auth2"]["getAuthInstance"]()["isSignedIn"]["get"]();
+    return this.clientLoaded &&
+        window["gapi"]["auth2"]["getAuthInstance"]()["isSignedIn"]["get"]();
 };
 SaveLoadGoogle.prototype.getToken = function () {
+    assert(() => this.isSignedIn());
     let authInstance = window["gapi"]["auth2"]["getAuthInstance"]();
     let currentUser = authInstance["currentUser"]["get"]();
     let authResponse = currentUser["getAuthResponse"]();
@@ -122,7 +124,7 @@ SaveLoadGoogle.prototype.createPicker = function (callback) {
 
     picker["setVisible"](true);
 }
-SaveLoadGoogle.prototype.doAuth = function (callback, onFail) {
+SaveLoadGoogle.prototype.doAuth = function (callback, fail) {
     assert(() => this.clientLoaded === true);
     callback = callback || function () { };
     let googleAuth = window["gapi"]["auth2"]["getAuthInstance"]()
@@ -132,10 +134,10 @@ SaveLoadGoogle.prototype.doAuth = function (callback, onFail) {
             callback();
         }
         else {
-            onFail(response);
+            fail();
         }
-    }).catch((error) => {
-        onFail(error)
+    }).catch(() => {
+        fail();
     });
 }
 SaveLoadGoogle.prototype.openFileWithPickerResponse = function (callback, fail, pickerResponse) {
@@ -155,13 +157,7 @@ SaveLoadGoogle.prototype.openFileWithPickerResponse = function (callback, fail, 
             'fileId': fileId,
             'alt': 'media'
         })["execute"](file => {
-            if (file["id"]) {
-                this.fileId = file["id"];
-                callback(file);
-            }
-            else {
-                fail();
-            }
+            callback(file);
         });
     }
     else {
@@ -241,6 +237,114 @@ SaveLoadGoogle.prototype.saveFile = function (callback, fail, data) {
 }
 
 var SaveLoadOnedrive = function () {
+    /** @type {?Object} */ this.file = null;
+    /** @type {?string} */ this.accessToken = null;
+};
+SaveLoadOnedrive.CLIENT_ID = "3f9462f2-10c5-4686-a3ba-8eb21ea94ab9";
+SaveLoadOnedrive.SCOPES = ["Files.ReadWrite"];
+SaveLoadOnedrive.prototype.reset = function () {
+    this.fileId = null;
+};
+SaveLoadOnedrive.prototype.isFileOpen = function () {
+    return this.fileId !== null;
+};
+SaveLoadOnedrive.prototype.open = function (callback, fail) {
+    cps(
+        (proceed) => {
+            window["OneDrive"]["open"]({
+                "clientId": SaveLoadOnedrive.CLIENT_ID,
+                "action": "download",
+                "multiSelect": false,
+                "advanced": {
+                    "filter": ".json",
+                    "scopes": SaveLoadOnedrive.SCOPES,
+                },
+                "success": proceed,
+                "cancel": fail,
+                "error": fail,
+            });
+        },
+        (proceed, response) => {
+            this.accessToken = response["accessToken"];
+            if (response && response["value"] && response["value"].length > 0) {
+                this.file = response["value"][0];
 
+                let url = this.file["@microsoft.graph.downloadUrl"];
+                fetch(url).then(proceed, fail);
+            }
+            else {
+                fail(response);
+            }
+        },
+        (proceed, response) => {
+            response.json().then(proceed, fail);
+        }
+    )(callback);
+};
+SaveLoadOnedrive.prototype.saveAs = function (callback, fail, title, data) {
+    cps(
+        (proceed) => {
+            window["OneDrive"]["save"]({
+                "clientId": SaveLoadOnedrive.CLIENT_ID,
+                "action": "query",
+                "advanced": {
+                    "queryParameters": "select=id,name,parentReference",
+                    "scopes": SaveLoadOnedrive.SCOPES,
+                },
+                "success": proceed,
+                "cancel": fail,
+                "error": fail,
+            });
+        },
+        (proceed, response) => {
+            console.log(response);
+            this.accessToken = response["accessToken"];
+            if (response && response["value"] && response["value"].length > 0) {
+                let folder = response["value"][0];
+                let url = response["apiEndpoint"] + "drives/" +
+                    folder["parentReference"]["driveId"] + "/items/" +
+                    folder["id"] + "/children/" +
+                    "abcd.json" + "/content"
+
+                fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/octet-stream",
+                        "Authorization": "Bearer" + this.accessToken,
+                    },
+                    body: data,
+                }).then(proceed, fail);
+            }
+            else {
+                fail(response);
+            }
+        },
+        (proceed, response) => {
+            console.log(response);
+        }
+    )(callback);
+};
+SaveLoadOnedrive.prototype.doAuth = function (callback, fail) {
+    this.msalInstance.loginPopup({
+        scopes: SaveLoadOnedrive.SCOPES,
+    }).then(response => callback(response.accessToken), fail);
+};
+SaveLoadOnedrive.prototype.getToken = function (callback, fail) {
+    this.msalInstance.acquireTokenSilent({
+        scopes: SaveLoadOnedrive.SCOPES,
+    }).then(response => callback(response.accessToken), fail);
+};
+
+var generateGraphUrl = function (driveItem, targetParentFolder, itemRelativeApiPath) {
+    var url = "https://graph.microsoft.com/v1.0/";
+    if (targetParentFolder) {
+        url += "drives/" + driveItem.parentReference.driveId + "/items/" + driveItem.parentReference.id + "/children/" + driveItem.name;
+    } else {
+        url += "drives/" + driveItem.parentReference.driveId + "/items/" + driveItem.id;
+    }
+
+    if (itemRelativeApiPath) {
+        url += itemRelativeApiPath;
+    }
+    return url;
 }
-SaveLoadOneDrive
