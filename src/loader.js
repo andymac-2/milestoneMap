@@ -28,7 +28,7 @@ Loader.prototype.save = function () {
             this.console.textContent = "Error saving file"
             console.error(error);
         },
-        this.map.name,
+        this.map.name + ".json",
         string,
     );
 

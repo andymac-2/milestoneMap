@@ -237,16 +237,21 @@ SaveLoadGoogle.prototype.saveFile = function (callback, fail, data) {
 }
 
 var SaveLoadOnedrive = function () {
-    /** @type {?Object} */ this.file = null;
+    /** @type {?string} */ this.fileName = null;
+    /** @type {?string} */ this.fileParentId = null;
+    /** @type {?string} */ this.fileDriveId = null;
     /** @type {?string} */ this.accessToken = null;
+    /** @type {?string} */ this.apiEndpoint = null;
 };
 SaveLoadOnedrive.CLIENT_ID = "3f9462f2-10c5-4686-a3ba-8eb21ea94ab9";
-SaveLoadOnedrive.SCOPES = ["Files.ReadWrite"];
-SaveLoadOnedrive.prototype.reset = function () {
-    this.fileId = null;
-};
+SaveLoadOnedrive.SCOPES = ["files.readwrite", "offline_access"];
 SaveLoadOnedrive.prototype.isFileOpen = function () {
-    return this.fileId !== null;
+    return this.fileParentId !== null;
+};
+SaveLoadOnedrive.prototype.reset = function () {
+    this.fileName = null;
+    this.fileParentId = null;
+    this.fileDriveId = null;
 };
 SaveLoadOnedrive.prototype.open = function (callback, fail) {
     cps(
@@ -256,8 +261,7 @@ SaveLoadOnedrive.prototype.open = function (callback, fail) {
                 "action": "download",
                 "multiSelect": false,
                 "advanced": {
-                    "filter": ".json",
-                    "scopes": SaveLoadOnedrive.SCOPES,
+                    "queryParameters": "select=id,name,parentReference"
                 },
                 "success": proceed,
                 "cancel": fail,
@@ -266,10 +270,15 @@ SaveLoadOnedrive.prototype.open = function (callback, fail) {
         },
         (proceed, response) => {
             this.accessToken = response["accessToken"];
-            if (response && response["value"] && response["value"].length > 0) {
-                this.file = response["value"][0];
+            this.apiEndPoint = response["apiEndpoint"];
 
-                let url = this.file["@microsoft.graph.downloadUrl"];
+            if (response && response["value"] && response["value"].length > 0) {
+                let file = response["value"][0];
+                this.fileName = file["name"];
+                this.fileParentId = file["parentReference"]["id"];
+                this.fileDriveId = file["parentReference"]["driveId"]
+
+                let url = file["@microsoft.graph.downloadUrl"];
                 fetch(url).then(proceed, fail);
             }
             else {
@@ -287,64 +296,69 @@ SaveLoadOnedrive.prototype.saveAs = function (callback, fail, title, data) {
             window["OneDrive"]["save"]({
                 "clientId": SaveLoadOnedrive.CLIENT_ID,
                 "action": "query",
-                "advanced": {
-                    "queryParameters": "select=id,name,parentReference",
-                    "scopes": SaveLoadOnedrive.SCOPES,
-                },
+                "advanced": {},
                 "success": proceed,
                 "cancel": fail,
                 "error": fail,
             });
         },
         (proceed, response) => {
-            console.log(response);
             this.accessToken = response["accessToken"];
+            this.apiEndPoint = response["apiEndpoint"];
+
             if (response && response["value"] && response["value"].length > 0) {
                 let folder = response["value"][0];
+                "drives/" + folder["parentReference"]["driveId"]
                 let url = response["apiEndpoint"] + "drives/" +
                     folder["parentReference"]["driveId"] + "/items/" +
-                    folder["id"] + "/children/" +
-                    "abcd.json" + "/content"
+                    folder["id"] + ":/" + encodeURI(title) + ":/content";
 
                 fetch(url, {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/octet-stream",
-                        "Authorization": "Bearer" + this.accessToken,
+                    "method": "PUT",
+                    "headers": {
+                        "Authorization": "Bearer " + this.accessToken,
+                        "Content-Type": "application/json",
                     },
-                    body: data,
-                }).then(proceed, fail);
+                    "body": data,
+                }).then(response => {
+                    this.fileName = title;
+                    this.fileParentId = folder["id"];
+                    this.fileDriveId = folder["parentReference"]["driveId"]
+                    proceed(response);
+                }, fail);
             }
             else {
                 fail(response);
             }
         },
         (proceed, response) => {
-            console.log(response);
+            if (response.ok === false) {
+                return fail(response);
+            }
+            proceed(response);
         }
     )(callback);
 };
-SaveLoadOnedrive.prototype.doAuth = function (callback, fail) {
-    this.msalInstance.loginPopup({
-        scopes: SaveLoadOnedrive.SCOPES,
-    }).then(response => callback(response.accessToken), fail);
-};
-SaveLoadOnedrive.prototype.getToken = function (callback, fail) {
-    this.msalInstance.acquireTokenSilent({
-        scopes: SaveLoadOnedrive.SCOPES,
-    }).then(response => callback(response.accessToken), fail);
-};
+SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
+    assert(() => this.accessToken !== null);
+    assert(() => this.fileName !== null);
+    assert(() => this.fileDriveId !== null);
+    assert(() => this.fileParentId !== null);
 
-var generateGraphUrl = function (driveItem, targetParentFolder, itemRelativeApiPath) {
-    var url = "https://graph.microsoft.com/v1.0/";
-    if (targetParentFolder) {
-        url += "drives/" + driveItem.parentReference.driveId + "/items/" + driveItem.parentReference.id + "/children/" + driveItem.name;
-    } else {
-        url += "drives/" + driveItem.parentReference.driveId + "/items/" + driveItem.id;
-    }
+    let url = this.apiEndpoint + "drives/" + this.fileDriveId + "/items/" +
+        this.fileParentId + ":/" + encodeURI(this.fileName) + ":/content";
 
-    if (itemRelativeApiPath) {
-        url += itemRelativeApiPath;
-    }
-    return url;
-}
+    fetch(url, {
+        "method": "PUT",
+        "headers": {
+            "Authorization": "Bearer " + this.accessToken,
+            "Content-Type": "application/json",
+        },
+        "body": data,
+    }).then(response => {
+        if (response.ok === false) {
+            return fail(response);
+        }
+        callback(response);
+    }, fail);
+};
