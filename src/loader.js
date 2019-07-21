@@ -13,7 +13,7 @@ var Loader = function (parent) {
     /** @type {MilestoneMap} */ this.map;
     /** @type {Element} */ this.parent = parent;
     /** @type {Element} */ this.console;
-    /** @type {SaveLoad} */ this.saveLoad = new SaveLoadOnedrive();
+    /** @type {SaveLoad} */ this.saveLoad = new SaveLoad();
 
     this.newFile();
 };

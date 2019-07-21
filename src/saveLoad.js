@@ -16,6 +16,51 @@ let bindCPS = function (func1, func2) {
     }
 }
 
+var SaveLoad = function () {
+    /** @type {SaveLoadGoogle} */ this.googleSave = new SaveLoadGoogle();
+    /** @type {SaveLoadOnedrive} */ this.onedriveSave = new SaveLoadOnedrive();
+    /** @type {SaveLoadDownload} */ this.downloadSave = new SaveLoadDownload();
+
+    /** @type {?(SaveLoadGoogle|SaveLoadOnedrive|SaveLoadDownload)} */
+    this.currentSave = null;
+};
+SaveLoad.prototype.isFileOpen = function () {
+    return this.currentSave && this.currentSave.isFileOpen();
+};
+SaveLoad.prototype.reset = function () {
+    if (this.currentSave) {
+        this.currentSave.reset();
+        this.currentSave = null;
+    }
+};
+SaveLoad.prototype.open = function (callback, fail) {
+    this.reset();
+    let dialog = Draw.htmlElem("dialog", {
+        "class": "fileDialog",
+    }, document.body);
+    dialog.textContent = "Open File:"
+    dialog.showModal();
+
+    let cleanup = () => document.body.removeChild(dialog);
+
+    let button = Draw.htmlElem("button", {}, dialog);
+    button.textContent = "Save to Microsoft Onedrive";
+    button = Draw.htmlElem("button", {}, dialog);
+    button.textContent = "Save to Google Drive";
+    button = Draw.htmlElem("button", {}, dialog);
+    button.textContent = "Download File";
+};
+SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
+    this.fileName = title;
+    this.save(callback, fail, data);
+};
+SaveLoad.prototype.save = function (callback, _fail, data) {
+    assert(() => this.fileName !== null);
+    Util.download(this.fileName, data, "application/json", document.body);
+    callback()
+};
+
+
 /** @constructor
     @struct */
 var SaveLoadGoogle = function () {
@@ -254,90 +299,82 @@ SaveLoadOnedrive.prototype.reset = function () {
     this.fileDriveId = null;
 };
 SaveLoadOnedrive.prototype.open = function (callback, fail) {
-    cps(
-        (proceed) => {
-            window["OneDrive"]["open"]({
-                "clientId": SaveLoadOnedrive.CLIENT_ID,
-                "action": "download",
-                "multiSelect": false,
-                "advanced": {
-                    "queryParameters": "select=id,name,parentReference"
-                },
-                "success": proceed,
-                "cancel": fail,
-                "error": fail,
-            });
-        },
-        (proceed, response) => {
-            this.accessToken = response["accessToken"];
-            this.apiEndPoint = response["apiEndpoint"];
+    cps((proceed) => {
+        window["OneDrive"]["open"]({
+            "clientId": SaveLoadOnedrive.CLIENT_ID,
+            "action": "download",
+            "multiSelect": false,
+            "advanced": {
+                "queryParameters": "select=id,name,parentReference"
+            },
+            "success": proceed,
+            "cancel": fail,
+            "error": fail,
+        });
+    }, (proceed, response) => {
+        this.accessToken = response["accessToken"];
+        this.apiEndPoint = response["apiEndpoint"];
 
-            if (response && response["value"] && response["value"].length > 0) {
-                let file = response["value"][0];
-                this.fileName = file["name"];
-                this.fileParentId = file["parentReference"]["id"];
-                this.fileDriveId = file["parentReference"]["driveId"]
-
-                let url = file["@microsoft.graph.downloadUrl"];
-                fetch(url).then(proceed, fail);
-            }
-            else {
-                fail(response);
-            }
-        },
-        (proceed, response) => {
-            response.json().then(proceed, fail);
+        if (!response || !response["value"] || response["value"].length <= 0) {
+            return fail(response);
         }
-    )(callback);
+
+        let file = response["value"][0];
+        this.fileName = file["name"];
+        this.fileParentId = file["parentReference"]["id"];
+        this.fileDriveId = file["parentReference"]["driveId"]
+
+        let url = file["@microsoft.graph.downloadUrl"];
+        fetch(url).then(proceed, fail);
+
+    }, (proceed, response) => {
+        response.json().then(proceed, fail);
+    })(callback);
 };
 SaveLoadOnedrive.prototype.saveAs = function (callback, fail, title, data) {
-    cps(
-        (proceed) => {
-            window["OneDrive"]["save"]({
-                "clientId": SaveLoadOnedrive.CLIENT_ID,
-                "action": "query",
-                "advanced": {},
-                "success": proceed,
-                "cancel": fail,
-                "error": fail,
-            });
-        },
-        (proceed, response) => {
-            this.accessToken = response["accessToken"];
-            this.apiEndPoint = response["apiEndpoint"];
+    cps((proceed) => {
+        window["OneDrive"]["save"]({
+            "clientId": SaveLoadOnedrive.CLIENT_ID,
+            "action": "query",
+            "advanced": {},
+            "success": proceed,
+            "cancel": fail,
+            "error": fail,
+        });
+    }, (proceed, response) => {
+        this.accessToken = response["accessToken"];
+        this.apiEndPoint = response["apiEndpoint"];
 
-            if (response && response["value"] && response["value"].length > 0) {
-                let folder = response["value"][0];
-                "drives/" + folder["parentReference"]["driveId"]
-                let url = response["apiEndpoint"] + "drives/" +
-                    folder["parentReference"]["driveId"] + "/items/" +
-                    folder["id"] + ":/" + encodeURI(title) + ":/content";
-
-                fetch(url, {
-                    "method": "PUT",
-                    "headers": {
-                        "Authorization": "Bearer " + this.accessToken,
-                        "Content-Type": "application/json",
-                    },
-                    "body": data,
-                }).then(response => {
-                    this.fileName = title;
-                    this.fileParentId = folder["id"];
-                    this.fileDriveId = folder["parentReference"]["driveId"]
-                    proceed(response);
-                }, fail);
-            }
-            else {
-                fail(response);
-            }
-        },
-        (proceed, response) => {
-            if (response.ok === false) {
-                return fail(response);
-            }
-            proceed(response);
+        if (!response || !response["value"] || response["value"].length <= 0) {
+            return fail(response);
         }
-    )(callback);
+
+        let folder = response["value"][0];
+        "drives/" + folder["parentReference"]["driveId"]
+        let url = response["apiEndpoint"] + "drives/" +
+            folder["parentReference"]["driveId"] + "/items/" +
+            folder["id"] + ":/" + encodeURI(title) + ":/content";
+
+        fetch(url, {
+            "method": "PUT",
+            "headers": {
+                "Authorization": "Bearer " + this.accessToken,
+                "Content-Type": "application/json",
+            },
+            "body": data,
+        }).then(response => {
+            this.fileName = title;
+            this.fileParentId = folder["id"];
+            this.fileDriveId = folder["parentReference"]["driveId"]
+            proceed(response);
+        }, fail);
+
+    }, (proceed, response) => {
+        if (response.ok === false) {
+            return fail(response);
+        }
+        proceed(response);
+    })(callback);
 };
 SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
     assert(() => this.accessToken !== null);
@@ -361,4 +398,33 @@ SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
         }
         callback(response);
     }, fail);
+};
+
+var SaveLoadDownload = function () {
+    /** @type {?string} */ this.fileName = null;
+};
+SaveLoadDownload.prototype.isFileOpen = function () {
+    return this.fileName !== null;
+};
+SaveLoadDownload.prototype.reset = function () {
+    this.fileName = null;
+};
+SaveLoadDownload.prototype.open = function (callback, fail) {
+    Util.upload(document.body, (string) => {
+        try {
+            callback(JSON.parse(string));
+        }
+        catch (err) {
+            fail(err);
+        }
+    }, ".json");
+};
+SaveLoadDownload.prototype.saveAs = function (callback, fail, title, data) {
+    this.fileName = title;
+    this.save(callback, fail, data);
+};
+SaveLoadDownload.prototype.save = function (callback, _fail, data) {
+    assert(() => this.fileName !== null);
+    Util.download(this.fileName, data, "application/json", document.body);
+    callback()
 };
