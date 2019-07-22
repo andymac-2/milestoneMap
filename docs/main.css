@@ -12,17 +12,33 @@ body {
     position: fixed;
     float: right;
     bottom: 0;
-    right: 0;
-
-    border: 1px solid #888;
+    right: 0; 
     background-color: rgba(244, 244, 244, 0.8);
+    font-size: small;  
+}
+/* Download dialog */
+.fileDialog{
+    border: 2px solid #888;
+    background-color: rgba(248, 248, 248, 0.95);
+    border-radius: 3px;
+    color: #444;
+    text-align: center;
+}
+.downloadDialogButton {
+    font-size: small;
+    display: block;
+    width: 100%;
+    background-color: hsl(180, 30%, 95%);
+}
+.console, .downloadDialogButton{
+    border: 1px solid #888;
     border-radius: 3px;
     padding: 2px;
     margin: 2px;
 
     color: #444;
-    font-size: small;   
 }
+
 .menubar {
     position: fixed;
     left: 0;
@@ -76,12 +92,6 @@ milestoneMap.js draw function. */
 .dropdownSegmentDropdown {
     width: 90%;
     display: inline;
-}
-
-/* Download dialog */
-.downloadDialogButton {
-    display: block;
-    width: 100%;
 }
 
 /* milestone map total */

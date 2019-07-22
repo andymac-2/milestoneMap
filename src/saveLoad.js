@@ -33,10 +33,11 @@ SaveLoad.prototype.open = function (callback, fail) {
     let dialog = Draw.htmlElem("dialog", {
         "class": "fileDialog",
     }, document.body);
-    dialog.textContent = "Open File:"
-    dialog.showModal();
-
     let cleanup = () => document.body.removeChild(dialog);
+
+    let heading = Draw.htmlElem("div", {}, dialog);
+    heading.textContent = "Open File:";
+    Draw.htmlElem("hr", {}, dialog);
 
     let button = Draw.htmlElem("button", {
         "class": "downloadDialogButton",
@@ -76,20 +77,24 @@ SaveLoad.prototype.open = function (callback, fail) {
         cleanup();
         fail();
     });
+
+    dialog.showModal();
 };
 SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
     let dialog = Draw.htmlElem("dialog", {
         "class": "fileDialog",
     }, document.body);
-    dialog.textContent = "Save File:"
-    dialog.showModal();
-
     let cleanup = () => document.body.removeChild(dialog);
+
+    let heading = Draw.htmlElem("div", {}, dialog);
+    heading.textContent = "Save File As:";
+    Draw.htmlElem("hr", {}, dialog);
 
     let fileName = Draw.htmlElem("input", {
         "type": "text",
         "value": title,
     }, dialog);
+    Draw.htmlElem("hr", {}, dialog);
 
     let button = Draw.htmlElem("button", {
         "class": "downloadDialogButton",
@@ -129,6 +134,8 @@ SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
         cleanup();
         fail();
     });
+
+    dialog.showModal();
 };
 SaveLoad.prototype.save = function (callback, fail, data) {
     assert(() => this.currentSave !== null);
