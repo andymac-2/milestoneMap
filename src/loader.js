@@ -18,26 +18,6 @@ var Loader = function (parent) {
     this.newFile();
 };
 
-Loader.prototype.save = function () {
-    var string = JSON.stringify(this.map.save(), null, "\t");
-    this.console.textContent = "Saving..."
-    this.saveLoad.save((fileResource) => {
-        if (fileResource) {
-            this.console.textContent = "Saved as: " + fileResource["name"];
-        }
-        else {
-            this.console.textContent = "Error saving file"
-        }
-    }, this.map.name, string);
-    // Util.download (this.map.name + ".json", string, "application/json",
-    //                this.elem);
-};
-Loader.prototype.download = function () {
-    var string = JSON.stringify(this.map.save(), null, "\t");
-    Util.download(this.map.name + ".json", string, "application/json",
-        this.elem);
-};
-
 Loader.prototype.restore = function (obj) {
     this.map = new MilestoneMap(obj);
 };
@@ -60,24 +40,20 @@ Loader.prototype.draw = function () {
         mouseover: () => this.console.textContent = "New file"
     }, {
         icon: "icons/open.svg",
-        action: this.loadFile.bind(this),
+        action: this.open.bind(this),
         mouseover: () => this.console.textContent = "Open file from Google Drive"
     }, {
         icon: "icons/save.svg",
         action: this.save.bind(this),
-        mouseover: () => this.console.textContent = "Save file to google drive"
+        mouseover: () => this.console.textContent = "Save file"
     }, {
-        icon: "icons/download.svg",
-        action: this.download.bind(this),
-        mouseover: () => this.console.textContent = "Download file"
-    }, {
-        icon: "icons/upload.svg",
-        action: this.uploadFile.bind(this),
-        mouseover: () => this.console.textContent = "Upload file"
+        icon: "icons/save-as.svg",
+        action: this.saveAs.bind(this),
+        mouseover: () => this.console.textContent = "Save file as"
     }, {
         icon: "icons/exportCSV.svg",
         action: this.exportCSV.bind(this),
-        mouseover: () => this.console.textContent = "Download snapshot as CSV"
+        mouseover: () => this.console.textContent = "Export snapshot as CSV"
     }, {
         icon: "icons/import.svg",
         action: this.importCSVReport.bind(this),
@@ -232,7 +208,36 @@ Loader.prototype.newFile = function () {
     this.draw();
 };
 
-Loader.prototype.loadFile = function () {
+Loader.prototype.save = function () {
+    var string = JSON.stringify(this.map.save(), null, "\t");
+    this.console.textContent = "Saving..."
+
+    let success = name => this.console.textContent = "Saved as: " + name;
+    let failure = error => {
+        this.console.textContent = "Error saving file"
+        console.error(error);
+    };
+
+    if (this.saveLoad.isFileOpen()) {
+        this.saveLoad.save(success, failure, string);
+    }
+    else {
+        this.saveLoad.saveAs(success, failure, this.map.name + ".json", string);
+    }
+};
+Loader.prototype.saveAs = function () {
+    var string = JSON.stringify(this.map.save(), null, "\t");
+    this.console.textContent = "Saving..."
+
+    let success = name => this.console.textContent = "Saved as: " + name;
+    let failure = error => {
+        this.console.textContent = "Error saving file"
+        console.error(error);
+    };
+
+    this.saveLoad.saveAs(success, failure, this.map.name + ".json", string);
+};
+Loader.prototype.open = function () {
     var restoreDraw = (obj) => {
         try {
             this.restore(obj);
@@ -243,20 +248,10 @@ Loader.prototype.loadFile = function () {
             throw e;
         }
     };
-    this.saveLoad.open(restoreDraw);
-};
-Loader.prototype.uploadFile = function () {
-    var restoreDraw = (string) => {
-        try {
-            this.restore(JSON.parse(string));
-            this.draw();
-        }
-        catch (e) {
-            alert("Error: Invalid file.");
-            throw e;
-        }
-    };
-    Util.upload(this.elem, restoreDraw, ".json");
+    this.saveLoad.open(restoreDraw, (err) => {
+        this.console.textContent = "Error opening file"
+        console.error(err);
+    });
 };
 Loader.prototype.importCSVReport = function () {
     var restoreDraw = (string) => {
