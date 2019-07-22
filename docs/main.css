@@ -18,11 +18,18 @@ body {
 }
 /* Download dialog */
 .fileDialog{
+    display: block;
+    width: 20em;
+    margin: auto;
+    margin-top: 10%;
+
     border: 2px solid #888;
     background-color: rgba(248, 248, 248, 0.95);
     border-radius: 3px;
     color: #444;
     text-align: center;
+
+    padding: 1em;
 }
 .downloadDialogButton {
     font-size: small;
@@ -156,12 +163,6 @@ value in milestomeMap.js */
 }
 .svgCommentBox {
     display: block;
-}
-
-/* general */
-.transparent {
-    stroke: none;
-    fill: rgba(0, 0, 0, 1);
 }
 
 /* date headers */
@@ -384,4 +385,28 @@ value in milestomeMap.js */
 
 .noFill {
     fill: none;
+}
+
+/* general */
+.transparent {
+    stroke: none;
+    fill: rgba(0, 0, 0, 1);
+}
+
+/* general */
+.transparent {
+    stroke: none;
+    fill: rgba(0, 0, 0, 1);
+}
+
+.modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.1);
 }
