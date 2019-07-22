@@ -78,6 +78,12 @@ milestoneMap.js draw function. */
     display: inline;
 }
 
+/* Download dialog */
+.downloadDialogButton {
+    display: block;
+    width: 100%;
+}
+
 /* milestone map total */
 .mMapScrollBox {
     overflow-y: auto;

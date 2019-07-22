@@ -1,12 +1,5 @@
 'use strict'
 
-class FileError extends Error {
-    constructor(msg) {
-        super("Error saving/loading file: " + msg);
-        this.name = "NotYetLoadedError"
-    }
-}
-
 let cps = function (...array) {
     return array.reduceRight((func2, func1) => bindCPS(func1, func2))
 }
@@ -16,6 +9,8 @@ let bindCPS = function (func1, func2) {
     }
 }
 
+/** @constructor
+    @struct */
 var SaveLoad = function () {
     /** @type {SaveLoadGoogle} */ this.googleSave = new SaveLoadGoogle();
     /** @type {SaveLoadOnedrive} */ this.onedriveSave = new SaveLoadOnedrive();
@@ -43,21 +38,101 @@ SaveLoad.prototype.open = function (callback, fail) {
 
     let cleanup = () => document.body.removeChild(dialog);
 
-    let button = Draw.htmlElem("button", {}, dialog);
-    button.textContent = "Save to Microsoft Onedrive";
-    button = Draw.htmlElem("button", {}, dialog);
-    button.textContent = "Save to Google Drive";
-    button = Draw.htmlElem("button", {}, dialog);
-    button.textContent = "Download File";
+    let button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Open from Microsoft Onedrive";
+    button.addEventListener("click", () => {
+        this.currentSave = this.onedriveSave;
+        cleanup();
+        this.currentSave.open(callback, fail);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Open from Google Drive";
+    button.addEventListener("click", () => {
+        this.currentSave = this.googleSave;
+        cleanup();
+        this.currentSave.open(callback, fail);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Upload File";
+    button.addEventListener("click", () => {
+        this.currentSave = this.downloadSave;
+        cleanup();
+        this.currentSave.open(callback, fail);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Cancel";
+    button.addEventListener("click", () => {
+        cleanup();
+        fail();
+    });
 };
 SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
-    this.fileName = title;
-    this.save(callback, fail, data);
+    let dialog = Draw.htmlElem("dialog", {
+        "class": "fileDialog",
+    }, document.body);
+    dialog.textContent = "Save File:"
+    dialog.showModal();
+
+    let cleanup = () => document.body.removeChild(dialog);
+
+    let fileName = Draw.htmlElem("input", {
+        "type": "text",
+        "value": title,
+    }, dialog);
+
+    let button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Save to Microsoft Onedrive";
+    button.addEventListener("click", () => {
+        this.currentSave = this.onedriveSave;
+        cleanup();
+        this.currentSave.saveAs(callback, fail, fileName.value, data);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Save to Google Drive";
+    button.addEventListener("click", () => {
+        this.currentSave = this.googleSave;
+        cleanup();
+        this.currentSave.saveAs(callback, fail, fileName.value, data);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Download File";
+    button.addEventListener("click", () => {
+        this.currentSave = this.downloadSave;
+        cleanup();
+        this.currentSave.saveAs(callback, fail, fileName.value, data);
+    });
+
+    button = Draw.htmlElem("button", {
+        "class": "downloadDialogButton",
+    }, dialog);
+    button.textContent = "Cancel";
+    button.addEventListener("click", () => {
+        cleanup();
+        fail();
+    });
 };
-SaveLoad.prototype.save = function (callback, _fail, data) {
-    assert(() => this.fileName !== null);
-    Util.download(this.fileName, data, "application/json", document.body);
-    callback()
+SaveLoad.prototype.save = function (callback, fail, data) {
+    assert(() => this.currentSave !== null);
+    this.currentSave.save(callback, fail, data);
 };
 
 
@@ -192,6 +267,7 @@ SaveLoadGoogle.prototype.openFileWithPickerResponse = function (callback, fail, 
     const RESPONSE_ACTION = window["google"]["picker"]["Response"]["ACTION"];
     const RESPONSE_DOCUMENTS = window["google"]["picker"]["Response"]["DOCUMENTS"];
     const ACTION_PICKED = window["google"]["picker"]["Action"]["PICKED"];
+    const ACTION_CANCEL = window["google"]["picker"]["Action"]["CANCEL"];
     const DOCUMENT_ID = window["google"]["picker"]["Document"]["ID"];
 
     if (pickerResponse[RESPONSE_ACTION] == ACTION_PICKED) {
@@ -205,8 +281,8 @@ SaveLoadGoogle.prototype.openFileWithPickerResponse = function (callback, fail, 
             callback(file);
         });
     }
-    else {
-        fail();
+    else if (pickerResponse[RESPONSE_ACTION] == ACTION_CANCEL) {
+        fail(pickerResponse);
     }
 }
 SaveLoadGoogle.prototype.newFileWithTitle = function (callback, fail, title, data) {
@@ -281,6 +357,8 @@ SaveLoadGoogle.prototype.saveFile = function (callback, fail, data) {
     });
 }
 
+/** @constructor
+    @struct */
 var SaveLoadOnedrive = function () {
     /** @type {?string} */ this.fileName = null;
     /** @type {?string} */ this.fileParentId = null;
@@ -313,7 +391,7 @@ SaveLoadOnedrive.prototype.open = function (callback, fail) {
         });
     }, (proceed, response) => {
         this.accessToken = response["accessToken"];
-        this.apiEndPoint = response["apiEndpoint"];
+        this.apiEndpoint = response["apiEndpoint"];
 
         if (!response || !response["value"] || response["value"].length <= 0) {
             return fail(response);
@@ -343,14 +421,13 @@ SaveLoadOnedrive.prototype.saveAs = function (callback, fail, title, data) {
         });
     }, (proceed, response) => {
         this.accessToken = response["accessToken"];
-        this.apiEndPoint = response["apiEndpoint"];
+        this.apiEndpoint = response["apiEndpoint"];
 
         if (!response || !response["value"] || response["value"].length <= 0) {
             return fail(response);
         }
 
         let folder = response["value"][0];
-        "drives/" + folder["parentReference"]["driveId"]
         let url = response["apiEndpoint"] + "drives/" +
             folder["parentReference"]["driveId"] + "/items/" +
             folder["id"] + ":/" + encodeURI(title) + ":/content";
@@ -373,7 +450,7 @@ SaveLoadOnedrive.prototype.saveAs = function (callback, fail, title, data) {
         if (response.ok === false) {
             return fail(response);
         }
-        proceed(response);
+        proceed(this.fileName);
     })(callback);
 };
 SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
@@ -381,9 +458,10 @@ SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
     assert(() => this.fileName !== null);
     assert(() => this.fileDriveId !== null);
     assert(() => this.fileParentId !== null);
+    assert(() => this.apiEndpoint !== null);
 
     let url = this.apiEndpoint + "drives/" + this.fileDriveId + "/items/" +
-        this.fileParentId + ":/" + encodeURI(this.fileName) + ":/content";
+        this.fileParentId + ":/" + encodeURI(this.fileName || "Untitled.json") + ":/content";
 
     fetch(url, {
         "method": "PUT",
@@ -396,10 +474,12 @@ SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
         if (response.ok === false) {
             return fail(response);
         }
-        callback(response);
+        callback(this.fileName);
     }, fail);
 };
 
+/** @constructor
+    @struct */
 var SaveLoadDownload = function () {
     /** @type {?string} */ this.fileName = null;
 };
@@ -426,5 +506,5 @@ SaveLoadDownload.prototype.saveAs = function (callback, fail, title, data) {
 SaveLoadDownload.prototype.save = function (callback, _fail, data) {
     assert(() => this.fileName !== null);
     Util.download(this.fileName, data, "application/json", document.body);
-    callback()
+    callback(this.fileName);
 };
