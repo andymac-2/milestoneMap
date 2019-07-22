@@ -30,10 +30,14 @@ SaveLoad.prototype.reset = function () {
 };
 SaveLoad.prototype.open = function (callback, fail) {
     this.reset();
-    let dialog = Draw.htmlElem("dialog", {
-        "class": "fileDialog",
+    let dialogBackground = Draw.htmlElem("div", {
+        "class": "modal",
     }, document.body);
-    let cleanup = () => document.body.removeChild(dialog);
+    let cleanup = () => document.body.removeChild(dialogBackground);
+
+    let dialog = Draw.htmlElem("div", {
+        "class": "fileDialog",
+    }, dialogBackground);
 
     let heading = Draw.htmlElem("div", {}, dialog);
     heading.textContent = "Open File:";
@@ -77,14 +81,16 @@ SaveLoad.prototype.open = function (callback, fail) {
         cleanup();
         fail();
     });
-
-    dialog.showModal();
 };
 SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
+    let dialogBackground = Draw.htmlElem("div", {
+        "class": "modal",
+    }, document.body);
+    let cleanup = () => document.body.removeChild(dialogBackground);
+
     let dialog = Draw.htmlElem("dialog", {
         "class": "fileDialog",
-    }, document.body);
-    let cleanup = () => document.body.removeChild(dialog);
+    }, dialogBackground);
 
     let heading = Draw.htmlElem("div", {}, dialog);
     heading.textContent = "Save File As:";
@@ -134,8 +140,6 @@ SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
         cleanup();
         fail();
     });
-
-    dialog.showModal();
 };
 SaveLoad.prototype.save = function (callback, fail, data) {
     assert(() => this.currentSave !== null);

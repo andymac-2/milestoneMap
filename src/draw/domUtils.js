@@ -21,7 +21,7 @@ Draw.activate = function (elem) {
 
 Draw.getElemXY = function (elem) {
     var matrix = elem["getCTM"]();
-    return {x: matrix["e"], y: matrix["f"]};
+    return { x: matrix["e"], y: matrix["f"] };
 };
 Draw.getElemHeight = function (elem) {
     return elem.getBoundingClientRect().height;
@@ -49,27 +49,27 @@ Draw.forceGetElementHeight = function (elem) {
 
 // an element drawn one way when clicked, and drawn another way when clicked elsewhere.
 Draw.activeOnClickElem = function (normal, active, unclicker, attrs, parent) {
-    var g = Draw.svgElem ("g", attrs, parent);   
-    return Draw.activeOrDeactive (g, normal, active, unclicker, parent);
+    var g = Draw.svgElem("g", attrs, parent);
+    return Draw.activeOrDeactive(g, normal, active, unclicker, parent);
 };
 
 Draw.activeOrDeactive = function (elem, normal, active, unclicker, parent) {
-    var onclick = function ()  {
-        active (elem);
-        parent.removeEventListener ("click", onclick);
+    var onclick = function () {
+        active(elem);
+        parent.removeEventListener("click", onclick);
         if (parent.contains(elem)) {
-            unclicker.onUnclickOnce (parent, onUnclick);
-        }
-    };
-    
-    var onUnclick = function () {
-        normal (elem);
-        if (parent.contains(elem)) {
-            parent.addEventListener ("click", onclick);
+            unclicker.onUnclickOnce(parent, onUnclick);
         }
     };
 
-    onUnclick ();
+    var onUnclick = function () {
+        normal(elem);
+        if (parent.contains(elem)) {
+            parent.addEventListener("click", onclick);
+        }
+    };
+
+    onUnclick();
     return elem;
 };
 
@@ -77,9 +77,9 @@ Draw.activeOrDeactive = function (elem, normal, active, unclicker, parent) {
 Draw.fixedXElement = function (xoffset, y, elem, parentElem) {
     var timer;
     var moveNow = function () {
-        elem.setAttribute ("transform", "translate(" +
-                           (xoffset + parentElem.scrollLeft) + " " +
-                           y + ")");
+        elem.setAttribute("transform", "translate(" +
+            (xoffset + parentElem.scrollLeft) + " " +
+            y + ")");
     };
     var move = function () {
         if (timer) {
@@ -88,10 +88,10 @@ Draw.fixedXElement = function (xoffset, y, elem, parentElem) {
         timer = setTimeout(moveNow, 100);
     };
     parentElem.addEventListener("scroll", move)
-    moveNow ();
+    moveNow();
 };
 
-Draw.getTextWidth = function (font, text) {  
+Draw.getTextWidth = function (font, text) {
     var ctx = Draw.getTextWidth.ctx;
     ctx.font = font;
     return ctx.measureText(text).width;
