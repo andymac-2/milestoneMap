@@ -9,7 +9,7 @@ var Project = function (obj, index, mMap) {
     /** @type {Programme} */ this.programme;
 
     // view
-    /** @type {Element} */ 
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "project"
     }, mMap.programmes[obj["programme"]].elem);
@@ -26,7 +26,7 @@ var Project = function (obj, index, mMap) {
 
     /** @type {Draw.vertResizableForeign} */ this.headingBox;
     /** @type {number} */ this.milestoneHeight = 0;
-    this.restore (obj);
+    this.restore(obj);
 };
 
 
@@ -37,23 +37,23 @@ var Project = function (obj, index, mMap) {
 /** @const {number} */ Project.MENUOFFSET = -20;
 // obj is a parsed JSON string, access members using obj["membername"]
 Project.prototype.restore = function (obj) {
-    runTAssert (() => typeof obj["name"] === "string");
-    runTAssert (() => !obj["comment"] || typeof obj["comment"] === "string");
-    runTAssert (() => Number.isInteger(obj["programme"]));
-    runTAssert (() => this.mMap.programmes[obj["programme"]]);
-    
+    runTAssert(() => typeof obj["name"] === "string");
+    runTAssert(() => !obj["comment"] || typeof obj["comment"] === "string");
+    runTAssert(() => Number.isInteger(obj["programme"]));
+    runTAssert(() => this.mMap.programmes[obj["programme"]]);
+
     this.name = obj["name"];
     this.comment = obj["comment"] || "";
 
     if (this.programme) {
         this.programme.removeProject(this);
     }
-    
+
     this.programme = this.mMap.programmes[obj["programme"]];
-    this.programme.addProject (this);
+    this.programme.addProject(this);
 };
 Project.prototype.save = function () {
-    assert (() => this.mMap.programmes[this.programme.index] === this.programme)
+    assert(() => this.mMap.programmes[this.programme.index] === this.programme)
     return {
         "name": this.name,
         "programme": this.programme.index,
@@ -64,7 +64,7 @@ Project.prototype.draw = function () {
     this.elem.innerHTML = "";
 
     //set y transform to this.height - Project.MILESTONEOFFSET later
-    this.container = Draw.svgElem ("g", { }, this.elem);
+    this.container = Draw.svgElem("g", {}, this.elem);
     Draw.svgElem("line", {
         "x1": 0,
         "y1": 0,
@@ -72,47 +72,56 @@ Project.prototype.draw = function () {
         "y2": 0,
         "class": "projectLine"
     }, this.container);
-    
+
     var milestoneData = this.flowMilestoneData();
-    this.milestones.forEach(milestone => this.container.appendChild(milestone.elem));
+    this.milestones.forEach(milestone => {
+        let elem = milestone.getPointer();
+        if (elem) {
+            this.container.appendChild(elem)
+        }
+    });
+    this.milestones.forEach(milestone =>
+        this.container.appendChild(milestone.elem));
     this.container.appendChild(milestoneData);
 
     // this group stops multiple click events on the parent elem occuring
-    var g = Draw.svgElem ("g", {
+    var g = Draw.svgElem("g", {
         "transform": "translate(" +
             Project.HEADINGMARGIN + " " +
             Project.HEADINGOFFSET + ")"
     }, this.container);
     this.drawHeadingBox(g);
-    
-    this.getHeight();
 
+    this.getHeight();
     this.container.setAttribute(
         "transform", "translate(0 " +
-            (this.height - Project.MILESTONEOFFSET) + ")");
-    
-    // var name = new Draw.svgTextInput (
-    //     this.name, Draw.ALIGNLEFT, this.mMap.unclicker,
-    //     this.modifyName.bind(this), {
-    //     }, g, "Untitled");
+        (this.height - Project.MILESTONEOFFSET) + ")");
 
-    this.menu = Draw.menu (Draw.ALIGNLEFT, this.mMap.unclicker, [{
-        "icon": "icons/move-down.svg",
-        "action": this.moveDown.bind(this)
-    },{
-        "icon": "icons/move-up.svg",
-        "action": this.moveUp.bind(this)
-    },{
-        "icon": "icons/delete.svg",
-        "action": this.deleteDraw.bind(this)
-    },{
-        "icon": "icons/plus.svg",
-        "action": this.newMilestone.bind(this)
-    }], {
-        "transform": "translate(0 " + (Project.MENUOFFSET - this.headingBox.height) + ")"
-    }, g);
+    this.menu = Draw.menu(Draw.ALIGNLEFT, this.mMap.unclicker, [
+        {
+            "icon": "icons/move-down.svg",
+            "action": this.moveDown.bind(this)
+        }, {
+            "icon": "icons/move-up.svg",
+            "action": this.moveUp.bind(this)
+        }, {
+            "icon": "icons/delete.svg",
+            "action": this.deleteDraw.bind(this)
+        }, {
+            "icon": "icons/plus.svg",
+            "action": this.newMilestone.bind(this)
+        }], {
+            "transform": "translate(0 " + (Project.MENUOFFSET - this.headingBox.height) + ")"
+        }, g);
 
     return this.elem;
+};
+Project.prototype.drawCollapsed = function (parent) {
+    let elem = Draw.svgElem("g", {
+        "class": "project"
+    }, parent);
+    this.milestones.forEach(milestone => milestone.drawCollapsed(elem));
+    return elem;
 };
 
 /** @this {Project|BusinessMs} */
@@ -126,28 +135,27 @@ Project.prototype.flowMilestoneData = function () {
         .filter(msAtReport => msAtReport && msAtReport.isDrawable());
 
     // sort descending
-    milestones.sort((a, b) => b.x - a.x);
+    milestones.sort((a, b) => b.getX() - a.getX());
     milestones.forEach(ms => {
-        var lEdge = ms.x;
-        
+        var lEdge = ms.getX();
+
         var width1 = ms.getLine1Width();
         var rEdge1 = lEdge + width1;
-        
+
         var width2 = ms.getLine2Width();
         var rEdge2 = lEdge + width2;
 
         // find the first layer with no collisions.
         for (var i = 0; i < spaces.length; i++) {
             if ((!spaces[i] || rEdge2 <= spaces[i]) &&
-                (!spaces [i + 1] || rEdge1 <= spaces [i + 1]))
-            {
+                (!spaces[i + 1] || rEdge1 <= spaces[i + 1])) {
                 break;
             }
         }
         // insert layer, if comment exists, add that too.
         spaces[i + 1] = lEdge;
         if (width2 !== 0) {
-            spaces [i] = lEdge;
+            spaces[i] = lEdge;
         }
 
         // add milestone to that layer. Create a new one if required
@@ -157,15 +165,15 @@ Project.prototype.flowMilestoneData = function () {
                     (-i * MilestoneTD.HEIGHT / 2) + ")"
             });
         }
-        layers[i].appendChild (ms.elemInfo);
-        ms.drawPointer (i);
+        layers[i].appendChild(ms.elemInfo);
+        ms.drawPointer(i);
     });
 
     // height dependent on how many layers.
     this.milestoneHeight = layers.length * MilestoneTD.HEIGHT / 2;
 
     // add layers from top to bottom.
-    var milestoneData = Draw.svgElem ("g", {
+    var milestoneData = Draw.svgElem("g", {
         "transform": "translate(0 " + (-Project.MILESTONEOFFSET) + ")"
     });
     for (var i = layers.length - 1; i >= 0; i--) {
@@ -183,27 +191,27 @@ Project.PARAGRAPHMARGIN = 4;
 Project.prototype.drawHeadingBox = function (parent) {
     var usableWidth = this.mMap.getSideBarWidth() -
         Project.HEADINGMARGIN;
-    this.headingBox = new Draw.vertResizableForeign (
+    this.headingBox = new Draw.vertResizableForeign(
         usableWidth, Project.PARAGRAPHMARGIN, {}, parent);
-    
-    new Draw.editableParagraph (this.name, {
+
+    new Draw.editableParagraph(this.name, {
         unclicker: this.mMap.unclicker,
         defaultText: "Untitled",
         onchange: this.modifyName.bind(this)
     }, {
-        "class": "projectHeader"
-    }, this.headingBox.container);
+            "class": "projectHeader"
+        }, this.headingBox.container);
 
-    new Draw.editableParagraph (this.comment, {
+    new Draw.editableParagraph(this.comment, {
         unclicker: this.mMap.unclicker,
         defaultText: "...",
         onchange: this.modifyComment.bind(this)
     }, {
-        "class": "headingComment"
-    }, this.headingBox.container);
-    
+            "class": "headingComment"
+        }, this.headingBox.container);
+
     this.headingBox.update();
-    this.headingBox.elem.addEventListener ("verticalResize", this.adjustHeight.bind(this));
+    this.headingBox.elem.addEventListener("verticalResize", this.adjustHeight.bind(this));
 };
 
 Project.prototype.adjustHeight = function () {
@@ -213,7 +221,7 @@ Project.prototype.adjustHeight = function () {
     if (this.menu) {
         this.menu.setAttribute(
             "transform", "translate(0 " +
-                (Project.MENUOFFSET - this.headingBox.height) + ")");
+            (Project.MENUOFFSET - this.headingBox.height) + ")");
     }
 
     if (oldHeight === this.height) {
@@ -221,7 +229,7 @@ Project.prototype.adjustHeight = function () {
     }
     this.container.setAttribute(
         "transform", "translate(0 " +
-            (this.height - Project.MILESTONEOFFSET) + ")");
+        (this.height - Project.MILESTONEOFFSET) + ")");
     this.reflowUp();
 };
 
@@ -247,7 +255,7 @@ Project.prototype.reflowMove = function () {
 
 //linking
 Project.prototype.addMilestone = function (milestone) {
-    this.milestones.push (milestone);
+    this.milestones.push(milestone);
 };
 
 Project.prototype.removeMilestone = function (milestone) {
@@ -265,15 +273,15 @@ Project.prototype.modifyComment = function (e, input) {
 };
 
 Project.prototype.deleteThis = function () {
-    this.programme.removeProject (this);
-    this.milestones.forEach (milestone => milestone.deleteThis());
-    this.mMap.removeProject (this);
+    this.programme.removeProject(this);
+    this.milestones.forEach(milestone => milestone.deleteThis());
+    this.mMap.removeProject(this);
 };
 Project.prototype.moveUpProgramme = function () {
     assert(() => this.programme.projects.indexOf(this) === 0);
     assert(() => Util.isSortedByIndex(this.programme.projects));
     var index = this.programme.index;
-    
+
     // already the first programme
     if (index <= 0) {
         return;
@@ -301,10 +309,10 @@ Project.prototype.moveUpProgramme = function () {
 
 Project.prototype.moveDownProgramme = function () {
     assert(() => this.programme.projects.indexOf(this) ===
-           this.programme.projects.length - 1);
+        this.programme.projects.length - 1);
     assert(() => Util.isSortedByIndex(this.programme.projects));
     var index = this.programme.index;
-    
+
     // already the last programme
     if (index >= this.mMap.programmes.length - 1) {
         return;
@@ -358,7 +366,7 @@ Project.prototype.newMilestone = function () {
 
 
 Project.prototype.moveUp = function () {
-    assert (() => this.programme.projects.indexOf(this) >= 0);
+    assert(() => this.programme.projects.indexOf(this) >= 0);
     var index = this.programme.projects.indexOf(this);
 
     // already the first element
@@ -379,7 +387,7 @@ Project.prototype.moveUp = function () {
 };
 
 Project.prototype.moveDown = function () {
-    assert (() => this.programme.projects.indexOf(this) >= 0);
+    assert(() => this.programme.projects.indexOf(this) >= 0);
     var index = this.programme.projects.indexOf(this);
 
     // already the first element

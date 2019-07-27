@@ -33,7 +33,7 @@ debug : dist/main.css dist/index.html dist/icons
 		--js_output_file dist/bundle.js\
 		--create_source_map dist/bundle.js.map\
 		--output_wrapper '%output% //# sourceMappingURL=bundle.js.map'\
-		-W VERBOSE\
+		--warning_level VERBOSE\
 		--debug\
 		--use_types_for_optimization\
 		$(files)
@@ -47,7 +47,7 @@ dist/bundle.js : $(files) dist
 		--js_output_file dist/bundle.js\
 		--isolation_mode IIFE\
 		--assume_function_wrapper\
-		-W VERBOSE\
+		--warning_level VERBOSE\
 		--use_types_for_optimization\
 		$(files)
 dist/main.css : src/main.css dist

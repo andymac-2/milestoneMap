@@ -6,9 +6,10 @@ var Programme = function (obj, index, mMap) {
     // state
     /** @type {string} */ this.name;
     /** @type {string} */ this.comment;
+    /** @type {boolean} */ this.isCollapsed;
 
     // view
-    /** @type {Element} */ 
+    /** @type {Element} */
     this.elem = Draw.svgElem("g", {
         "class": "programme"
     });
@@ -19,55 +20,81 @@ var Programme = function (obj, index, mMap) {
     /** @type {number} */ this.height = Programme.HEADERHEIGHT;
     /** @type {Array<Project>} */ this.projects = [];
     /** @type {number} */ this.yOffset = 0;
-    
+
     /** @type {Draw.vertResizableForeign} */ this.headingBox;
 
-    this.restore (obj);
+    this.restore(obj);
 };
 /** @const {number} */ Programme.HEADERHEIGHT = 45;
+/** @const {number} */ Programme.COLLAPSEDHEIGHT = 60;
 
 Programme.prototype.restore = function (obj) {
-    runTAssert (() => typeof obj["name"] === "string");
-    runTAssert (() => !obj["comment"] || typeof obj["comment"] === "string");
-    
+    runTAssert(() => typeof obj["name"] === "string");
+    runTAssert(() => !obj["comment"] || typeof obj["comment"] === "string");
+    runTAssert(() => !obj["isCollapsed"] || typeof obj["isCollapsed"] === "boolean");
+
     this.name = obj["name"];
     this.comment = obj["comment"] || "";
+    this.isCollapsed = obj["isCollapsed"] || false;
 };
 Programme.prototype.save = function () {
     return {
         "name": this.name,
-        "comment": this.comment
+        "comment": this.comment,
+        "isCollapsed": this.isCollapsed
     };
 };
 
+Programme.COLLAPSEDMILESTONEOFFSET = 40;
 // depends on projects already being drawn correctly
 Programme.prototype.draw = function () {
     this.elem.innerHTML = "";
 
     // this group stops multiple click events on the parent elem occuring
-    var g = Draw.svgElem ("g", {
+    var g = Draw.svgElem("g", {
         "transform": "translate(0 " + (Programme.HEADERHEIGHT - 5) + ")"
-    } , this.elem);
+    }, this.elem);
     this.drawHeadingBox(g);
 
-    Draw.menu (Draw.ALIGNRIGHT, this.mMap.unclicker, [{
-        "icon": "icons/move-down.svg",
-        "action": this.moveDown.bind(this)
-    },{
-        "icon": "icons/move-up.svg",
-        "action": this.moveUp.bind(this)
-    },{
-        "icon": "icons/delete.svg",
-        "action": this.deleteDraw.bind(this)
-    },{
-        "icon": "icons/plus.svg",
-        "action": this.newProject.bind(this)
-    }], {
-        "transform": "translate("+ this.mMap.width + " -30)"
-    }, g);
+    Draw.menu(Draw.ALIGNRIGHT, this.mMap.unclicker, [
+        {
+            "icon": "icons/move-down.svg",
+            "action": () => this.moveDown()
+        }, {
+            "icon": "icons/move-up.svg",
+            "action": () => this.moveUp()
+        }, {
+            "icon": "icons/delete.svg",
+            "action": () => this.deleteDraw()
+        }, {
+            "icon": "icons/plus.svg",
+            "action": () => this.newProject()
+        }, {
+            "icon": this.isCollapsed ? "icons/expand.svg" : "icons/collapse.svg",
+            "action": () => this.toggleCollapsed()
+        }], {
+            "transform": "translate(" + this.mMap.width + " -30)"
+        }, g);
 
-    this.projects.forEach(project => this.elem.appendChild (project.elem));
-    this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
+    if (this.isCollapsed) {
+        let milestones = Draw.svgElem("g", {
+            "transform": "translate(0 " + Programme.COLLAPSEDMILESTONEOFFSET + ")",
+        }, this.elem);
+        Draw.svgElem("line", {
+            "x1": 0,
+            "y1": 0,
+            "x2": this.mMap.width,
+            "y2": 0,
+            "class": "projectLine"
+        }, milestones);
+
+        this.projects.forEach(project => project.drawCollapsed(milestones));
+        this.height = Programme.COLLAPSEDHEIGHT;
+    }
+    else {
+        this.projects.forEach(project => this.elem.appendChild(project.elem));
+        this.height = Draw.verticalReflow(Programme.HEADERHEIGHT, this.projects);
+    }
 
     return this.elem;
 };
@@ -75,60 +102,90 @@ Programme.prototype.draw = function () {
 Programme.MENUWIDTH = 250;
 Programme.prototype.drawHeadingBox = function (parent) {
     // TODO: variable header height for extremely long titles or comments.
-    this.headingBox = new Draw.vertResizableForeign (
+    this.headingBox = new Draw.vertResizableForeign(
         this.mMap.width - Programme.MENUWIDTH, Project.PARAGRAPHMARGIN, {}, parent);
-    
-    new Draw.editableParagraph (this.name, {
-        unclicker: this.mMap.unclicker,
-        defaultText: "Untitled",
-        onchange: this.modifyName.bind(this)
-    }, {
-        "class": "programmeHeader"
-    }, this.headingBox.container);
 
-    new Draw.editableParagraph (this.comment, {
-        unclicker: this.mMap.unclicker,
-        defaultText: "...",
-        onchange: this.modifyComment.bind(this)
-    }, {
-        "class": "headingComment"
-    }, this.headingBox.container);
-    
+    new Draw.editableParagraph(this.name,
+        {
+            unclicker: this.mMap.unclicker,
+            defaultText: "Untitled",
+            onchange: this.modifyName.bind(this)
+        }, {
+            "class": "programmeHeader"
+        }, this.headingBox.container);
+
+    new Draw.editableParagraph(this.comment,
+        {
+            unclicker: this.mMap.unclicker,
+            defaultText: "...",
+            onchange: this.modifyComment.bind(this)
+        }, {
+            "class": "headingComment"
+        }, this.headingBox.container);
+
     this.headingBox.update();
 };
 
 Programme.prototype.reflow = function () {
-    this.height = Draw.verticalReflow (Programme.HEADERHEIGHT, this.projects);
+    this.height = Draw.verticalReflow(Programme.HEADERHEIGHT, this.projects);
     return this.elem;
 };
 
 Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) {
     var saveStartIndex = startIndex;
-    var printable = Draw.svgElem ("g", {
+    var printable = Draw.svgElem("g", {
         "class": "programme"
     });
     // TODO: variable header height for extremely long titles or comments.
-    var g = Draw.svgElem ("g", {
+    var g = Draw.svgElem("g", {
         "transform": "translate(0 " + (Programme.HEADERHEIGHT - 5) + ")"
     }, printable);
     this.drawHeadingBox(g);
 
+    // return early for collapsed programme.
+    if (this.isCollapsed) {
+        let milestones = Draw.svgElem("g", {
+            "transform": "translate(0 " + Programme.COLLAPSEDMILESTONEOFFSET + ")",
+        }, printable);
+        Draw.svgElem("line", {
+            "x1": 0,
+            "y1": 0,
+            "x2": this.mMap.width,
+            "y2": 0,
+            "class": "projectLine"
+        }, milestones);
+
+        this.projects.forEach(project => {
+            project.pageNo = pageNo;
+            project.drawCollapsed(milestones)
+        });
+
+        if (Programme.COLLAPSEDHEIGHT > spaceLeft) {
+            throw new Error("Not enough room on page for programme.");
+        }
+        return {
+            elem: printable,
+            spaceLeft: spaceLeft - Programme.COLLAPSEDHEIGHT,
+            index: this.projects.length
+        }
+    }
+
     var yOffset = Programme.HEADERHEIGHT;
     for (var projects = [];
-         startIndex < this.projects.length && yOffset < spaceLeft;
-         startIndex++)
-    {
+        startIndex < this.projects.length && yOffset < spaceLeft;
+        startIndex++) {
+
         var project = this.projects[startIndex];
         project.pageNo = pageNo;
         project.elem.setAttribute("transform", "translate(0, " + yOffset + ")");
         project.yOffset = yOffset + this.yOffset;
-        projects.push (project);
+        projects.push(project);
         yOffset += project.height;
     }
 
     // all fit
     if (yOffset < spaceLeft) {
-        projects.forEach(project => printable.appendChild (project.elem));
+        projects.forEach(project => printable.appendChild(project.elem));
         return {
             elem: printable,
             spaceLeft: spaceLeft - yOffset,
@@ -137,18 +194,18 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) 
     }
     // the header doesn't fit on an entire page
     else if (projects.length === 0 && first) {
-        throw new Error ("Not enough room on page for programme headers.");
+        throw new Error("Not enough room on page for programme headers.");
     }
     // the first project doesn't fit on an entire page
     else if (projects.length === 1 && first) {
-        throw new Error (
+        throw new Error(
             "Project: '" + projects[0].name +
-                "' is larger than a single page, and cannot be printed");
+            "' is larger than a single page, and cannot be printed");
     }
     // the first project doesn't fit, but we can put it on the next page
     else if (projects.length <= 1) {
         return {
-            elem: Draw.svgElem ("g", {}),
+            elem: Draw.svgElem("g", {}),
             spaceLeft: 0,
             index: saveStartIndex
         };
@@ -156,7 +213,7 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) 
     // some projects fit, but not all
     else {
         projects.pop();
-        projects.forEach(project => printable.appendChild (project.elem));
+        projects.forEach(project => printable.appendChild(project.elem));
         return {
             elem: printable,
             spaceLeft: 0,
@@ -167,10 +224,10 @@ Programme.prototype.drawPrint = function (spaceLeft, startIndex, first, pageNo) 
 
 // linking
 Programme.prototype.addProject = function (project) {
-    this.projects.push (project);
+    this.projects.push(project);
 };
 Programme.prototype.removeProject = function (project) {
-    this.projects = this.projects.filter (elem => elem !== project);
+    this.projects = this.projects.filter(elem => elem !== project);
 };
 
 // modifications
@@ -182,12 +239,17 @@ Programme.prototype.modifyComment = function (e, input) {
 };
 Programme.prototype.deleteThis = function () {
     this.projects.forEach(project => project.deleteThis());
-    this.mMap.removeProgramme (this);
+    this.mMap.removeProgramme(this);
 };
 
 // user events
+Programme.prototype.toggleCollapsed = function () {
+    this.isCollapsed = !this.isCollapsed;
+    this.draw();
+    this.mMap.reflow();
+};
 Programme.prototype.newProject = function () {
-    var project = this.mMap.addProject ({
+    var project = this.mMap.addProject({
         "name": "New Project",
         "programme": this.index
     });
@@ -198,7 +260,7 @@ Programme.prototype.newProject = function () {
 };
 
 Programme.prototype.moveUp = function () {
-    assert (() => this.mMap.programmes.indexOf(this) >= 0);
+    assert(() => this.mMap.programmes.indexOf(this) >= 0);
     var index = this.mMap.programmes.indexOf(this);
 
     // already the first element
@@ -212,7 +274,7 @@ Programme.prototype.moveUp = function () {
 };
 
 Programme.prototype.moveDown = function () {
-    assert (() => this.mMap.programmes.indexOf(this) >= 0);
+    assert(() => this.mMap.programmes.indexOf(this) >= 0);
     var index = this.mMap.programmes.indexOf(this);
 
     // already the last element
@@ -230,4 +292,4 @@ Programme.prototype.deleteDraw = function () {
     this.mMap.draw();
 };
 
-    
+

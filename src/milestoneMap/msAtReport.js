@@ -31,8 +31,6 @@ var MsAtReport = function (obj, index, mMap) {
     this.elemPointer = Draw.svgElem("g", {
         "class": "milestonePointer"
     });
-    /** @type {number} */  this.x;
-    /** @type {number} */  this.y;
 
     // used to prevent click event accumulation
     /** @type {Element} */ this.g;
@@ -90,38 +88,43 @@ MsAtReport.prototype.save = function () {
     };
 };
 
-
-
 // drawing methods
 MsAtReport.prototype.draw = function () {
     this.elem.innerHTML = "";
     this.elemPointer.innerHTML = "";
-
-    this.x = this.mMap.getXCoord(this.date);
-    this.elem.setAttribute("transform", "translate(" + this.x + " 0)");
+    this.elem.setAttribute("transform", "translate(" + this.getX() + " 0)");
 
     if (!this.isDrawable()) {
         return;
     }
 
     this.drawInfo();
-    this.elem.appendChild(this.elemPointer);
     if (this.isCurrent() && this.isBusinessMs() && this.isDrawable()) {
         this.elem.appendChild(this.elemLine);
     }
 
-
     var g = Draw.svgElem("g", {}, this.elem);
-
-    this.diamond = Draw.svgElem("path", {
+    this.diamond = this.drawDiamond(g);
+};
+MsAtReport.prototype.drawCollapsed = function (parent) {
+    let elem = Draw.svgElem("g", {
+        "class": "msAtReport",
+        "transform": "translate(" + this.getX() + " 0)"
+    }, parent);
+    this.drawDiamond(elem);
+    return elem;
+};
+MsAtReport.prototype.drawDiamond = function (parent) {
+    let diamond = Draw.svgElem("path", {
         "class": this.resolveStatusClass(),
         "d": "M -" + MsAtReport.DIAMONDSIZE + " 0" +
             "L 0 " + MsAtReport.DIAMONDSIZE +
             "L " + MsAtReport.DIAMONDSIZE + " 0" +
             "L 0 -" + MsAtReport.DIAMONDSIZE + " Z"
-    }, g);
-    this.diamond.addEventListener("click", this.diamondOnClick.bind(this));
-};
+    }, parent);
+    diamond.addEventListener("click", this.diamondOnClick.bind(this));
+    return diamond;
+}
 MsAtReport.prototype.drawLine = function () {
     this.elemLine.innerHTML = "";
     this.elemLineMain.innerHTML = "";
@@ -131,9 +134,10 @@ MsAtReport.prototype.drawLine = function () {
         "x2": 0, "y2": "100%"
     }, this.elemLine);
 
+    const x = this.getX();
     Draw.svgElem("line", {
-        "x1": this.x, "y1": 0,
-        "x2": this.x, "y2": "100%"
+        "x1": x, "y1": 0,
+        "x2": x, "y2": "100%"
     }, this.elemLineMain);
 
     return this.elemLine;
@@ -145,11 +149,11 @@ MsAtReport.prototype.drawInfo = function () {
     if (!this.isCurrent()) {
         return this.elemInfo;
     }
-    var g = Draw.svgElem("g", {
-        "transform": "translate(" + this.x + " 0)"
+    const g = Draw.svgElem("g", {
+        "transform": "translate(" + this.getX() + " 0)"
     }, this.elemInfo);
 
-    var nameDate = new MilestoneTD({
+    new MilestoneTD({
         unclicker: this.mMap.unclicker,
         onChange: this.modifyData.bind(this),
         parent: g,
@@ -176,14 +180,15 @@ MsAtReport.prototype.drawInfo = function () {
 
 MsAtReport.prototype.drawPointer = function (level) {
     this.elemPointer.innerHTML = "";
+    this.elemPointer.setAttribute("transform", "translate(" + this.getX() + " 0)");
     var height = Project.MILESTONEOFFSET -
         level * (MilestoneTD.HEIGHT / 2) -
         Project.MINHEIGHT - 20;;
-    var line = Draw.svgElem("line", {
+    Draw.svgElem("line", {
         "x1": "0", "y1": height,
         "x2": "0", "y2": 0
     }, this.elemPointer);
-    var circle = Draw.svgElem("circle", {
+    Draw.svgElem("circle", {
         "cx": "0", "cy": height,
         "r": "2"
     }, this.elemPointer);
@@ -255,20 +260,33 @@ MsAtReport.prototype.getLine2Width = function () {
     return width === 0 ? 0 : width + MsAtReport.INFOMARGIN;
 };
 
+MsAtReport.prototype.getX = function () {
+    return this.mMap.getXCoord(this.date);
+};
 MsAtReport.prototype.getXY = function () {
-    var project = this.milestone.project;
-    var y = project.programme.yOffset +
-        project.yOffset +
-        project.height - Project.MILESTONEOFFSET;
+    const project = this.milestone.project;
+    let y;
+    if (project.programme && project.programme.isCollapsed) {
+        y = project.programme.yOffset + Programme.COLLAPSEDMILESTONEOFFSET;
+    }
+    else {
+        y = project.programme.yOffset +
+            project.yOffset +
+            project.height - Project.MILESTONEOFFSET;
+    }
 
-    return { x: this.x, y: y }
+    return { x: this.getX(), y: y };
 };
 MsAtReport.prototype.getXYPrint = function () {
-    var project = this.milestone.project;
-    var y = project.yOffset +
-        project.height - Project.MILESTONEOFFSET;
-
-    return { x: this.x, y: y }
+    const project = this.milestone.project;
+    let y;
+    if (project.programme && project.programme.isCollapsed) {
+        y = project.programme.yOffset + Programme.COLLAPSEDMILESTONEOFFSET;
+    } else {
+        y = project.yOffset +
+            project.height - Project.MILESTONEOFFSET;
+    }
+    return { x: this.getX(), y: y };
 };
 
 MsAtReport.prototype.reflowUp = function () {

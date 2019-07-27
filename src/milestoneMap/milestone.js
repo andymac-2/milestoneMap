@@ -22,16 +22,16 @@ var Milestone = function (obj, index, mMap) {
     /** @type {MsAtReport|undefined} */ this.currReport;
     /** @type {MsAtReport|undefined} */ this.cmpReport;
 
-    this.restore (obj);
+    this.restore(obj);
 };
 
 Milestone.prototype.restore = function (obj) {
-    runTAssert (() => Number.isInteger(obj["project"]));
-    runTAssert (() => this.mMap.projects[obj["project"]] || obj["project"] < 0);
+    runTAssert(() => Number.isInteger(obj["project"]));
+    runTAssert(() => this.mMap.projects[obj["project"]] || obj["project"] < 0);
     this.name = obj["name"];
-    
+
     if (this.project) {
-        this.project.removeMilestone (this);
+        this.project.removeMilestone(this);
     }
 
     if (obj["project"] >= 0) {
@@ -40,7 +40,7 @@ Milestone.prototype.restore = function (obj) {
     else {// business milestone
         this.project = this.mMap.businessMs;
     }
-    this.project.addMilestone (this);
+    this.project.addMilestone(this);
 };
 Milestone.prototype.save = function () {
     return {
@@ -48,7 +48,7 @@ Milestone.prototype.save = function () {
         "project": this.project.index
     };
 };
-Milestone.prototype.exportCSVRow = function () {    
+Milestone.prototype.exportCSVRow = function () {
     var msAtReport = this.currentReport();
     var currReport = msAtReport ? Util.getISODateOnly(msAtReport.date) : null;
 
@@ -72,32 +72,49 @@ Milestone.prototype.draw = function () {
 
     if (current && comparison &&
         (this.mMap.currReport !== this.mMap.cmpReport)) {
-        Draw.bowedLine ({x: comparison.x, y: 0}, {x: current.x, y: 0},
-                        "thick evenDashed brightPink noFill", this.elem);
-        
-        // if (comparison.x < current.x) {
-        //     Draw.svgElem ("path", {
+        Draw.bowedLine({ x: comparison.getX(), y: 0 }, { x: current.getX(), y: 0 },
+            "thick evenDashed brightPink noFill", this.elem);
+
+        // uncomment for arrowheads
+        // if (comparison.getX() < current.getX()) {
+        //     Draw.svgElem("path", {
         //         "class": "compareArrow",
         //         "d": "M -6 -6 L -6 6 L 0 0 Z",
-        //         "transform": "translate("+
-        //             (current.x - MsAtReport.DIAMONDSIZE) + ", 0)"
+        //         "transform": "translate(" +
+        //             (current.getX() - MsAtReport.DIAMONDSIZE) + ", 0)"
         //     }, this.elem);
         // }
-        // else if (comparison.x > current.x) {
-        //     Draw.svgElem ("path", {
+        // else if (comparison.getX() > current.getX()) {
+        //     Draw.svgElem("path", {
         //         "class": "compareArrow",
         //         "d": "M 6 -6 L 6 6 L 0 0 Z",
-        //         "transform": "translate("+
-        //             (current.x + MsAtReport.DIAMONDSIZE) + ", 0)"
+        //         "transform": "translate(" +
+        //             (current.getX() + MsAtReport.DIAMONDSIZE) + ", 0)"
         //     }, this.elem);
         // }
     };
 
     if (comparison) {
-        this.elem.appendChild (comparison.elem);
+        this.elem.appendChild(comparison.elem);
     }
     if (current) {
-        this.elem.appendChild (current.elem);
+        this.elem.appendChild(current.elem);
+    }
+};
+// only draw the current milestone and no comparison line.
+Milestone.prototype.drawCollapsed = function (parent) {
+    let current = this.currentReport();
+    if (current) {
+        let elem = Draw.svgElem("g", {
+            "class": "milestone"
+        }, parent);
+        current.drawCollapsed(elem);
+    }
+};
+Milestone.prototype.getPointer = function () {
+    var current = this.currentReport();
+    if (current) {
+        return current.elemPointer;
     }
 };
 
@@ -110,7 +127,7 @@ Milestone.prototype.reflowUp = function () {
 
 // linking
 Milestone.prototype.addReport = function (report) {
-    assert (() => report instanceof MsAtReport);
+    assert(() => report instanceof MsAtReport);
     this.atReports.push(report);
 };
 Milestone.prototype.removeReport = function (msAtReport) {
@@ -125,9 +142,9 @@ Milestone.prototype.removeReport = function (msAtReport) {
 
 // modifications
 Milestone.prototype.deleteThis = function () {
-    this.project.removeMilestone (this);
+    this.project.removeMilestone(this);
     this.atReports.forEach(atReport => atReport.deleteThis());
-    this.mMap.removeMilestone (this);
+    this.mMap.removeMilestone(this);
 };
 
 
@@ -137,17 +154,15 @@ Milestone.prototype.hasReport = function (report) {
 };
 Milestone.prototype.currentReport = function () {
     if (this.currReport &&
-        this.currReport.report === this.mMap.currReport)
-    {
+        this.currReport.report === this.mMap.currReport) {
         return this.currReport;
     }
-    return this.currReport = this.hasReport (this.mMap.currReport);
+    return this.currReport = this.hasReport(this.mMap.currReport);
 };
 Milestone.prototype.comparisonReport = function () {
     if (this.cmpReport &&
-        this.cmpReport.report === this.mMap.cmpReport)
-    {
+        this.cmpReport.report === this.mMap.cmpReport) {
         return this.cmpReport;
     }
-    return this.cmpReport = this.hasReport (this.mMap.cmpReport);
+    return this.cmpReport = this.hasReport(this.mMap.cmpReport);
 };
