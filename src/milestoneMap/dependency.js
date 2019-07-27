@@ -84,14 +84,6 @@ Dependency.prototype.draw = function () {
     //start.x +=  MsAtReport.DIAMONDSIZE;
     var end = this.dependent.getXY();
 
-    // Draw.quadrupleAngledLine (
-    //     start, end, Dependency.HSPACE, Dependency.VSPACE, "dependencyLine",
-    //     this.elem);
-
-    // Draw.quadrupleAngledLine (
-    //     start, end, Dependency.HSPACE, Dependency.VSPACE, "thick transparentLine",
-    //     this.elem);
-
     this.drawLine(start, end, this.elem);
 };
 
@@ -163,7 +155,6 @@ Dependency.prototype.drawPrint = function (depLayers) {
     // TODO fix getXY code to work on pages
     var start = this.dependency.getXYPrint();
     var end = this.dependent.getXYPrint();
-    end.x -= MsAtReport.DIAMONDSIZE;
     var dependentPage = this.dependent.milestone.project.pageNo;
     var dependencyPage = this.dependency.milestone.project.pageNo;
 

@@ -1,4 +1,4 @@
-var VERSION = "1.4.1\u03B2";
+var VERSION = "1.5.0";
 
 window.onload = function () {
     var app = document.getElementById("app");
