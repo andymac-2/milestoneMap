@@ -19,6 +19,9 @@ var SaveLoad = function () {
     /** @type {?(SaveLoadGoogle|SaveLoadOnedrive|SaveLoadDownload)} */
     this.currentSave = null;
 };
+SaveLoad.prototype.isReady = function () {
+    return true;
+};
 SaveLoad.prototype.isFileOpen = function () {
     return this.currentSave && this.currentSave.isFileOpen();
 };
@@ -43,37 +46,30 @@ SaveLoad.prototype.open = function (callback, fail) {
     heading.textContent = "Open File:";
     Draw.htmlElem("hr", {}, dialog);
 
+    let loadButton = (saveLoad, text) => {
+        if (saveLoad.isReady()) {
+            let button = Draw.htmlElem("button", {
+                "class": "downloadDialogButton",
+            }, dialog);
+            button.textContent = text;
+            button.addEventListener("click", () => {
+                this.currentSave = saveLoad;
+                cleanup();
+                this.currentSave.open(callback, fail);
+            });
+        }
+        else {
+            let button = Draw.htmlElem("button", {
+                "class": "downloadDialogButtonInactive",
+            }, dialog);
+            button.textContent = text;
+        }
+    };
+    loadButton(this.onedriveSave, "Open from Microsoft Onedrive");
+    loadButton(this.googleSave, "Open from Google Drive");
+    loadButton(this.downloadSave, "Upload File");
+
     let button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Open from Microsoft Onedrive";
-    button.addEventListener("click", () => {
-        this.currentSave = this.onedriveSave;
-        cleanup();
-        this.currentSave.open(callback, fail);
-    });
-
-    button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Open from Google Drive";
-    button.addEventListener("click", () => {
-        this.currentSave = this.googleSave;
-        cleanup();
-        this.currentSave.open(callback, fail);
-    });
-
-    button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Upload File";
-    button.addEventListener("click", () => {
-        this.currentSave = this.downloadSave;
-        cleanup();
-        this.currentSave.open(callback, fail);
-    });
-
-    button = Draw.htmlElem("button", {
         "class": "downloadDialogButton",
     }, dialog);
     button.textContent = "Cancel";
@@ -102,37 +98,30 @@ SaveLoad.prototype.saveAs = function (callback, fail, title, data) {
     }, dialog);
     Draw.htmlElem("hr", {}, dialog);
 
+    let saveButton = (saveLoad, text) => {
+        if (saveLoad.isReady()) {
+            let button = Draw.htmlElem("button", {
+                "class": "downloadDialogButton",
+            }, dialog);
+            button.textContent = text;
+            button.addEventListener("click", () => {
+                this.currentSave = saveLoad;
+                cleanup();
+                this.currentSave.saveAs(callback, fail, fileName.value, data);
+            });
+        }
+        else {
+            let button = Draw.htmlElem("button", {
+                "class": "downloadDialogButtonInactive",
+            }, dialog);
+            button.textContent = text;
+        }
+    };
+    saveButton(this.onedriveSave, "Save to Microsoft Onedrive");
+    saveButton(this.googleSave, "Save to Google Drive");
+    saveButton(this.downloadSave, "Download File");
+
     let button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Save to Microsoft Onedrive";
-    button.addEventListener("click", () => {
-        this.currentSave = this.onedriveSave;
-        cleanup();
-        this.currentSave.saveAs(callback, fail, fileName.value, data);
-    });
-
-    button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Save to Google Drive";
-    button.addEventListener("click", () => {
-        this.currentSave = this.googleSave;
-        cleanup();
-        this.currentSave.saveAs(callback, fail, fileName.value, data);
-    });
-
-    button = Draw.htmlElem("button", {
-        "class": "downloadDialogButton",
-    }, dialog);
-    button.textContent = "Download File";
-    button.addEventListener("click", () => {
-        this.currentSave = this.downloadSave;
-        cleanup();
-        this.currentSave.saveAs(callback, fail, fileName.value, data);
-    });
-
-    button = Draw.htmlElem("button", {
         "class": "downloadDialogButton",
     }, dialog);
     button.textContent = "Cancel";
@@ -158,8 +147,13 @@ var SaveLoadGoogle = function () {
     /** @type {boolean} */ this.clientLoaded = false;
     /** @type {?string} */ this.fileId = null;
 
-    window["gapi"]["load"]('client:auth2:picker', () => this.initClient());
+    if (window["gapi"]) {
+        window["gapi"]["load"]('client:auth2:picker', () => this.initClient());
+    }
 };
+SaveLoadGoogle.prototype.isReady = function () {
+    return this.clientLoaded;
+}
 SaveLoadGoogle.prototype.isFileOpen = function () {
     return this.fileId !== null;
 };
@@ -379,6 +373,9 @@ var SaveLoadOnedrive = function () {
 };
 SaveLoadOnedrive.CLIENT_ID = "3f9462f2-10c5-4686-a3ba-8eb21ea94ab9";
 SaveLoadOnedrive.SCOPES = ["files.readwrite", "offline_access"];
+SaveLoadOnedrive.prototype.isReady = function () {
+    return window["OneDrive"] ? true : false;
+};
 SaveLoadOnedrive.prototype.isFileOpen = function () {
     return this.fileParentId !== null;
 };
@@ -493,6 +490,9 @@ SaveLoadOnedrive.prototype.save = function (callback, fail, data) {
     @struct */
 var SaveLoadDownload = function () {
     /** @type {?string} */ this.fileName = null;
+};
+SaveLoadDownload.prototype.isReady = function () {
+    return true;
 };
 SaveLoadDownload.prototype.isFileOpen = function () {
     return this.fileName !== null;
